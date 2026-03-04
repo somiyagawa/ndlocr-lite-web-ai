@@ -270,7 +270,7 @@ class OCRWorker {
       )
 
       // 各領域を事前クロップ（メインスレッドに Transferable で返す）
-      const croppedImages = textRegions.map(region => TextRecognizer.cropImageData(imageData, region))
+      const croppedImages = TextRecognizer.cropImageDataBatch(imageData, textRegions)
       const transferables = croppedImages.map(img => img.data.buffer)
 
       self.postMessage(

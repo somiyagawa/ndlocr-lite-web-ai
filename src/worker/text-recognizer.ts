@@ -105,6 +105,20 @@ export class TextRecognizer {
     return ctx.getImageData(0, 0, region.width, region.height)
   }
 
+  /** 複数領域を一括クロップ。sourceCanvas を1度だけ生成して使い回す（個別生成だと N × フルサイズ Canvas が同時に乗るためOOM） */
+  static cropImageDataBatch(imageData: ImageData, regions: TextRegion[]): ImageData[] {
+    const sourceCanvas = new OffscreenCanvas(imageData.width, imageData.height)
+    const sourceCtx = sourceCanvas.getContext('2d')!
+    sourceCtx.putImageData(imageData, 0, 0)
+
+    return regions.map(region => {
+      const canvas = new OffscreenCanvas(region.width, region.height)
+      const ctx = canvas.getContext('2d')!
+      ctx.drawImage(sourceCanvas, region.x, region.y, region.width, region.height, 0, 0, region.width, region.height)
+      return ctx.getImageData(0, 0, region.width, region.height)
+    })
+  }
+
   private preprocess(imageData: ImageData): OrtType.Tensor {
     const [, channels, height, width] = this.config.inputShape
     const imgWidth = imageData.width
