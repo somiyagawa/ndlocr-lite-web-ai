@@ -57,7 +57,15 @@ export class ReadingOrderProcessor {
     return this.processXYCut(validBlocks)
   }
 
-  /** DEIMモデルの text_block 出力を使って段割り→行ソートを行う */
+  /**
+   * DEIMモデルの text_block 出力を使って段割り→行ソートを行う
+   *
+   * 設計方針:
+   *   - 未割り当て行（text_block に収まらない行）を末尾追加せず「1行グループ」として扱い、
+   *     グループ bbox 全体に XY-Cut を実行して正しい位置に配置する
+   *   - text_block が段単位で正確なら XY-Cut の入力が整理されて精度向上
+   *   - text_block が不正確でも XY-Cut on all lines と同等に劣化するだけで悪化しない
+   */
   private processWithBlocks(lines: TextBlock[], blocks: PageBlock[]): TextBlock[] {
     // 1. 各行の中心点がどのブロック内に収まるか判定
     const assigned = new Map<number, TextBlock[]>()
@@ -82,27 +90,35 @@ export class ReadingOrderProcessor {
       return this.processXYCut(lines)
     }
 
-    // 3. 縦書き/横書き判定（割り当て済み行の過半数で判定）
-    const isVert = allAssigned.filter(b => b.width < b.height).length * 2 >= allAssigned.length
+    // 3. グループを生成
+    //    - text_block 割り当て済みグループ: bbox = グループ内全行の外接矩形
+    //    - 未割り当て行: 各行を独立した 1 行グループとして扱う（末尾追加しない）
+    type Group = { lines: TextBlock[]; bbox: number[] }
+    const groups: Group[] = []
 
-    // 4. ブロックを読み順にソート（縦書き: 右→左、横書き: 上→下）
-    const sortedBlockIndices = [...assigned.keys()].sort((a, b) => {
-      const ba = blocks[a], bb = blocks[b]
-      const cax = ba.x + ba.width / 2, cay = ba.y + ba.height / 2
-      const cbx = bb.x + bb.width / 2, cby = bb.y + bb.height / 2
-      return isVert ? cbx - cax : cay - cby
-    })
-
-    // 5. 各ブロック内の行を XY-Cut で整序（ブロックが複数列を含む場合も正しく処理）
-    const result: TextBlock[] = []
-    for (const idx of sortedBlockIndices) {
-      const blockLines = assigned.get(idx)!
-      result.push(...(blockLines.length > 1 ? this.processXYCut(blockLines) : blockLines))
+    for (const groupLines of assigned.values()) {
+      const x0 = Math.min(...groupLines.map(l => l.x))
+      const y0 = Math.min(...groupLines.map(l => l.y))
+      const x1 = Math.max(...groupLines.map(l => l.x + l.width))
+      const y1 = Math.max(...groupLines.map(l => l.y + l.height))
+      groups.push({ lines: groupLines, bbox: [x0, y0, x1, y1] })
+    }
+    for (const line of unassigned) {
+      groups.push({ lines: [line], bbox: [line.x, line.y, line.x + line.width, line.y + line.height] })
     }
 
-    // 6. 未割り当て行を XY-Cut で処理して末尾に追加
-    if (unassigned.length > 0) {
-      result.push(...(unassigned.length > 1 ? this.processXYCut(unassigned) : unassigned))
+    // 4. グループ bbox に XY-Cut を実行してグループ間の読み順を決定
+    const groupRanks = this.getXYCutRanks(groups.map(g => g.bbox))
+
+    // 5. グループを読み順にソート
+    const sortedGroups = groups
+      .map((g, i) => ({ ...g, rank: groupRanks[i] }))
+      .sort((a, b) => a.rank - b.rank)
+
+    // 6. 各グループ内の行を XY-Cut で整序
+    const result: TextBlock[] = []
+    for (const group of sortedGroups) {
+      result.push(...(group.lines.length > 1 ? this.processXYCut(group.lines) : group.lines))
     }
 
     return result.map((b, i) => ({ ...b, readingOrder: i + 1 }))
@@ -110,24 +126,26 @@ export class ReadingOrderProcessor {
 
   /** XY-Cut アルゴリズムによる読み順推定（フォールバック） */
   private processXYCut(validBlocks: TextBlock[]): TextBlock[] {
-    // ブロック bbox を [x0, y0, x1, y1] 配列に変換
     const rawBboxes = validBlocks.map(b => [b.x, b.y, b.x + b.width, b.y + b.height])
+    const ranks = this.getXYCutRanks(rawBboxes)
+    const result = validBlocks.map((block, i) => ({ ...block, readingOrder: ranks[i] + 1 }))
+    result.sort((a, b) => a.readingOrder - b.readingOrder)
+    return result
+  }
 
-    // 1. 正規化 → 2. メッシュテーブル → 3. XY-Cut → 4. ブロック割り当て → 5. ソート → 6. ランク取得
+  /** XY-Cut を rawBboxes に対して実行しランク配列を返すヘルパー */
+  private getXYCutRanks(rawBboxes: number[][]): number[] {
+    if (rawBboxes.length === 0) return []
+    if (rawBboxes.length === 1) return [0]
     const { normBboxes, w, h } = this.normalizeBboxes(rawBboxes)
     const table = this.makeMeshTable(normBboxes, w, h)
     const root = makeNode(0, 0, w, h)
     this.xyCut(table, root)
     this.assignBboxToNode(root, normBboxes)
     this.sortNodes(root, normBboxes)
-
-    const ranks = new Array(validBlocks.length).fill(-1)
+    const ranks = new Array(rawBboxes.length).fill(-1)
     this.getRanking(root, ranks, 0)
-
-    // ranks[i] = validBlocks[i] の読み順（0-indexed）
-    const result = validBlocks.map((block, i) => ({ ...block, readingOrder: ranks[i] + 1 }))
-    result.sort((a, b) => a.readingOrder - b.readingOrder)
-    return result
+    return ranks
   }
 
   // ---------------------------------------------------------------------------
