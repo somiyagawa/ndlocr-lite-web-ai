@@ -161,7 +161,7 @@ export class ReadingOrderProcessor {
     const hPage = yMax - yMin
     if (wPage === 0 || hPage === 0) {
       // 全ブロックが同一座標: 正規化不能 → そのまま返す
-      const norm = bboxes.map(b => [0, 0, 1, 1])
+      const norm = bboxes.map(() => [0, 0, 1, 1])
       return { normBboxes: norm, w: 2, h: 2 }
     }
 
