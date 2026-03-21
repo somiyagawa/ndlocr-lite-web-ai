@@ -43,11 +43,23 @@ ndlocr-lite-web-ai/
 ├── src/
 │   ├── App.tsx               # メインアプリコンポーネント
 │   ├── main.tsx              # エントリポイント
+│   ├── ai/
+│   │   ├── direct-api.ts          # Direct APIコネクタ（Anthropic/OpenAI/Google/Groq）
+│   │   └── mcp-connector.ts       # MCP Serverコネクタ（Streamable HTTP）
 │   ├── components/
-│   │   ├── layout/SplitView.tsx   # リサイズ可能な左右分割パネル
-│   │   ├── editor/TextEditor.tsx  # 編集可能テキストエリア（monospace）
-│   │   ├── viewer/ImageViewer.tsx # 画像表示（ズーム/パン対応）
+│   │   ├── layout/
+│   │   │   ├── SplitView.tsx      # リサイズ可能な左右分割パネル
+│   │   │   ├── BottomToolbar.tsx  # ボトムバー（Upload + 処理時間表示）
+│   │   │   └── Header.tsx         # ヘッダー（バージョンバッジ + AI接続ステータス）
+│   │   ├── editor/
+│   │   │   ├── TextEditor.tsx     # 編集可能テキストエリア + AI校正ボタン
+│   │   │   └── DiffView.tsx       # 差分表示（accept/reject UI付き）
+│   │   ├── viewer/ImageViewer.tsx # 画像表示（ズーム/パン + ページ/サイズ情報）
+│   │   ├── settings/SettingsModal.tsx # AI接続設定 + キャッシュ管理
 │   │   └── ...                    # その他UIコンポーネント
+│   ├── hooks/useAISettings.ts     # AI設定管理hook
+│   ├── utils/crypto.ts            # APIキー暗号化（Web Crypto API）
+│   ├── types/ai.ts                # AI関連の型定義
 │   └── ...                   # OCR処理、hooks、utils等
 ├── docs/
 │   └── NDLOCR-Lite-Web-AI-開発計画書.md
@@ -78,8 +90,8 @@ ndlocr-lite-web-ai/
 - [x] Phase 1: フォーク＆セットアップ
 - [x] Phase 2: レイアウト改修（SplitView、TextEditor、ズーム/パン）
 - [x] Phase 3: AI接続機能（Direct API / MCP Server、設定パネル拡張）
-- [ ] Phase 4: AI校正機能 ← **現在ここ（UIモック準拠の改修中）**
-- [ ] Phase 5: 仕上げ・デプロイ
+- [x] Phase 4: AI校正機能（DiffView、個別accept/reject、ボトムツールバー）
+- [ ] Phase 5: 仕上げ・デプロイ ← **現在ここ**
 
 ## UI設計仕様
 
