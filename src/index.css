@@ -586,6 +586,26 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   pointer-events: none;
 }
 
+.region-selected-highlight {
+  position: absolute;
+  border: 3px solid #e65100;
+  background: rgba(230, 81, 0, 0.15);
+  pointer-events: none;
+  border-radius: 2px;
+}
+
+.region-action-bar {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.4rem 0;
+}
+
+.pending-viewer-buttons {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
 /* ===== RESULT PANEL ===== */
 .result-panel {
   background: var(--color-surface);

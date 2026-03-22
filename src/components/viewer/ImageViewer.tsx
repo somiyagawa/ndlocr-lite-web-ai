@@ -6,7 +6,8 @@ interface ImageViewerProps {
   textBlocks: TextBlock[]
   selectedBlock: TextBlock | null
   onBlockSelect: (block: TextBlock) => void
-  onRegionSelect?: (blocks: TextBlock[], bbox: BoundingBox) => void
+  onRegionSelect?: (bbox: BoundingBox) => void
+  selectedRegion?: BoundingBox | null
   pageBlocks?: PageBlock[]
   selectedPageBlock?: PageBlock | null
   onPageBlockSelect?: (block: PageBlock) => void
@@ -24,6 +25,7 @@ export function ImageViewer({
   selectedBlock,
   onBlockSelect,
   onRegionSelect,
+  selectedRegion,
   pageBlocks,
   selectedPageBlock,
   onPageBlockSelect,
@@ -126,13 +128,9 @@ export function ImageViewer({
       height: y2 - y1,
     }
 
-    const selected = textBlocks.filter((b) => {
-      return b.x < x2 && b.x + b.width > x1 && b.y < y2 && b.y + b.height > y1
-    })
-
     const MIN_DRAG = 15
     if (bbox.width >= MIN_DRAG && bbox.height >= MIN_DRAG) {
-      onRegionSelect(selected, bbox)
+      onRegionSelect(bbox)
     }
 
     setDragStart(null)
@@ -231,7 +229,7 @@ export function ImageViewer({
               />
             ))}
 
-            {/* マウスドラッグ選択範囲 */}
+            {/* マウスドラッグ中の選択範囲 */}
             {selectionRect && (
               <div
                 className="drag-selection"
@@ -240,6 +238,19 @@ export function ImageViewer({
                   top: selectionRect.top,
                   width: selectionRect.width,
                   height: selectionRect.height,
+                }}
+              />
+            )}
+
+            {/* 確定済み選択領域のハイライト */}
+            {selectedRegion && !selectionRect && (
+              <div
+                className="region-selected-highlight"
+                style={{
+                  left: selectedRegion.x * scaleX,
+                  top: selectedRegion.y * scaleY,
+                  width: selectedRegion.width * scaleX,
+                  height: selectedRegion.height * scaleY,
                 }}
               />
             )}

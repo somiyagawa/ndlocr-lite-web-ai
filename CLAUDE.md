@@ -54,7 +54,7 @@ ndlocr-lite-web-ai/
 │   │   ├── editor/
 │   │   │   ├── TextEditor.tsx     # 編集可能テキストエリア + AI校正ボタン
 │   │   │   └── DiffView.tsx       # 差分表示（accept/reject UI付き）
-│   │   ├── viewer/ImageViewer.tsx # 画像表示（ズーム/パン + ページ/サイズ情報）
+│   │   ├── viewer/ImageViewer.tsx # 画像表示（ズーム/スクロール + 領域選択 + ページ/サイズ情報）
 │   │   ├── settings/SettingsModal.tsx # AI接続設定 + キャッシュ管理
 │   │   └── ...                    # その他UIコンポーネント
 │   ├── hooks/useAISettings.ts     # AI設定管理hook
@@ -91,7 +91,7 @@ ndlocr-lite-web-ai/
 - [x] Phase 2: レイアウト改修（SplitView、TextEditor、ズーム/パン）
 - [x] Phase 3: AI接続機能（Direct API / MCP Server、設定パネル拡張）
 - [x] Phase 4: AI校正機能（DiffView、個別accept/reject、ボトムツールバー）
-- [ ] Phase 5: 仕上げ・デプロイ ← **現在ここ**
+- [x] Phase 5: 仕上げ・デプロイ（エラーハンドリング、レスポンシブ、デプロイ最適化）
 
 ## UI設計仕様
 
@@ -127,8 +127,9 @@ ndlocr-lite-web-ai/
 - 右: AI接続ステータスバッジ（connected=緑 / disconnected=灰）+ Settingsボタン
 
 **左パネル（ImageViewer）:**
-- 元画像の表示（ズーム/パン対応済み）
+- 元画像の表示（+/−ボタンとCtrl+ホイールでズーム、スクロールバーで移動）
 - OCR検出されたテキスト行の矩形をオーバーレイ（青枠、半透明）
+- 領域選択: マウスドラッグ → オレンジ枠ハイライト → 「選択領域のOCRを開始」ボタンで部分OCR
 - 画像下部にページ番号（page N/M）と画像サイズ表示
 
 **右パネル（TextEditor）:**
@@ -234,6 +235,8 @@ ndlocr-lite-web-ai/
       削除部分 → 赤背景 + 取り消し線
       追加部分 → 緑背景
   → 各差分箇所に accept(✓) / reject(✗) ボタン表示
+  → ctrl+z で判断を1つ前に戻す
+  → 「選択を適用」で個別判断を反映、または「全て適用」「全て却下」
   → ボトムバーに修正件数・処理時間を表示
 ```
 

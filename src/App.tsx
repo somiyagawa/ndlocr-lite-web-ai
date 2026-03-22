@@ -17,7 +17,6 @@ import { ImageViewer } from './components/viewer/ImageViewer'
 import { TextEditor } from './components/editor/TextEditor'
 import { HistoryPanel } from './components/results/HistoryPanel'
 import { SettingsModal } from './components/settings/SettingsModal'
-import { RegionOCRDialog } from './components/viewer/RegionOCRDialog'
 import { imageDataToDataUrl } from './utils/imageLoader'
 import './App.css'
 
@@ -65,6 +64,9 @@ export default function App() {
   const [isReadyToProcess, setIsReadyToProcess] = useState(false)
   const [pendingImageIndex, setPendingImageIndex] = useState(0)
 
+  // 領域選択状態
+  const [selectedRegion, setSelectedRegion] = useState<BoundingBox | null>(null)
+
   // pending 状態での ImageViewer 表示用（全解像度 DataUrl）
   const pendingDataUrls = useMemo(
     () => processedImages.map((img) => imageDataToDataUrl(img.imageData)),
@@ -73,11 +75,6 @@ export default function App() {
 
   // processedImages が差し替わったらインデックスをリセット
   useEffect(() => { setPendingImageIndex(0) }, [processedImages])
-  const [regionOCRDialog, setRegionOCRDialog] = useState<{
-    cropDataUrl: string
-    isProcessing: boolean
-    result: { textBlocks: TextBlock[]; fullText: string } | null
-  } | null>(null)
 
   const currentResult = sessionResults[selectedResultIndex] ?? null
 
@@ -144,12 +141,49 @@ export default function App() {
     }
   }, [processFiles])
 
-  // 「認識を開始」が押されたら OCR 実行
+  // 「OCRを開始」が押されたら OCR 実行（全体 or 領域）
   useEffect(() => {
     if (!isReadyToProcess || processedImages.length === 0 || isProcessing) return
 
     const runOCR = async () => {
       setIsProcessing(true)
+
+      // 領域選択がある場合 → その領域だけOCR
+      if (selectedRegion) {
+        const regionBbox = selectedRegion
+        // 結果表示中の場合は現在の画像、pending中は pendingDataUrls を使う
+        const srcDataUrl = currentResult
+          ? currentResult.imageDataUrl
+          : pendingDataUrls[pendingImageIndex] ?? ''
+        const fileName = currentResult
+          ? currentResult.fileName
+          : processedImages[pendingImageIndex]?.fileName ?? 'region'
+
+        try {
+          const { previewDataUrl, imageData } = await cropRegion(srcDataUrl, regionBbox)
+          const result = await processRegion(imageData)
+          const regionResult: OCRResult = {
+            id: `region-${Date.now()}`,
+            fileName: `${fileName} (region)`,
+            imageDataUrl: previewDataUrl,
+            textBlocks: result.textBlocks,
+            fullText: result.fullText,
+            processingTimeMs: 0,
+            createdAt: Date.now(),
+          }
+          setSessionResults((prev) => [...prev, regionResult])
+          setSelectedResultIndex((prev) => prev + 1 > 0 ? sessionResults.length : 0)
+        } catch (err) {
+          console.error('Region OCR failed:', err)
+        }
+
+        setSelectedRegion(null)
+        setIsProcessing(false)
+        setIsReadyToProcess(false)
+        return
+      }
+
+      // 全体OCR
       setSessionResults([])
       setSelectedResultIndex(0)
       resetState()
@@ -200,24 +234,24 @@ export default function App() {
     setSelectedResultIndex(0)
     setSelectedBlock(null)
     setSelectedPageBlock(null)
+    setSelectedRegion(null)
     resetState()
     setIsProcessing(false)
     setIsReadyToProcess(false)
     setPendingImageIndex(0)
   }
 
-  // 領域 OCR の共通ハンドラ（pending・result 両方から呼ぶ）
-  const handleRegionOCR = useCallback(async (blocks: TextBlock[], bbox: BoundingBox, srcDataUrl: string) => {
-    if (blocks.length > 0) setSelectedBlock(blocks[0])
-    const { previewDataUrl, imageData } = await cropRegion(srcDataUrl, bbox)
-    setRegionOCRDialog({ cropDataUrl: previewDataUrl, isProcessing: true, result: null })
-    try {
-      const result = await processRegion(imageData)
-      setRegionOCRDialog(prev => prev ? { ...prev, isProcessing: false, result } : null)
-    } catch {
-      setRegionOCRDialog(prev => prev ? { ...prev, isProcessing: false, result: { textBlocks: [], fullText: '' } } : null)
-    }
-  }, [processRegion])
+  // 領域選択ハンドラ（選択範囲を保持するだけ、即座にOCRしない）
+  const handleRegionSelect = useCallback((bbox: BoundingBox) => {
+    setSelectedRegion(bbox)
+    setSelectedBlock(null)
+    setSelectedPageBlock(null)
+  }, [])
+
+  // 領域選択をクリア
+  const handleClearRegion = useCallback(() => {
+    setSelectedRegion(null)
+  }, [])
 
   const handleHistorySelect = (run: DBRunEntry) => {
     const restoredResults: OCRResult[] = run.files.map((file, i) => ({
@@ -233,6 +267,7 @@ export default function App() {
     setSelectedResultIndex(0)
     setSelectedBlock(null)
     setSelectedPageBlock(null)
+    setSelectedRegion(null)
     setShowHistory(false)
   }
 
@@ -251,7 +286,7 @@ export default function App() {
     <div className="result-page-nav">
       <button
         className="btn-nav"
-        onClick={() => { setIndex((prev) => prev - 1); setSelectedBlock(null); setSelectedPageBlock(null) }}
+        onClick={() => { setIndex((prev) => prev - 1); setSelectedBlock(null); setSelectedPageBlock(null); setSelectedRegion(null) }}
         disabled={index === 0}
         title={lang === 'ja' ? '前のファイル' : 'Previous file'}
       >←</button>
@@ -262,6 +297,7 @@ export default function App() {
           setIndex(() => Number(e.target.value))
           setSelectedBlock(null)
           setSelectedPageBlock(null)
+          setSelectedRegion(null)
         }}
       >
         {processedImages.map((img, i) => {
@@ -275,7 +311,7 @@ export default function App() {
       </select>
       <button
         className="btn-nav"
-        onClick={() => { setIndex((prev) => prev + 1); setSelectedBlock(null); setSelectedPageBlock(null) }}
+        onClick={() => { setIndex((prev) => prev + 1); setSelectedBlock(null); setSelectedPageBlock(null); setSelectedRegion(null) }}
         disabled={index >= maxIndex}
         title={lang === 'ja' ? '次のファイル' : 'Next file'}
       >→</button>
@@ -328,7 +364,7 @@ export default function App() {
                   <button
                     key={i}
                     className={`result-sidebar-item ${i === pendingImageIndex ? 'active' : ''}`}
-                    onClick={() => setPendingImageIndex(i)}
+                    onClick={() => { setPendingImageIndex(i); setSelectedRegion(null) }}
                     title={img.pageIndex ? `${img.fileName} (p.${img.pageIndex})` : img.fileName}
                   >
                     <img src={img.thumbnailDataUrl} alt={img.fileName} />
@@ -346,22 +382,30 @@ export default function App() {
               }
 
               <div className="pending-viewer">
-                <button className="btn btn-primary btn-above-viewer" onClick={() => setIsReadyToProcess(true)}>
-                  {lang === 'ja' ? 'OCRを開始' : 'Start OCR'}
-                </button>
+                <div className="pending-viewer-buttons">
+                  <button className="btn btn-primary" onClick={() => setIsReadyToProcess(true)}>
+                    {selectedRegion
+                      ? (lang === 'ja' ? '選択領域のOCRを開始' : 'OCR Selected Region')
+                      : (lang === 'ja' ? 'OCRを開始' : 'Start OCR')}
+                  </button>
+                  {selectedRegion && (
+                    <button className="btn btn-secondary" onClick={handleClearRegion}>
+                      {lang === 'ja' ? '選択解除' : 'Clear Selection'}
+                    </button>
+                  )}
+                </div>
                 <ImageViewer
                   imageDataUrl={pendingDataUrls[pendingImageIndex] ?? ''}
                   textBlocks={[]}
                   selectedBlock={null}
                   onBlockSelect={() => {}}
-                  onRegionSelect={(blocks, bbox) =>
-                    handleRegionOCR(blocks, bbox, pendingDataUrls[pendingImageIndex] ?? '')
-                  }
+                  onRegionSelect={handleRegionSelect}
+                  selectedRegion={selectedRegion}
                 />
                 <p className="region-select-hint">
                   {lang === 'ja'
-                    ? 'マウスで領域をドラッグすると、その領域のみ認識をおこないます'
-                    : 'Drag to select a region and run OCR on that area only'}
+                    ? 'マウスで領域をドラッグして選択し、「OCRを開始」で認識できます'
+                    : 'Drag to select a region, then click "Start OCR" to recognize'}
                 </p>
               </div>
             </div>
@@ -410,7 +454,7 @@ export default function App() {
                     <button
                       key={i}
                       className={`result-sidebar-item ${result && i === selectedResultIndex ? 'active' : ''} ${isPending || isInProgress ? 'sidebar-pending' : ''}`}
-                      onClick={() => { if (result) { setSelectedResultIndex(i); setSelectedBlock(null) } }}
+                      onClick={() => { if (result) { setSelectedResultIndex(i); setSelectedBlock(null); setSelectedRegion(null) } }}
                       disabled={!result}
                       title={img.pageIndex ? `${img.fileName} (p.${img.pageIndex})` : img.fileName}
                     >
@@ -451,28 +495,37 @@ export default function App() {
                 left={
                   <div className="split-image-panel">
                     {currentResult && (
-                      <ImageViewer
-                        imageDataUrl={currentResult.imageDataUrl}
-                        textBlocks={currentResult.textBlocks}
-                        selectedBlock={selectedBlock}
-                        onBlockSelect={(block) => { setSelectedBlock(block); setSelectedPageBlock(null) }}
-                        onRegionSelect={(blocks, bbox) =>
-                          currentResult
-                            ? handleRegionOCR(blocks, bbox, currentResult.imageDataUrl)
-                            : undefined
-                        }
-                        pageBlocks={currentResult.pageBlocks}
-                        selectedPageBlock={selectedPageBlock}
-                        onPageBlockSelect={(block) => { setSelectedPageBlock(block); setSelectedBlock(null) }}
-                        pageIndex={selectedResultIndex}
-                        totalPages={processedImages.length}
-                      />
+                      <>
+                        <ImageViewer
+                          imageDataUrl={currentResult.imageDataUrl}
+                          textBlocks={currentResult.textBlocks}
+                          selectedBlock={selectedBlock}
+                          onBlockSelect={(block) => { setSelectedBlock(block); setSelectedPageBlock(null) }}
+                          onRegionSelect={handleRegionSelect}
+                          selectedRegion={selectedRegion}
+                          pageBlocks={currentResult.pageBlocks}
+                          selectedPageBlock={selectedPageBlock}
+                          onPageBlockSelect={(block) => { setSelectedPageBlock(block); setSelectedBlock(null) }}
+                          pageIndex={selectedResultIndex}
+                          totalPages={processedImages.length}
+                        />
+                        {selectedRegion && (
+                          <div className="region-action-bar">
+                            <button className="btn btn-primary btn-sm" onClick={() => setIsReadyToProcess(true)}>
+                              {lang === 'ja' ? '選択領域のOCRを開始' : 'OCR Selected Region'}
+                            </button>
+                            <button className="btn btn-secondary btn-sm" onClick={handleClearRegion}>
+                              {lang === 'ja' ? '選択解除' : 'Clear Selection'}
+                            </button>
+                          </div>
+                        )}
+                        <p className="region-select-hint">
+                          {lang === 'ja'
+                            ? 'マウスで領域をドラッグして選択し、「選択領域のOCRを開始」で再認識できます'
+                            : 'Drag to select a region, then click "OCR Selected Region" to re-recognize'}
+                        </p>
+                      </>
                     )}
-                    <p className="region-select-hint">
-                      {lang === 'ja'
-                        ? 'マウスで領域をドラッグすると、その領域のみ認識をおこないます（Alt+ドラッグでパン、ホイールでズーム）'
-                        : 'Drag to select a region for OCR (Alt+drag to pan, scroll to zoom)'}
-                    </p>
                   </div>
                 }
                 right={
@@ -519,15 +572,6 @@ export default function App() {
           onSwitchProvider={switchProvider}
           connectionStatus={aiConnectionStatus}
           onTestConnection={testAndConnect}
-        />
-      )}
-      {regionOCRDialog && (
-        <RegionOCRDialog
-          cropDataUrl={regionOCRDialog.cropDataUrl}
-          isProcessing={regionOCRDialog.isProcessing}
-          result={regionOCRDialog.result}
-          lang={lang}
-          onClose={() => setRegionOCRDialog(null)}
         />
       )}
     </div>
