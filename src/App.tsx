@@ -541,6 +541,7 @@ export default function App() {
                     selectedPageBlockText={selectedPageBlockText}
                     lang={lang}
                     aiConnector={getConnector()}
+                    aiConnectionStatus={aiConnectionStatus}
                     imageDataUrl={currentResult?.imageDataUrl}
                   />
                 }

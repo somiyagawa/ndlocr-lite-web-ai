@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import type { OCRResult, TextBlock } from '../../types/ocr'
 import type { AIConnector } from '../../types/ai'
+import type { AIConnectionStatus } from '../../hooks/useAISettings'
 import { downloadText, copyToClipboard } from '../../utils/textExport'
 import { DiffView } from './DiffView'
 
@@ -11,6 +12,7 @@ interface TextEditorProps {
   lang: 'ja' | 'en'
   onTextChange?: (text: string) => void
   aiConnector: AIConnector | null
+  aiConnectionStatus?: AIConnectionStatus
   imageDataUrl?: string
 }
 
@@ -27,6 +29,7 @@ export function TextEditor({
   lang,
   onTextChange,
   aiConnector,
+  aiConnectionStatus = 'disconnected',
   imageDataUrl,
 }: TextEditorProps) {
   const [editedText, setEditedText] = useState<string | null>(null)
@@ -81,6 +84,15 @@ export function TextEditor({
   // AI校正実行
   const handleProofread = useCallback(async () => {
     if (!aiConnector || !result) return
+
+    // AI未接続（接続テスト未実施）の場合、警告を表示
+    if (aiConnectionStatus !== 'connected') {
+      const msg = lang === 'ja'
+        ? 'AI接続が確認されていません。設定画面で接続テストを実行してください。続行しますか？'
+        : 'AI connection has not been verified. Please run a connection test in Settings. Continue anyway?'
+      if (!window.confirm(msg)) return
+    }
+
     const textToProofread = editedText ?? result.fullText
     setProofreadState({ status: 'loading' })
     try {
@@ -96,7 +108,7 @@ export function TextEditor({
         message: err instanceof Error ? err.message : String(err),
       })
     }
-  }, [aiConnector, result, editedText, imageDataUrl])
+  }, [aiConnector, aiConnectionStatus, lang, result, editedText, imageDataUrl])
 
   // 校正結果を全て適用
   const handleAcceptAll = useCallback(() => {
