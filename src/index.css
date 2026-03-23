@@ -1604,6 +1604,89 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   margin: 0;
 }
 
+/* ── AI Connect Help modal ── */
+.ai-help-intro {
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--color-text);
+  margin: 0 0 1.25rem 0;
+}
+.ai-help-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.ai-help-step {
+  padding: 0.65rem 0.85rem;
+  border-left: 3px solid var(--color-primary);
+  background: var(--color-primary-light);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+.ai-help-step-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--color-text);
+  margin-bottom: 0.2rem;
+}
+.ai-help-step-detail {
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--color-text-secondary);
+}
+.ai-help-providers {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+.ai-help-provider {
+  display: flex;
+  gap: 0.75rem;
+  align-items: baseline;
+  font-size: 0.85rem;
+}
+.ai-help-provider-name {
+  font-weight: 600;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+.ai-help-provider-desc {
+  color: var(--color-text-secondary);
+}
+.ai-help-notes {
+  margin-bottom: 1.25rem;
+}
+.ai-help-note {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--color-text-secondary);
+  margin: 0 0 0.3rem 0;
+  padding-left: 0.75rem;
+  border-left: 2px solid var(--color-border);
+}
+.ai-help-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  padding-top: 0.5rem;
+}
+/* AI status clickable when disconnected */
+button.ai-status-clickable {
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all var(--transition);
+}
+button.ai-status-clickable:hover {
+  filter: brightness(0.9);
+  box-shadow: var(--shadow-sm);
+}
+button.ai-status-clickable .ai-status-text {
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+}
+
 /* ===== FOOTER ===== */
 .footer {
   background:

@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react'
 import type { OCRResult, TextBlock, BoundingBox, PageBlock } from './types/ocr'
 import type { DBRunEntry } from './types/db'
 import { useI18n } from './hooks/useI18n'
@@ -16,12 +16,15 @@ import { DirectoryPicker } from './components/upload/DirectoryPicker'
 import { ProgressBar } from './components/progress/ProgressBar'
 import { ImageViewer } from './components/viewer/ImageViewer'
 import { TextEditor } from './components/editor/TextEditor'
-import { ImagePreprocessPanel } from './components/viewer/ImagePreprocessPanel'
-import { HistoryPanel } from './components/results/HistoryPanel'
-import { SettingsModal } from './components/settings/SettingsModal'
-import { HelpPage } from './components/help/HelpPage'
 import { imageDataToDataUrl } from './utils/imageLoader'
 import './App.css'
+
+// Lazy-loaded modals & heavy panels (not needed at initial render)
+const ImagePreprocessPanel = lazy(() => import('./components/viewer/ImagePreprocessPanel').then(m => ({ default: m.ImagePreprocessPanel })))
+const HistoryPanel = lazy(() => import('./components/results/HistoryPanel').then(m => ({ default: m.HistoryPanel })))
+const SettingsModal = lazy(() => import('./components/settings/SettingsModal').then(m => ({ default: m.SettingsModal })))
+const HelpPage = lazy(() => import('./components/help/HelpPage').then(m => ({ default: m.HelpPage })))
+const AIConnectHelp = lazy(() => import('./components/help/AIConnectHelp').then(m => ({ default: m.AIConnectHelp })))
 
 function cropRegion(srcDataUrl: string, bbox: BoundingBox) {
   return new Promise<{ previewDataUrl: string; imageData: ImageData }>((resolve) => {
@@ -66,6 +69,7 @@ export default function App() {
   const [showHistory, setShowHistory] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
+  const [showAIConnectHelp, setShowAIConnectHelp] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isReadyToProcess, setIsReadyToProcess] = useState(false)
   const [pendingImageIndex, setPendingImageIndex] = useState(0)
@@ -366,6 +370,7 @@ export default function App() {
         onOpenSettings={() => setShowSettings(true)}
         onOpenHistory={() => setShowHistory(true)}
         onOpenHelp={() => setShowHelp(true)}
+        onAIStatusClick={() => setShowAIConnectHelp(true)}
         onLogoClick={handleClear}
         aiConnectionStatus={aiConnectionStatus}
         theme={theme}
@@ -442,13 +447,15 @@ export default function App() {
                     </p>
                   </div>
                   {showPreprocessPanel && (
-                    <ImagePreprocessPanel
-                      lang={lang}
-                      imageDataUrl={pendingDataUrls[pendingImageIndex] ?? ''}
-                      onProcessed={(url) => handlePreprocessed(pendingImageIndex, url)}
-                      onReset={() => handlePreprocessReset(pendingImageIndex)}
-                      sidePanel
-                    />
+                    <Suspense fallback={null}>
+                      <ImagePreprocessPanel
+                        lang={lang}
+                        imageDataUrl={pendingDataUrls[pendingImageIndex] ?? ''}
+                        onProcessed={(url) => handlePreprocessed(pendingImageIndex, url)}
+                        onReset={() => handlePreprocessReset(pendingImageIndex)}
+                        sidePanel
+                      />
+                    </Suspense>
                   )}
                 </div>
               </div>
@@ -618,6 +625,13 @@ export default function App() {
         <HelpPage
           lang={lang}
           onClose={() => setShowHelp(false)}
+        />
+      )}
+      {showAIConnectHelp && (
+        <AIConnectHelp
+          lang={lang}
+          onClose={() => setShowAIConnectHelp(false)}
+          onOpenSettings={() => { setShowAIConnectHelp(false); setShowSettings(true) }}
         />
       )}
     </div>

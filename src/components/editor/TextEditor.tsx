@@ -590,30 +590,32 @@ export function TextEditor({
           <span className="text-editor-toolbar-sep" />
 
           <button
-            className="btn btn-icon btn-sm"
+            className="btn btn-sm btn-text-toggle"
             onClick={handleRemoveEmptyLines}
             title={lang === 'ja' ? '空行を削除' : 'Remove empty lines'}
             aria-label="Remove empty lines"
           >
-            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ marginRight: '2px' }}>
               <line x1="2" y1="3" x2="14" y2="3" />
               <line x1="5" y1="8" x2="11" y2="8" strokeDasharray="2 2" opacity="0.4" />
               <path d="M7 7l2 2M9 7l-2 2" strokeWidth="1.2" />
               <line x1="2" y1="13" x2="14" y2="13" />
             </svg>
+            {lang === 'ja' ? '空行削除' : 'Del blank'}
           </button>
 
           <button
-            className="btn btn-icon btn-sm"
+            className="btn btn-sm btn-text-toggle"
             onClick={handleJoinLines}
             title={lang === 'ja' ? '改行を削除して結合' : 'Join lines'}
             aria-label="Join lines"
           >
-            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ marginRight: '2px' }}>
               <line x1="2" y1="8" x2="14" y2="8" />
               <polyline points="5 5 2 8 5 11" fill="none" />
               <polyline points="11 5 14 8 11 11" fill="none" />
             </svg>
+            {lang === 'ja' ? '行結合' : 'Join'}
           </button>
 
           <button

@@ -16,6 +16,7 @@ interface HeaderProps {
   onOpenSettings: () => void
   onOpenHistory: () => void
   onOpenHelp: () => void
+  onAIStatusClick: () => void
   onLogoClick: () => void
   aiConnectionStatus?: AIConnectionStatus
   theme: Theme
@@ -28,6 +29,7 @@ export function Header({
   onOpenSettings,
   onOpenHistory,
   onOpenHelp,
+  onAIStatusClick,
   onLogoClick,
   aiConnectionStatus = 'disconnected',
   theme,
@@ -93,10 +95,21 @@ export function Header({
       <div className="header-actions">
         {/* AI Status + Settings Group */}
         <div className="header-actions-group">
-          <span className={statusClass} title={statusText}>
-            <span className="ai-status-dot" />
-            <span className="ai-status-text">{statusText}</span>
-          </span>
+          {aiConnectionStatus === 'disconnected' || aiConnectionStatus === 'error' ? (
+            <button
+              className={`${statusClass} ai-status-clickable`}
+              title={lang === 'ja' ? 'クリックしてAI接続方法を確認' : 'Click to learn how to connect AI'}
+              onClick={onAIStatusClick}
+            >
+              <span className="ai-status-dot" />
+              <span className="ai-status-text">{statusText}</span>
+            </button>
+          ) : (
+            <span className={statusClass} title={statusText}>
+              <span className="ai-status-dot" />
+              <span className="ai-status-text">{statusText}</span>
+            </span>
+          )}
           <button
             className="btn-icon"
             onClick={onOpenSettings}
