@@ -2,10 +2,9 @@ import type { Language } from '../../i18n'
 
 interface FooterProps {
   lang: Language
-  githubUrl?: string
 }
 
-export function Footer({ lang, githubUrl = 'https://github.com/ogwata/ndlocr-lite-web-ai' }: FooterProps) {
+export function Footer({ lang }: FooterProps) {
   return (
     <footer className="footer">
       <div className="footer-privacy">
@@ -67,23 +66,14 @@ export function Footer({ lang, githubUrl = 'https://github.com/ogwata/ndlocr-lit
           {lang === 'ja' ? '小形克宏（一般社団法人ビブリオスタイル）' : 'Katsuhiro Ogata (Bibliostyle)'}
         </div>
         <div className="footer-credit-line">
-          {lang === 'ja' ? 'Ultra機能（ダークモード、デザイン修正、画像補正・前処理）: ' : 'Ultra features (dark mode, design, image preprocessing): '}
+          {lang === 'ja' ? 'Ultra機能（ダークモード、UIデザイン改修、画像前処理、縦書き表示、多言語UI、エクスポート拡張、処理履歴等）: ' : 'Ultra features (dark mode, UI design, image preprocessing, vertical text, i18n, export, history, etc.): '}
           <a href="https://researchmap.jp/SoMiyagawa" target="_blank" rel="noopener noreferrer">
             {lang === 'ja' ? '宮川創' : 'So Miyagawa'}
           </a>
           {lang === 'ja' ? '（筑波大学）' : ' (University of Tsukuba)'}
         </div>
       </div>
-      <div className="footer-meta">
-        <a
-          href={githubUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="footer-github"
-        >
-          {lang === 'ja' ? 'GitHubリポジトリ' : 'GitHub Repository'} ↗
-        </a>
-      </div>
+      {/* GitHubリポジトリリンク削除済み */}
     </footer>
   )
 }
