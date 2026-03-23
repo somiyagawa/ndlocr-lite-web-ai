@@ -360,6 +360,36 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   transform: scale(1.02);
 }
 
+/* ── Language flag buttons ── */
+.lang-flags {
+  display: flex;
+  gap: 0.15rem;
+  align-items: center;
+}
+.lang-flag-btn {
+  background: none;
+  border: 2px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 0.15rem 0.2rem;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: all var(--transition);
+  filter: grayscale(0.6);
+}
+.lang-flag-btn:hover {
+  opacity: 0.85;
+  filter: grayscale(0);
+  transform: scale(1.15);
+}
+.lang-flag-btn.lang-flag-active {
+  opacity: 1;
+  filter: grayscale(0);
+  border-color: var(--color-primary);
+  background: var(--color-primary-light);
+}
+
 /* ===== BUTTONS ===== */
 .btn {
   display: inline-flex;
@@ -507,6 +537,25 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   gap: 1.25rem;
   padding: 2rem 0;
   animation: slide-up 0.5s ease;
+  /* 青い池（美瑛）背景 / Blue Pond (Biei) background */
+  background: linear-gradient(rgba(255,255,255,0.55), rgba(255,255,255,0.55)),
+              url('/bluepond.jpg') center / cover no-repeat;
+  border-radius: var(--radius-lg);
+  margin: 0.5rem;
+  position: relative;
+}
+[data-theme="dark"] .upload-section {
+  background: linear-gradient(rgba(20,24,30,0.6), rgba(20,24,30,0.6)),
+              url('/bluepond.jpg') center / cover no-repeat;
+}
+.bluepond-credit {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.75rem;
+  font-size: 0.65rem;
+  opacity: 0.55;
+  color: var(--color-text-secondary);
+  pointer-events: none;
 }
 
 .dropzone {

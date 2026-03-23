@@ -386,6 +386,11 @@ export default function App() {
                 {lang === 'ja' ? 'サンプルを試す' : 'Try Sample'}
               </button>
             </div>
+            <span className="bluepond-credit">
+              {lang === 'ja'
+                ? '背景写真: 美瑛・青い池 — MaedaAkihiko, CC BY-SA 4.0'
+                : 'Background: Blue Pond, Biei — MaedaAkihiko, CC BY-SA 4.0'}
+            </span>
           </section>
         )}
 

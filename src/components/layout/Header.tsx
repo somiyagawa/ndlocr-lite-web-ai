@@ -46,6 +46,14 @@ export function Header({
     help: { ja: '使い方ガイド', en: 'User Guide', 'zh-CN': '使用指南', 'zh-TW': '使用指南', ko: '사용 안내' },
   }
 
+  const FLAG_EMOJI: Record<string, string> = {
+    ja: '\u{1F1EF}\u{1F1F5}',      // 🇯🇵
+    en: '\u{1F1EC}\u{1F1E7}',      // 🇬🇧
+    'zh-CN': '\u{1F1E8}\u{1F1F3}', // 🇨🇳
+    'zh-TW': '\u{1F1F9}\u{1F1FC}', // 🇹🇼
+    ko: '\u{1F1F0}\u{1F1F7}',      // 🇰🇷
+  }
+
   const themeTitle = theme === 'dark'
     ? (THEME_LABELS.toLight[lang] ?? THEME_LABELS.toLight.en)
     : (THEME_LABELS.toDark[lang] ?? THEME_LABELS.toDark.en)
@@ -148,16 +156,21 @@ export function Header({
               <circle cx="12" cy="12" r="10" />
             </svg>
           </button>
-          <select
-            className="select-lang"
-            value={lang}
-            onChange={onToggleLanguage}
-            aria-label={THEME_LABELS.history[lang] ?? 'Language'}
-          >
+          <div className="lang-flags" role="radiogroup" aria-label="Language">
             {LANGUAGES.map(code => (
-              <option key={code} value={code}>{LANGUAGE_LABELS[code]}</option>
+              <button
+                key={code}
+                className={`lang-flag-btn${lang === code ? ' lang-flag-active' : ''}`}
+                onClick={() => onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)}
+                title={LANGUAGE_LABELS[code]}
+                aria-label={LANGUAGE_LABELS[code]}
+                role="radio"
+                aria-checked={lang === code}
+              >
+                {FLAG_EMOJI[code]}
+              </button>
             ))}
-          </select>
+          </div>
         </div>
       </div>
     </header>

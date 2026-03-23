@@ -1,4 +1,4 @@
-import type { Language } from '../../hooks/useI18n'
+import type { Language } from '../../i18n'
 
 interface HelpPageProps {
   lang: Language
