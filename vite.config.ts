@@ -15,6 +15,15 @@ export default defineConfig({
 
   build: {
     target: 'esnext',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'pdf': ['pdfjs-dist'],
+          'heic': ['heic2any'],
+          'diff': ['diff-match-patch'],
+        },
+      },
+    },
   },
 
   // Web WorkerをES moduleフォーマットで出力

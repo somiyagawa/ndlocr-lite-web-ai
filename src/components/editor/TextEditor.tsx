@@ -3,6 +3,8 @@ import type { OCRResult, TextBlock } from '../../types/ocr'
 import type { AIConnector } from '../../types/ai'
 import type { AIConnectionStatus } from '../../hooks/useAISettings'
 import { downloadText, copyToClipboard } from '../../utils/textExport'
+import { downloadTEI } from '../../utils/exportTEI'
+import { downloadHOCR } from '../../utils/exportHOCR'
 import { DiffView } from './DiffView'
 import type { Language } from '../../i18n'
 
@@ -58,9 +60,11 @@ export function TextEditor({
   const [undoStack, setUndoStack] = useState<UndoRedoEntry[]>([])
   const [redoStack, setRedoStack] = useState<UndoRedoEntry[]>([])
   const [saved, setSaved] = useState(true)
+  const [showExportMenu, setShowExportMenu] = useState(false)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const gutterRef = useRef<HTMLDivElement>(null)
+  const exportMenuRef = useRef<HTMLDivElement>(null)
 
   // editedText が null なら result.fullText を使う
   const displayText = editedText ?? result?.fullText ?? ''
@@ -86,6 +90,9 @@ export function TextEditor({
   const lineCount = useMemo(() => {
     return displayText.split('\n').length
   }, [displayText])
+
+  // Character count
+  const charCount = displayText.length
 
   const handleTextChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -136,7 +143,7 @@ export function TextEditor({
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [showSearchBar, displayText, undoStack, redoStack])
+  }, [showSearchBar, displayText, undoStack, redoStack]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // result が変わったら編集状態・校正状態をリセット
   const [prevResultId, setPrevResultId] = useState<string | null>(null)
@@ -247,6 +254,30 @@ export function TextEditor({
     setSaved(false)
   }
 
+  // Export menu: close on click outside
+  useEffect(() => {
+    if (!showExportMenu) return
+    const handleClickOutside = (e: MouseEvent) => {
+      if (exportMenuRef.current && !exportMenuRef.current.contains(e.target as Node)) {
+        setShowExportMenu(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [showExportMenu])
+
+  const handleExport = useCallback((format: 'txt' | 'tei' | 'hocr') => {
+    if (!result) return
+    setShowExportMenu(false)
+    if (format === 'txt') {
+      handleDownload()
+    } else if (format === 'tei') {
+      downloadTEI(result)
+    } else if (format === 'hocr') {
+      downloadHOCR(result)
+    }
+  }, [result]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // AI校正実行
   const handleProofread = useCallback(async () => {
     if (!aiConnector || !result) return
@@ -334,43 +365,48 @@ export function TextEditor({
 
   return (
     <div className="text-editor">
-      {/* ヘッダー: タイトル + ボタン群（AI校正 / Copy / DL） */}
+      {/* ── Row 1: Title bar with AI proofread ── */}
       <div className="text-editor-header">
         <div className="text-editor-header-left">
           <span className="text-editor-label">
-            OCR result
-            {!saved && <span className="text-editor-unsaved-indicator" title={lang === 'ja' ? '保存されていません' : 'Unsaved changes'} />}
+            {lang === 'ja' ? 'OCR結果' : 'OCR Result'}
+            {!saved && <span className="text-editor-unsaved-indicator" title={lang === 'ja' ? '未保存' : 'Unsaved'} />}
           </span>
           <span className="text-editor-stats">
             {result.textBlocks.length}
-            {lang === 'ja' ? ' 領域' : ' regions'}
+            {lang === 'ja' ? '領域' : ' regions'}
             {' · '}
             {(result.processingTimeMs / 1000).toFixed(1)}s
           </span>
         </div>
         <div className="text-editor-header-buttons">
           <button
-            className="btn btn-icon btn-sm"
-            onClick={() => setShowSearchBar(!showSearchBar)}
-            title={lang === 'ja' ? '検索と置換 (Ctrl+F)' : 'Find and Replace (Ctrl+F)'}
-            aria-label="Search"
+            className="btn btn-ai"
+            onClick={handleProofread}
+            disabled={!aiConnector || proofreadState.status === 'loading' || result.textBlocks.length === 0}
+            title={!aiConnector ? (lang === 'ja' ? '設定でAI接続を構成してください' : 'Configure AI connection in Settings') : ''}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <circle cx="6" cy="6" r="4" />
-              <path d="m10 10 4 4" />
-            </svg>
+            {proofreadState.status === 'loading' ? (
+              <>
+                <span className="btn-ai-spinner" />
+                {lang === 'ja' ? 'AI校正中...' : 'Proofreading...'}
+              </>
+            ) : (
+              <>
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <path d="M8 2l2 6h6l-5 3.5 2 6.5L8 14l-5 4 2-6.5L0 8h6z" />
+                </svg>
+                {lang === 'ja' ? 'AI校正' : 'AI Proofread'}
+              </>
+            )}
           </button>
-          <button
-            className="btn btn-icon btn-sm"
-            onClick={() => setShowLineNumbers(!showLineNumbers)}
-            title={lang === 'ja' ? '行番号' : 'Line numbers'}
-            aria-label="Toggle line numbers"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <text x="2" y="6" fontSize="8" fill="currentColor">1</text>
-              <text x="2" y="12" fontSize="8" fill="currentColor">2</text>
-            </svg>
-          </button>
+        </div>
+      </div>
+
+      {/* ── Row 2: Toolbar ── */}
+      <div className="text-editor-toolbar">
+        {/* Left: edit tools */}
+        <div className="text-editor-toolbar-group">
           <button
             className="btn btn-icon btn-sm"
             onClick={handleUndo}
@@ -378,8 +414,9 @@ export function TextEditor({
             title={lang === 'ja' ? '戻す (Ctrl+Z)' : 'Undo (Ctrl+Z)'}
             aria-label="Undo"
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M3 8a5 5 0 0 1 5-5h4m-4 0l2 2m-2-2l-2 2" />
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M4 7h6a3 3 0 0 1 0 6H8" />
+              <polyline points="7 4 4 7 7 10" fill="none" />
             </svg>
           </button>
           <button
@@ -389,28 +426,56 @@ export function TextEditor({
             title={lang === 'ja' ? 'やり直す (Ctrl+Shift+Z)' : 'Redo (Ctrl+Shift+Z)'}
             aria-label="Redo"
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M13 8a5 5 0 0 1-5-5H4m4 0l-2 2m2-2l2 2" />
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M12 7H6a3 3 0 0 0 0 6h2" />
+              <polyline points="9 4 12 7 9 10" fill="none" />
             </svg>
           </button>
+
+          <span className="text-editor-toolbar-sep" />
+
+          <button
+            className="btn btn-icon btn-sm"
+            onClick={() => setShowSearchBar(!showSearchBar)}
+            title={lang === 'ja' ? '検索と置換 (Ctrl+F)' : 'Find & Replace (Ctrl+F)'}
+            aria-label="Search"
+          >
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <circle cx="6.5" cy="6.5" r="4" />
+              <path d="m10 10 4 4" />
+            </svg>
+          </button>
+
+          <button
+            className={`btn btn-icon btn-sm${showLineNumbers ? ' btn-icon-active' : ''}`}
+            onClick={() => setShowLineNumbers(!showLineNumbers)}
+            title={lang === 'ja' ? '行番号' : 'Line numbers'}
+            aria-label="Toggle line numbers"
+          >
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <text x="1" y="6" fontSize="7" fill="currentColor" stroke="none" fontWeight="600">1</text>
+              <line x1="7" y1="4" x2="15" y2="4" />
+              <text x="1" y="13" fontSize="7" fill="currentColor" stroke="none" fontWeight="600">2</text>
+              <line x1="7" y1="11" x2="15" y2="11" />
+            </svg>
+          </button>
+
           <button
             className={`btn btn-icon btn-sm${isVertical ? ' btn-icon-active' : ''}`}
             onClick={() => setIsVertical(!isVertical)}
-            title={lang === 'ja' ? (isVertical ? '横書きに切替' : '縦書きに切替') : (isVertical ? 'Switch to horizontal' : 'Switch to vertical')}
+            title={lang === 'ja' ? (isVertical ? '横書きに切替' : '縦書きに切替') : (isVertical ? 'Horizontal' : 'Vertical')}
             aria-label="Toggle vertical text"
             aria-pressed={isVertical}
           >
             {isVertical ? (
-              /* Vertical text icon: 縦 */
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <line x1="11" y1="2" x2="11" y2="14" />
                 <line x1="8" y1="2" x2="8" y2="14" />
                 <line x1="5" y1="2" x2="5" y2="14" />
                 <polyline points="13 4 11 2 9 4" fill="none" />
               </svg>
             ) : (
-              /* Horizontal text icon: 横 */
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
                 <line x1="2" y1="5" x2="14" y2="5" />
                 <line x1="2" y1="8" x2="14" y2="8" />
                 <line x1="2" y1="11" x2="14" y2="11" />
@@ -418,35 +483,83 @@ export function TextEditor({
               </svg>
             )}
           </button>
+
+          <span className="text-editor-toolbar-sep" />
+
           <button
-            className="btn btn-primary btn-sm"
-            onClick={handleSave}
-            title={lang === 'ja' ? '保存 (Ctrl+S)' : 'Save (Ctrl+S)'}
+            className="btn btn-icon btn-sm"
+            onClick={handleRemoveEmptyLines}
+            title={lang === 'ja' ? '空行を削除' : 'Remove empty lines'}
+            aria-label="Remove empty lines"
           >
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ marginRight: '4px', display: 'inline' }}>
-              <path d="M2 2v12h12V4l-2-2H2z" />
-              <line x1="6" y1="7" x2="10" y2="7" />
-              <rect x="5" y="10" width="6" height="3" />
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <line x1="2" y1="3" x2="14" y2="3" />
+              <line x1="5" y1="8" x2="11" y2="8" strokeDasharray="2 2" opacity="0.4" />
+              <path d="M7 7l2 2M9 7l-2 2" strokeWidth="1.2" />
+              <line x1="2" y1="13" x2="14" y2="13" />
+            </svg>
+          </button>
+
+          <button
+            className="btn btn-icon btn-sm"
+            onClick={handleJoinLines}
+            title={lang === 'ja' ? '改行を削除して結合' : 'Join lines'}
+            aria-label="Join lines"
+          >
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <line x1="2" y1="8" x2="14" y2="8" />
+              <polyline points="5 5 2 8 5 11" fill="none" />
+              <polyline points="11 5 14 8 11 11" fill="none" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Right: output actions */}
+        <div className="text-editor-toolbar-group">
+          <button className="btn btn-secondary btn-sm" onClick={handleCopy}>
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ marginRight: '3px' }}>
+              <rect x="5" y="5" width="9" height="9" rx="1" />
+              <path d="M3 11V3a1 1 0 0 1 1-1h8" />
+            </svg>
+            {copied
+              ? (lang === 'ja' ? 'OK!' : 'OK!')
+              : (lang === 'ja' ? 'コピー' : 'Copy')}
+          </button>
+          <div className="export-dropdown-wrapper" ref={exportMenuRef}>
+            <button className="btn btn-secondary btn-sm" onClick={() => setShowExportMenu(!showExportMenu)}>
+              <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ marginRight: '3px' }}>
+                <path d="M8 2v9M4 8l4 4 4-4" />
+                <path d="M2 12v2h12v-2" />
+              </svg>
+              {lang === 'ja' ? 'DL' : 'DL'}
+              <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginLeft: '2px' }}>
+                <path d="M4 6l4 4 4-4" />
+              </svg>
+            </button>
+            {showExportMenu && (
+              <div className="export-dropdown-menu">
+                <button className="export-dropdown-item" onClick={() => handleExport('txt')}>
+                  <span className="export-dropdown-icon">TXT</span>
+                  <span>{lang === 'ja' ? 'プレーンテキスト (.txt)' : 'Plain Text (.txt)'}</span>
+                </button>
+                <button className="export-dropdown-item" onClick={() => handleExport('tei')}>
+                  <span className="export-dropdown-icon">TEI</span>
+                  <span>{lang === 'ja' ? 'TEI XML (.xml)' : 'TEI XML (.xml)'}</span>
+                </button>
+                <button className="export-dropdown-item" onClick={() => handleExport('hocr')}>
+                  <span className="export-dropdown-icon">hOCR</span>
+                  <span>{lang === 'ja' ? 'hOCR (.hocr)' : 'hOCR (.hocr)'}</span>
+                </button>
+              </div>
+            )}
+          </div>
+          <button className="btn btn-primary btn-sm" onClick={handleSave} title="Ctrl+S">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" style={{ marginRight: '3px' }}>
+              <path d="M2 2v12h12V5l-3-3H2z" />
+              <path d="M5 2v4h5V2" />
+              <rect x="4" y="9" width="8" height="5" rx="0.5" />
             </svg>
             {lang === 'ja' ? '保存' : 'Save'}
-          </button>
-          <button
-            className="btn btn-ai"
-            onClick={handleProofread}
-            disabled={!aiConnector || proofreadState.status === 'loading' || result.textBlocks.length === 0}
-            title={!aiConnector ? (lang === 'ja' ? '設定でAI接続を構成してください' : 'Configure AI connection in Settings') : ''}
-          >
-            {proofreadState.status === 'loading'
-              ? (lang === 'ja' ? 'AI校正中...' : 'Proofreading...')
-              : (lang === 'ja' ? 'AI校正' : 'AI Proofread')}
-          </button>
-          <button className="btn btn-secondary btn-sm" onClick={handleCopy}>
-            {copied
-              ? lang === 'ja' ? 'コピーしました！' : 'Copied!'
-              : lang === 'ja' ? 'コピー' : 'Copy'}
-          </button>
-          <button className="btn btn-secondary btn-sm" onClick={handleDownload}>
-            {lang === 'ja' ? 'ダウンロード' : 'Download'}
           </button>
         </div>
       </div>
@@ -458,7 +571,7 @@ export function TextEditor({
             <input
               type="text"
               className="text-editor-search-input"
-              placeholder={lang === 'ja' ? '検索' : 'Find'}
+              placeholder={lang === 'ja' ? '検索...' : 'Find...'}
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value)
@@ -468,9 +581,10 @@ export function TextEditor({
                 if (e.key === 'Enter') handleNextMatch()
                 else if (e.key === 'Escape') setShowSearchBar(false)
               }}
+              autoFocus
             />
             <span className="text-editor-search-count">
-              {searchMatches.length > 0 ? `${currentMatchIndex + 1}/${searchMatches.length}` : lang === 'ja' ? 'マッチなし' : 'No match'}
+              {searchMatches.length > 0 ? `${currentMatchIndex + 1}/${searchMatches.length}` : lang === 'ja' ? '0件' : '0'}
             </span>
             <button
               className="btn btn-sm btn-icon"
@@ -497,7 +611,7 @@ export function TextEditor({
             <input
               type="text"
               className="text-editor-replace-input"
-              placeholder={lang === 'ja' ? '置換' : 'Replace'}
+              placeholder={lang === 'ja' ? '置換...' : 'Replace...'}
               value={replaceQuery}
               onChange={(e) => setReplaceQuery(e.target.value)}
               onKeyDown={(e) => {
@@ -509,7 +623,6 @@ export function TextEditor({
               className="btn btn-sm btn-secondary"
               onClick={handleReplace}
               disabled={searchMatches.length === 0}
-              title={lang === 'ja' ? '1つ置換' : 'Replace'}
             >
               {lang === 'ja' ? '置換' : 'Replace'}
             </button>
@@ -517,9 +630,8 @@ export function TextEditor({
               className="btn btn-sm btn-secondary"
               onClick={handleReplaceAll}
               disabled={searchMatches.length === 0}
-              title={lang === 'ja' ? 'すべて置換' : 'Replace All'}
             >
-              {lang === 'ja' ? 'すべて置換' : 'Replace All'}
+              {lang === 'ja' ? '全置換' : 'All'}
             </button>
             <button
               className="btn btn-sm btn-icon"
@@ -527,7 +639,7 @@ export function TextEditor({
               title={lang === 'ja' ? '閉じる' : 'Close'}
             >
               <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-                <path d="M3 3l10 10M13 3L3 13" />
+                <path d="M4 4l8 8M12 4L4 12" />
               </svg>
             </button>
           </div>
@@ -537,10 +649,15 @@ export function TextEditor({
       {/* AI校正ステータス表示 */}
       {(proofreadState.status === 'loading' || proofreadState.status === 'error') && (
         <div className="text-editor-ai-status">
-          {proofreadState.status === 'loading' && <span className="ai-bar-spinner" />}
+          {proofreadState.status === 'loading' && (
+            <>
+              <span className="ai-bar-spinner" />
+              <span className="ai-bar-hint">{lang === 'ja' ? 'AIが画像とテキストを比較中...' : 'AI is comparing image and text...'}</span>
+            </>
+          )}
           {proofreadState.status === 'error' && (
             <span className="ai-bar-error" title={proofreadState.message}>
-              {lang === 'ja' ? '校正エラー' : 'Proofread Error'}
+              {lang === 'ja' ? '校正エラー: ' : 'Error: '}{proofreadState.message?.slice(0, 80)}
             </span>
           )}
         </div>
@@ -611,72 +728,53 @@ export function TextEditor({
         )}
       </div>
 
-      {/* フッターオプション */}
-      <div className="text-editor-footer">
-        <div className="text-editor-options">
-          <label className="text-editor-option">
+      {/* ── Status bar ── */}
+      <div className="text-editor-statusbar">
+        <div className="text-editor-statusbar-left">
+          <span className="text-editor-stat-item">
+            {charCount.toLocaleString()} {lang === 'ja' ? '文字' : 'chars'}
+          </span>
+          <span className="text-editor-stat-sep" />
+          <span className="text-editor-stat-item">
+            {lineCount.toLocaleString()} {lang === 'ja' ? '行' : 'lines'}
+          </span>
+          {!saved && (
+            <>
+              <span className="text-editor-stat-sep" />
+              <span className="text-editor-stat-modified">{lang === 'ja' ? '変更あり' : 'Modified'}</span>
+            </>
+          )}
+        </div>
+        <div className="text-editor-statusbar-right">
+          <label className="text-editor-option-compact">
             <input
               type="checkbox"
               checked={includeFileName}
               onChange={(e) => setIncludeFileName(e.target.checked)}
             />
-            {lang === 'ja' ? 'ファイル名を記載' : 'Include filename'}
+            {lang === 'ja' ? 'ファイル名' : 'Filename'}
           </label>
-          <label className="text-editor-option">
+          <label className="text-editor-option-compact">
             <input
               type="checkbox"
               checked={ignoreNewlines}
               onChange={(e) => setIgnoreNewlines(e.target.checked)}
             />
-            {lang === 'ja' ? '改行を無視' : 'Ignore newlines'}
+            {lang === 'ja' ? '改行無視' : 'No newlines'}
           </label>
-          <button
-            className="btn btn-icon btn-sm"
-            onClick={handleRemoveEmptyLines}
-            title={lang === 'ja' ? '空行を削除' : 'Remove empty lines'}
-            aria-label="Remove empty lines"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <line x1="2" y1="4" x2="14" y2="4" />
-              <line x1="2" y1="12" x2="14" y2="12" />
-            </svg>
-          </button>
-          <button
-            className="btn btn-icon btn-sm"
-            onClick={handleJoinLines}
-            title={lang === 'ja' ? '改行を削除して結合' : 'Join lines'}
-            aria-label="Join lines"
-          >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <line x1="2" y1="8" x2="14" y2="8" />
-              <polyline points="5 5 2 8 5 11" fill="none" />
-              <polyline points="11 5 14 8 11 11" fill="none" />
-            </svg>
-          </button>
-        </div>
-        <div className="text-editor-stats-footer">
-          <span className="text-editor-stat-item">
-            {lang === 'ja' ? '文字数:' : 'Chars:'} {displayText.length}
-          </span>
-          <span className="text-editor-stat-separator">·</span>
-          <span className="text-editor-stat-item">
-            {lang === 'ja' ? '行数:' : 'Lines:'} {lineCount}
-          </span>
-        </div>
-        <div className="text-editor-font-controls">
-          <label className="text-editor-font-label">
-            {lang === 'ja' ? 'フォントサイズ' : 'Font size'}:
-          </label>
-          <input
-            type="range"
-            className="text-editor-font-slider"
-            min="10"
-            max="24"
-            value={fontSize}
-            onChange={(e) => setFontSize(Number(e.target.value))}
-            title={`${fontSize}px`}
-          />
-          <span className="text-editor-font-value">{fontSize}px</span>
+          <span className="text-editor-stat-sep" />
+          <div className="text-editor-font-controls-compact">
+            <span className="text-editor-font-value-compact">{fontSize}px</span>
+            <input
+              type="range"
+              className="text-editor-font-slider-compact"
+              min="10"
+              max="24"
+              value={fontSize}
+              onChange={(e) => setFontSize(Number(e.target.value))}
+              title={`${fontSize}px`}
+            />
+          </div>
         </div>
       </div>
     </div>

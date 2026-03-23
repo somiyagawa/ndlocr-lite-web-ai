@@ -4,15 +4,18 @@
 
 import type { ProcessedImage } from '../types/ocr'
 import { makeThumbnailDataUrl } from './imageLoader'
-import workerSrc from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 
 let pdfjsLib: typeof import('pdfjs-dist') | null = null
 
 async function getPdfJs() {
   if (!pdfjsLib) {
-    pdfjsLib = await import('pdfjs-dist')
-    // Viteがバンドルしたハッシュ付きURLを使用（CDN不要・COEP対応）
-    pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc
+    // 動的import でpdfjs-distとworkerを遅延ロード（初回PDF利用時のみ）
+    const [lib, { default: workerSrc }] = await Promise.all([
+      import('pdfjs-dist'),
+      import('pdfjs-dist/build/pdf.worker.min.mjs?url'),
+    ])
+    lib.GlobalWorkerOptions.workerSrc = workerSrc
+    pdfjsLib = lib
   }
   return pdfjsLib
 }

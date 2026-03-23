@@ -27,73 +27,91 @@ export function useOCRWorker() {
   const [isReady, setIsReady] = useState(false)
   const [jobState, setJobState] = useState<OCRJobState>(initialJobState)
 
-  // OCR Worker + 認識 Worker を起動
+  // OCR Worker + 認識 Worker を起動（UIレンダリング完了後に遅延起動して初期描画を高速化）
   useEffect(() => {
-    const worker = new Worker(
-      new URL('../worker/ocr.worker.ts', import.meta.url),
-      { type: 'module' }
-    )
-    workerRef.current = worker
+    let cancelled = false
 
-    // N 本の認識 Worker を ?worker import から生成（Vite が正しくバンドル）
-    const recWorkers: Worker[] = Array.from({ length: N_REC_WORKERS }, () => new RecognitionWorkerFactory())
-    recWorkersRef.current = recWorkers
+    const initWorkers = () => {
+      if (cancelled) return
 
-    // 初期化完了フラグ（OCR Worker + 認識 Workers の両方が揃ったら isReady = true）
-    let ocrWorkerReady = false
-    let recReadyCount = 0
+      const worker = new Worker(
+        new URL('../worker/ocr.worker.ts', import.meta.url),
+        { type: 'module' }
+      )
+      workerRef.current = worker
 
-    const checkBothReady = () => {
-      if (ocrWorkerReady && (N_REC_WORKERS === 0 || recReadyCount >= N_REC_WORKERS)) {
-        setIsReady(true)
-        setJobState(initialJobState)
-      }
-    }
+      // N 本の認識 Worker を ?worker import から生成（Vite が正しくバンドル）
+      const recWorkers: Worker[] = Array.from({ length: N_REC_WORKERS }, () => new RecognitionWorkerFactory())
+      recWorkersRef.current = recWorkers
 
-    // OCR Worker 初期化
-    worker.postMessage({ type: 'INITIALIZE', layoutOnly: isMobile } satisfies WorkerInMessage)
+      // 初期化完了フラグ（OCR Worker + 認識 Workers の両方が揃ったら isReady = true）
+      let ocrWorkerReady = false
+      let recReadyCount = 0
 
-    worker.onmessage = (event: MessageEvent<WorkerOutMessage>) => {
-      const msg = event.data
-      if (msg.type === 'OCR_PROGRESS') {
-        if (msg.stage === 'initialized') {
-          ocrWorkerReady = true
-          checkBothReady()
-        } else {
-          setJobState((prev) => ({
-            ...prev,
-            status: 'loading_model',
-            stageProgress: msg.progress,
-            stage: msg.stage,
-            message: msg.message,
-            modelProgress: msg.modelProgress,
-          }))
+      const checkBothReady = () => {
+        if (ocrWorkerReady && (N_REC_WORKERS === 0 || recReadyCount >= N_REC_WORKERS)) {
+          setIsReady(true)
+          setJobState(initialJobState)
         }
       }
-    }
 
-    // 認識 Worker 初期化
-    recWorkers.forEach((w) => {
-      w.onmessage = (e: MessageEvent<RecWorkerOutMessage>) => {
-        if (e.data.type === 'REC_READY') {
-          recReadyCount++
-          w.onmessage = null
-          checkBothReady()
+      // OCR Worker 初期化
+      worker.postMessage({ type: 'INITIALIZE', layoutOnly: isMobile } satisfies WorkerInMessage)
+
+      worker.onmessage = (event: MessageEvent<WorkerOutMessage>) => {
+        const msg = event.data
+        if (msg.type === 'OCR_PROGRESS') {
+          if (msg.stage === 'initialized') {
+            ocrWorkerReady = true
+            checkBothReady()
+          } else {
+            setJobState((prev) => ({
+              ...prev,
+              status: 'loading_model',
+              stageProgress: msg.progress,
+              stage: msg.stage,
+              message: msg.message,
+              modelProgress: msg.modelProgress,
+            }))
+          }
         }
-        // REC_PROGRESS は初期化進捗として無視（OCR Worker のモデル進捗を主表示に使用）
       }
-      w.postMessage({ type: 'REC_INIT', singleModel: isMobile } satisfies RecWorkerInMessage)
-    })
 
-    return () => {
-      worker.postMessage({ type: 'TERMINATE' } satisfies WorkerInMessage)
-      worker.terminate()
+      // 認識 Worker 初期化
       recWorkers.forEach((w) => {
-        w.postMessage({ type: 'REC_TERMINATE' } satisfies RecWorkerInMessage)
-        w.terminate()
+        w.onmessage = (e: MessageEvent<RecWorkerOutMessage>) => {
+          if (e.data.type === 'REC_READY') {
+            recReadyCount++
+            w.onmessage = null
+            checkBothReady()
+          }
+        }
+        w.postMessage({ type: 'REC_INIT', singleModel: isMobile } satisfies RecWorkerInMessage)
       })
-      workerRef.current = null
-      recWorkersRef.current = []
+    }
+
+    // requestIdleCallback でUIレンダリング後にワーカー起動（初期描画を阻害しない）
+    if ('requestIdleCallback' in window) {
+      const id = requestIdleCallback(() => initWorkers(), { timeout: 500 })
+      return () => {
+        cancelled = true
+        cancelIdleCallback(id)
+        // ワーカーが起動済みなら終了
+        workerRef.current?.terminate()
+        recWorkersRef.current.forEach((w) => w.terminate())
+        workerRef.current = null
+        recWorkersRef.current = []
+      }
+    } else {
+      const timer = setTimeout(initWorkers, 100)
+      return () => {
+        cancelled = true
+        clearTimeout(timer)
+        workerRef.current?.terminate()
+        recWorkersRef.current.forEach((w) => w.terminate())
+        workerRef.current = null
+        recWorkersRef.current = []
+      }
     }
   }, [])
 
