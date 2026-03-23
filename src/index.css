@@ -2037,19 +2037,19 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   overflow: hidden;
   flex-shrink: 0;
   user-select: none;
-  line-height: 1.9;
   font-family: 'Noto Sans Mono', 'Courier New', monospace;
-  font-size: 14px;
 }
 
 .line-number {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
   color: var(--color-text-tertiary);
-  text-align: right;
   padding-right: 0.5rem;
   min-width: 2rem;
   white-space: nowrap;
   font-size: 0.7rem;
+  box-sizing: border-box;
 }
 
 /* ── Status bar ── */
@@ -3563,7 +3563,7 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   align-items: center;
   background: var(--color-bg);
   border-bottom: 1px solid var(--color-border-light);
-  padding: 0.25rem 0.75rem;
+  padding: 0.25rem 1rem;
   overflow: hidden;
   flex-shrink: 0;
   user-select: none;
@@ -3577,9 +3577,10 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   justify-content: center;
   color: var(--color-text-tertiary);
   font-size: 0.6rem;
-  writing-mode: vertical-rl;
+  writing-mode: horizontal-tb;
   text-orientation: mixed;
-  min-width: 1.4em;
   height: 1.6rem;
   line-height: 1;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }

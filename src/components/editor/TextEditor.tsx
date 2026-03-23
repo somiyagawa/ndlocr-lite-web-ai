@@ -64,6 +64,7 @@ export function TextEditor({
   const [saved, setSaved] = useState(true)
   const [showExportMenu, setShowExportMenu] = useState(false)
   const [highlightRange, setHighlightRange] = useState<{ start: number; end: number } | null>(null)
+  const [computedLineHeight, setComputedLineHeight] = useState<number>(0)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const gutterRef = useRef<HTMLDivElement>(null)
@@ -75,6 +76,20 @@ export function TextEditor({
 
   // Determine if we should show diff view
   const shouldShowDiff = proofreadState.status === 'done'
+
+  // テキストエリアの実際の lineHeight を計測して行番号と同期する
+  useEffect(() => {
+    const ta = textareaRef.current
+    if (!ta) return
+    const style = window.getComputedStyle(ta)
+    const lh = parseFloat(style.lineHeight)
+    if (!isNaN(lh) && lh > 0) {
+      setComputedLineHeight(lh)
+    } else {
+      // fallback: fontSize × line-height ratio (CSS: 1.9)
+      setComputedLineHeight(fontSize * 1.9)
+    }
+  }, [fontSize, isVertical])
 
   // Search matches calculation
   const searchMatches = useMemo<SearchMatch[]>(() => {
@@ -793,7 +808,11 @@ export function TextEditor({
             {showLineNumbers && !isVertical && (
               <div className="line-numbers-gutter" ref={gutterRef}>
                 {Array.from({ length: lineCount }).map((_, i) => (
-                  <span key={i} className="line-number">
+                  <span
+                    key={i}
+                    className="line-number"
+                    style={{ height: computedLineHeight > 0 ? `${computedLineHeight}px` : undefined }}
+                  >
                     {i + 1}
                   </span>
                 ))}
@@ -802,7 +821,11 @@ export function TextEditor({
             {showLineNumbers && isVertical && (
               <div className="line-numbers-gutter-vertical" ref={gutterRef}>
                 {Array.from({ length: lineCount }).map((_, i) => (
-                  <span key={i} className="line-number-vertical">
+                  <span
+                    key={i}
+                    className="line-number-vertical"
+                    style={{ width: computedLineHeight > 0 ? `${computedLineHeight}px` : undefined }}
+                  >
                     {i + 1}
                   </span>
                 ))}
