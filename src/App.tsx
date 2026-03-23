@@ -389,23 +389,6 @@ export default function App() {
         {/* ===== Pending 画面（認識前） ===== */}
         {hasPendingImages && (
           <section className="result-section">
-            {processedImages.length > 1 && (
-              <div className="result-sidebar">
-                {processedImages.map((img, i) => (
-                  <button
-                    key={i}
-                    className={`result-sidebar-item ${i === pendingImageIndex ? 'active' : ''}`}
-                    onClick={() => { setPendingImageIndex(i); setSelectedRegion(null) }}
-                    title={img.pageIndex ? `${img.fileName} (p.${img.pageIndex})` : img.fileName}
-                  >
-                    <img src={img.thumbnailDataUrl} alt={img.fileName} />
-                    <span className="result-sidebar-label">
-                      {img.pageIndex ? `${img.fileName} (p.${img.pageIndex})` : img.fileName}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            )}
 
             <div className="result-content">
               {processedImages.length > 1 &&
@@ -496,34 +479,6 @@ export default function App() {
         {/* ===== 結果表示（SplitView） ===== */}
         {(hasResults || isProcessing) && processedImages.length > 0 && (
           <section className="result-section result-section-split">
-            {/* 左サイドバー: 全ファイル一覧 */}
-            {processedImages.length > 1 && (
-              <div className="result-sidebar">
-                {processedImages.map((img, i) => {
-                  const result = sessionResults[i]
-                  const isInProgress = !result && isProcessing && i === sessionResults.length
-                  const isPending = !result && !isInProgress
-                  return (
-                    <button
-                      key={i}
-                      className={`result-sidebar-item ${result && i === selectedResultIndex ? 'active' : ''} ${isPending || isInProgress ? 'sidebar-pending' : ''}`}
-                      onClick={() => { if (result) { setSelectedResultIndex(i); setSelectedBlock(null); setSelectedRegion(null) } }}
-                      disabled={!result}
-                      title={img.pageIndex ? `${img.fileName} (p.${img.pageIndex})` : img.fileName}
-                    >
-                      <div className="result-sidebar-thumb-wrap">
-                        <img src={result ? result.imageDataUrl : img.thumbnailDataUrl} alt={img.fileName} />
-                        {isInProgress && <div className="sidebar-item-spinner" />}
-                      </div>
-                      <span className="result-sidebar-label">
-                        {img.pageIndex ? `${img.fileName} (p.${img.pageIndex})` : img.fileName}
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
-            )}
-
             {/* メインコンテンツ: SplitView */}
             <div className="result-content">
               {/* 処理中プログレス */}
