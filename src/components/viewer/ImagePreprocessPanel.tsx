@@ -117,6 +117,8 @@ const t: Record<Language, TranslationStrings> = {
     autoCrop: '自动裁剪',
     splitCenter: '中心分割',
     splitAuto: '自动分割',
+    splitCenterTip: '将跨页扫描图像从正中央分割为左右两页',
+    splitAutoTip: '自动检测装订缝（空白最多的纵列）并分割为左右两页',
     rotation: '旋转',
     apply: '应用',
     reset: '重置',
@@ -137,6 +139,8 @@ const t: Record<Language, TranslationStrings> = {
     autoCrop: '自動裁剪',
     splitCenter: '中心分割',
     splitAuto: '自動分割',
+    splitCenterTip: '將跨頁掃描圖像從正中央分割為左右兩頁',
+    splitAutoTip: '自動偵測裝訂縫（空白最多的縱列）並分割為左右兩頁',
     rotation: '旋轉',
     apply: '應用',
     reset: '重置',
@@ -157,6 +161,8 @@ const t: Record<Language, TranslationStrings> = {
     autoCrop: '자동 자르기',
     splitCenter: '중심 분할',
     splitAuto: '자동 분할',
+    splitCenterTip: '양면 스캔 이미지를 정중앙에서 좌우 2페이지로 분할합니다',
+    splitAutoTip: '제본 틈(공백이 가장 많은 세로줄)을 자동 감지하여 좌우 2페이지로 분할합니다',
     rotation: '회전',
     apply: '적용',
     reset: '재설정',
@@ -415,6 +421,7 @@ export function ImagePreprocessPanel({
               onClick={handleSplitCenter}
               disabled={isProcessing || !onSplitPages}
               type="button"
+              title={strings.splitCenterTip}
             >
               {isProcessing ? strings.processing : strings.splitCenter}
             </button>
@@ -423,6 +430,7 @@ export function ImagePreprocessPanel({
               onClick={handleSplitAuto}
               disabled={isProcessing || !onSplitPages}
               type="button"
+              title={strings.splitAutoTip}
             >
               {isProcessing ? strings.processing : strings.splitAuto}
             </button>

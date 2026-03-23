@@ -1480,6 +1480,62 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   animation: pulse 2s ease-in-out infinite;
 }
 
+/* ===== HELP PAGE MODAL ===== */
+.help-page-modal {
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  max-width: 720px;
+  width: 92%;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg), 0 0 40px rgba(0, 0, 0, 0.15);
+  animation: slide-up 0.3s ease;
+}
+[data-theme="dark"] .help-page-modal {
+  box-shadow: var(--shadow-lg), 0 0 40px rgba(0, 0, 0, 0.4);
+}
+.help-page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+.help-page-title {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+.help-page-close {
+  flex-shrink: 0;
+}
+.help-page-body {
+  padding: 1.25rem 1.5rem 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+.help-section {
+  margin-bottom: 1.25rem;
+}
+.help-section:last-child {
+  margin-bottom: 0;
+}
+.help-section-heading {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  margin: 0 0 0.35rem 0;
+}
+.help-section-body {
+  font-size: 0.9rem;
+  line-height: 1.65;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
 /* ===== FOOTER ===== */
 .footer {
   background: var(--color-surface);

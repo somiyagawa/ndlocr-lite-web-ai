@@ -866,7 +866,12 @@ export function TextEditor({
           )}
         </div>
         <div className="text-editor-statusbar-right">
-          <label className="text-editor-option-compact">
+          <label
+            className="text-editor-option-compact"
+            title={lang === 'ja'
+              ? 'コピー・保存時にファイル名をヘッダーとして付加します'
+              : 'Prepend the filename as a header when copying or saving'}
+          >
             <input
               type="checkbox"
               checked={includeFileName}
@@ -874,7 +879,12 @@ export function TextEditor({
             />
             {lang === 'ja' ? 'ファイル名' : 'Filename'}
           </label>
-          <label className="text-editor-option-compact">
+          <label
+            className="text-editor-option-compact"
+            title={lang === 'ja'
+              ? 'コピー・保存時に改行を除去して1行にまとめます'
+              : 'Remove all line breaks when copying or saving'}
+          >
             <input
               type="checkbox"
               checked={ignoreNewlines}
