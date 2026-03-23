@@ -234,7 +234,9 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
 
 /* ===== HEADER ===== */
 .header {
-  background: var(--color-surface);
+  background:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20'><path d='M20 0H0v20' fill='none' stroke='%234a5e3a' stroke-opacity='0.08' stroke-width='0.5'/></svg>"),
+    var(--color-surface);
   border-bottom: 2px solid var(--color-primary);
   padding: 0 1.5rem;
   height: 52px;
@@ -248,6 +250,9 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
 }
 
 [data-theme="dark"] .header {
+  background:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20'><path d='M20 0H0v20' fill='none' stroke='%23b8963a' stroke-opacity='0.1' stroke-width='0.5'/></svg>"),
+    var(--color-surface);
   box-shadow: var(--shadow);
 }
 
@@ -632,6 +637,20 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
 .processing-section {
   padding: 2rem 0;
   animation: slide-up 0.4s ease;
+  /* 青い池背景（ローディング時） */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(rgba(255,255,255,0.6), rgba(255,255,255,0.6)),
+              url('/bluepond.jpg') center / cover no-repeat;
+  border-radius: var(--radius-lg);
+  margin: 0.5rem;
+}
+[data-theme="dark"] .processing-section {
+  background: linear-gradient(rgba(20,24,30,0.65), rgba(20,24,30,0.65)),
+              url('/bluepond.jpg') center / cover no-repeat;
 }
 
 .progress-container {
@@ -1587,12 +1606,19 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
 
 /* ===== FOOTER ===== */
 .footer {
-  background: var(--color-surface);
+  background:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20'><path d='M20 0H0v20' fill='none' stroke='%234a5e3a' stroke-opacity='0.08' stroke-width='0.5'/></svg>"),
+    var(--color-surface);
   border-top: 1px solid var(--color-border);
   padding: 1rem 1.5rem;
   text-align: center;
   font-size: 0.78rem;
   color: var(--color-text-secondary);
+}
+[data-theme="dark"] .footer {
+  background:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20'><path d='M20 0H0v20' fill='none' stroke='%23b8963a' stroke-opacity='0.1' stroke-width='0.5'/></svg>"),
+    var(--color-surface);
 }
 
 /* ===== SPLIT VIEW ===== */
