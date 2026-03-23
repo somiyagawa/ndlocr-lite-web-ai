@@ -1048,77 +1048,192 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   font-weight: 600;
 }
 
-/* ===== HISTORY EXTRAS ===== */
-.empty-message {
-  color: var(--color-text-tertiary);
-  text-align: center;
-  padding: 2rem 1rem;
-  font-style: italic;
+/* ===== HISTORY PANEL ===== */
+.history-panel {
+  max-width: 520px;
 }
 
+.history-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text);
+}
+
+.history-header-left h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.history-header-left svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.history-count {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-primary);
+  background: var(--color-primary-light);
+  border: 1px solid var(--color-primary-subtle);
+  padding: 0.1rem 0.45rem;
+  border-radius: 10px;
+  line-height: 1.3;
+}
+
+/* Empty state */
+.history-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 2.5rem 1rem;
+  text-align: center;
+  color: var(--color-text-tertiary);
+}
+
+.history-empty p {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.history-empty span {
+  font-size: 0.78rem;
+}
+
+/* List */
 .history-list {
   list-style: none;
   padding: 0;
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.35rem;
 }
 
 .history-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.75rem;
-  padding: 0.75rem;
-  background: var(--color-border-light);
+  padding: 0.65rem 0.75rem;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border-light);
   border-radius: var(--radius);
   cursor: pointer;
-  border-left: 3px solid var(--color-primary);
   transition: all var(--transition);
 }
 
 .history-item:hover {
   background: var(--color-primary-light);
-  transform: translateX(4px);
-  box-shadow: var(--shadow-sm);
+  border-color: var(--color-primary-subtle);
+  box-shadow: var(--shadow-xs);
+}
+
+/* Thumbnail */
+.history-thumb-wrap {
+  position: relative;
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
 }
 
 .history-thumb {
-  width: 60px;
-  height: 50px;
-  object-fit: contain;
+  width: 52px;
+  height: 52px;
+  object-fit: cover;
   border-radius: var(--radius-sm);
-  background: var(--color-bg);
-  flex-shrink: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
 }
 
+.history-thumb-badge {
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  font-size: 0.6rem;
+  font-weight: 700;
+  background: var(--color-primary);
+  color: white;
+  padding: 0.05rem 0.3rem;
+  border-radius: 8px;
+  line-height: 1.4;
+  box-shadow: var(--shadow-xs);
+}
+
+/* Info */
 .history-info {
   display: flex;
   flex-direction: column;
-  gap: 0.15rem;
+  gap: 0.2rem;
   min-width: 0;
+  flex: 1;
+}
+
+.history-info-top {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
 }
 
 .history-filename {
-  font-size: 0.85rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--color-text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .history-date {
-  font-size: 0.75rem;
+  font-size: 0.68rem;
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.history-meta {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.history-meta-tag {
+  font-size: 0.65rem;
   color: var(--color-text-secondary);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-light);
+  padding: 0.05rem 0.4rem;
+  border-radius: 4px;
+  white-space: nowrap;
 }
 
 .history-preview {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: var(--color-text-tertiary);
-  white-space: nowrap;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
   overflow: hidden;
-  text-overflow: ellipsis;
+  margin: 0;
+}
+
+/* Footer */
+.history-footer-hint {
+  font-size: 0.72rem;
+  color: var(--color-text-tertiary);
+}
+
+.empty-message {
+  color: var(--color-text-tertiary);
+  text-align: center;
+  padding: 2rem 1rem;
+  font-style: italic;
 }
 
 .modal-overlay {

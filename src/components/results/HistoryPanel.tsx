@@ -32,48 +32,84 @@ export function HistoryPanel({ runs, onSelect, onClear, onClose, lang }: History
     })
   }
 
+  const formatTime = (ms: number) => {
+    return ms < 1000 ? `${ms}ms` : `${(ms / 1000).toFixed(1)}s`
+  }
+
   return (
     <div className="panel-overlay" onClick={onClose}>
-      <div className="panel" onClick={(e) => e.stopPropagation()}>
+      <div className="panel history-panel" onClick={(e) => e.stopPropagation()}>
+        {/* Header */}
         <div className="panel-header">
-          <h2>{lang === 'ja' ? '処理履歴' : 'History'}</h2>
+          <div className="history-header-left">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 8v4l3 3" /><circle cx="12" cy="12" r="10" />
+            </svg>
+            <h2>{lang === 'ja' ? '処理履歴' : 'History'}</h2>
+            {runs.length > 0 && (
+              <span className="history-count">{runs.length}</span>
+            )}
+          </div>
           <button className="btn-close" onClick={onClose}>✕</button>
         </div>
 
+        {/* Body */}
         <div className="panel-body">
           {runs.length === 0 ? (
-            <p className="empty-message">
-              {lang === 'ja' ? '処理履歴がありません' : 'No history yet'}
-            </p>
+            <div className="history-empty">
+              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity: 0.3 }}>
+                <path d="M12 8v4l3 3" /><circle cx="12" cy="12" r="10" />
+              </svg>
+              <p>{lang === 'ja' ? '処理履歴がありません' : 'No history yet'}</p>
+              <span>{lang === 'ja' ? '画像やPDFをOCR処理すると、ここに履歴が表示されます' : 'OCR results will appear here after processing'}</span>
+            </div>
           ) : (
             <ul className="history-list">
               {runs.map((run) => {
                 const firstFile = run.files[0]
                 const fileCount = run.files.length
-                const previewText = run.files.map(f => f.fullText).join(' ').slice(0, 60)
+                const totalTime = run.files.reduce((sum, f) => sum + f.processingTimeMs, 0)
+                const totalChars = run.files.reduce((sum, f) => sum + f.fullText.length, 0)
+                const previewText = run.files.map(f => f.fullText).join(' ').slice(0, 80)
                 return (
                   <li key={run.id} className="history-item" onClick={() => onSelect(run)}>
+                    {/* Thumbnail */}
                     {firstFile && (
-                      <img
-                        src={firstFile.imageDataUrl}
-                        alt={firstFile.fileName}
-                        className="history-thumb"
-                      />
+                      <div className="history-thumb-wrap">
+                        <img
+                          src={firstFile.imageDataUrl}
+                          alt={firstFile.fileName}
+                          className="history-thumb"
+                        />
+                        {fileCount > 1 && (
+                          <span className="history-thumb-badge">+{fileCount - 1}</span>
+                        )}
+                      </div>
                     )}
+                    {/* Info */}
                     <div className="history-info">
-                      <span className="history-filename">
-                        {fileCount === 1
-                          ? firstFile?.fileName
-                          : lang === 'ja'
-                            ? `${firstFile?.fileName} 他${fileCount - 1}件`
-                            : `${firstFile?.fileName} +${fileCount - 1} more`}
-                      </span>
-                      <span className="history-date">{formatDate(run.createdAt)}</span>
-                      <span className="history-preview">
-                        {previewText
-                          ? previewText + '...'
-                          : (lang === 'ja' ? 'テキストなし' : 'No text')}
-                      </span>
+                      <div className="history-info-top">
+                        <span className="history-filename">
+                          {firstFile?.fileName ?? 'unknown'}
+                        </span>
+                        <span className="history-date">{formatDate(run.createdAt)}</span>
+                      </div>
+                      <div className="history-meta">
+                        {fileCount > 1 && (
+                          <span className="history-meta-tag">
+                            {lang === 'ja' ? `${fileCount}ページ` : `${fileCount} pages`}
+                          </span>
+                        )}
+                        <span className="history-meta-tag">
+                          {totalChars.toLocaleString()} {lang === 'ja' ? '文字' : 'chars'}
+                        </span>
+                        <span className="history-meta-tag">
+                          {formatTime(totalTime)}
+                        </span>
+                      </div>
+                      {previewText && (
+                        <p className="history-preview">{previewText}…</p>
+                      )}
                     </div>
                   </li>
                 )
@@ -82,15 +118,19 @@ export function HistoryPanel({ runs, onSelect, onClear, onClose, lang }: History
           )}
         </div>
 
+        {/* Footer */}
         <div className="panel-footer">
+          <span className="history-footer-hint">
+            {lang === 'ja' ? '項目をクリックして復元' : 'Click an item to restore'}
+          </span>
           <button
-            className={`btn ${confirmClear ? 'btn-danger' : 'btn-secondary'}`}
+            className={`btn btn-sm ${confirmClear ? 'btn-danger' : 'btn-secondary'}`}
             onClick={handleClear}
             disabled={runs.length === 0}
           >
             {confirmClear
-              ? (lang === 'ja' ? '本当に削除しますか？' : 'Confirm delete?')
-              : (lang === 'ja' ? 'キャッシュをクリア' : 'Clear Cache')}
+              ? (lang === 'ja' ? '本当に削除？' : 'Confirm?')
+              : (lang === 'ja' ? '履歴を削除' : 'Clear All')}
           </button>
         </div>
       </div>
