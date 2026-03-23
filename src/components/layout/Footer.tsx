@@ -78,8 +78,8 @@ export function Footer({ lang }: FooterProps) {
       </div>
       <div className="footer-frog-credit">
         {lang === 'ja'
-          ? '🐸 背景の蛙模様は NDLOCR 開発者・青池亨先生へのオマージュです'
-          : '🐸 The frog background pattern is a tribute to Toru Aoike, developer of NDLOCR'}
+          ? '🐸 背景の鳥獣戯画模様は NDLOCR 開発者・青池亨先生へのオマージュです'
+          : '🐸 The Choju-giga background pattern is a tribute to Toru Aoike, developer of NDLOCR'}
       </div>
     </footer>
   )
