@@ -1,5 +1,5 @@
 /**
- * Image Preprocessing Module for NDL-OCR Lite AI Ultra
+ * Image Preprocessing Module for NDLOCR-lite Web AI: Model BLUEPOND
  * Provides comprehensive image manipulation using Canvas API
  * Optimized for historical Japanese document OCR
  */

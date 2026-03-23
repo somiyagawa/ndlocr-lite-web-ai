@@ -19,6 +19,7 @@ import { TextEditor } from './components/editor/TextEditor'
 import { ImagePreprocessPanel } from './components/viewer/ImagePreprocessPanel'
 import { HistoryPanel } from './components/results/HistoryPanel'
 import { SettingsModal } from './components/settings/SettingsModal'
+import { HelpPage } from './components/help/HelpPage'
 import { imageDataToDataUrl } from './utils/imageLoader'
 import './App.css'
 
@@ -64,6 +65,7 @@ export default function App() {
   const [selectedPageBlock, setSelectedPageBlock] = useState<PageBlock | null>(null)
   const [showHistory, setShowHistory] = useState(false)
   const [showSettings, setShowSettings] = useState(false)
+  const [showHelp, setShowHelp] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isReadyToProcess, setIsReadyToProcess] = useState(false)
   const [pendingImageIndex, setPendingImageIndex] = useState(0)
@@ -363,6 +365,7 @@ export default function App() {
         onToggleLanguage={toggleLanguage}
         onOpenSettings={() => setShowSettings(true)}
         onOpenHistory={() => setShowHistory(true)}
+        onOpenHelp={() => setShowHelp(true)}
         onLogoClick={handleClear}
         aiConnectionStatus={aiConnectionStatus}
         theme={theme}
@@ -604,6 +607,12 @@ export default function App() {
           onSwitchProvider={switchProvider}
           connectionStatus={aiConnectionStatus}
           onTestConnection={testAndConnect}
+        />
+      )}
+      {showHelp && (
+        <HelpPage
+          lang={lang}
+          onClose={() => setShowHelp(false)}
         />
       )}
     </div>

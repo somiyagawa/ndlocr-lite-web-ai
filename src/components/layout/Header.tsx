@@ -15,6 +15,7 @@ interface HeaderProps {
   onToggleLanguage: (e: React.ChangeEvent<HTMLSelectElement>) => void
   onOpenSettings: () => void
   onOpenHistory: () => void
+  onOpenHelp: () => void
   onLogoClick: () => void
   aiConnectionStatus?: AIConnectionStatus
   theme: Theme
@@ -26,6 +27,7 @@ export function Header({
   onToggleLanguage,
   onOpenSettings,
   onOpenHistory,
+  onOpenHelp,
   onLogoClick,
   aiConnectionStatus = 'disconnected',
   theme,
@@ -41,6 +43,7 @@ export function Header({
     toDark:  { ja: 'ダークモードに切替', en: 'Switch to Dark Mode', 'zh-CN': '切换到深色模式', 'zh-TW': '切換到深色模式', ko: '다크 모드로 전환' },
     history: { ja: '処理履歴', en: 'History', 'zh-CN': '处理历史', 'zh-TW': '處理紀錄', ko: '처리 기록' },
     settings: { ja: '設定', en: 'Settings', 'zh-CN': '设置', 'zh-TW': '設定', ko: '설정' },
+    help: { ja: '使い方ガイド', en: 'User Guide', 'zh-CN': '使用指南', 'zh-TW': '使用指南', ko: '사용 안내' },
   }
 
   const themeTitle = theme === 'dark'
@@ -72,8 +75,8 @@ export function Header({
           </svg>
         </div>
         <div className="header-title-text">
-          <span className="header-title-main">NDL-OCR Lite</span>
-          <span className="header-title-accent">AI Ultra</span>
+          <span className="header-title-main">NDLOCR-lite Web AI</span>
+          <span className="header-title-accent">Model BLUEPOND</span>
         </div>
         <span className="header-version header-version-pulse">v0.2.0</span>
       </button>
@@ -98,8 +101,19 @@ export function Header({
           </button>
         </div>
 
-        {/* Theme & Language Group */}
+        {/* Help & Theme & Language Group */}
         <div className="header-actions-group">
+          <button
+            className="btn-icon"
+            onClick={onOpenHelp}
+            title={THEME_LABELS.help[lang] ?? 'User Guide'}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10" />
+              <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+          </button>
           <button
             className="btn-icon btn-theme-toggle"
             onClick={onToggleTheme}
