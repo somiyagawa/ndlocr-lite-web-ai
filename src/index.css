@@ -1564,51 +1564,85 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
 /* ===== ZOOM CONTROLS ===== */
 .zoom-controls {
   display: flex;
-  gap: 0.35rem;
-  padding: 0.4rem 0.5rem;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.3rem 0.4rem;
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   position: absolute;
   top: 0.5rem;
-  right: 0.5rem;
+  left: 0.5rem;
   z-index: 10;
   box-shadow: var(--shadow-sm);
 }
 
-.zoom-controls button {
-  width: 32px;
-  height: 32px;
+.btn-zoom {
+  width: 28px;
+  height: 28px;
   padding: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
   border-radius: var(--radius-sm);
-  transition: all var(--transition);
+  transition: all var(--transition-fast);
   background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border-light);
+  color: var(--color-text);
+  cursor: pointer;
 }
 
-.zoom-controls button:hover {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
-  color: white;
-  transform: scale(1.1);
-  box-shadow: var(--shadow-sm);
+.btn-zoom:hover:not(:disabled) {
+  background: var(--color-primary-light);
+  border-color: var(--color-primary-subtle);
+  color: var(--color-primary);
 }
 
+.btn-zoom:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.btn-zoom-active {
+  background: var(--color-primary) !important;
+  border-color: var(--color-primary) !important;
+  color: white !important;
+}
+
+.btn-zoom-reset {
+  font-size: 0.7rem;
+  font-weight: 500;
+}
+
+.zoom-level {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  min-width: 36px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  user-select: none;
+}
+
+.zoom-controls-sep {
+  display: inline-block;
+  width: 1px;
+  height: 18px;
+  background: var(--color-border-light);
+  margin: 0 0.1rem;
+  flex-shrink: 0;
+}
+
+/* Legacy compat */
 .zoom-percent {
   display: flex;
   align-items: center;
-  padding: 0.5rem 0.75rem;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
-  font-size: 0.8rem;
+  font-size: 0.72rem;
   font-weight: 600;
-  color: var(--color-text);
-  min-width: 50px;
+  color: var(--color-text-secondary);
+  min-width: 36px;
   text-align: center;
 }
 
@@ -2907,29 +2941,30 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   position: relative;
 }
 
-/* Override: make .image-viewer scrollable container inside wrap */
+/* Override: make .image-viewer a clip container for pan/zoom */
 .image-viewer-wrap > .image-viewer {
   flex: 1;
-  overflow: auto;
+  overflow: hidden;
   position: relative;
-  cursor: crosshair;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg);
 }
 
-/* ── image-viewer-transform (zoom container) ── */
+/* ── image-viewer-transform (zoom + pan container) ── */
 .image-viewer-transform {
   position: relative;
-  display: inline-block;
-  min-width: 100%;
-  transition: width 0.15s ease;
+  flex-shrink: 0;
+  will-change: transform;
 }
 
 /* ── viewer-image ── */
 .viewer-image {
-  width: 100%;
-  height: auto;
   display: block;
   user-select: none;
   -webkit-user-drag: none;
+  pointer-events: none;
 }
 
 /* ── viewer-overlay (positioned over the image for bbox drawing) ── */
