@@ -1,4 +1,4 @@
-# NDLOCR-Lite Web AI Deluxe
+# NDLOCR-Lite Web AI Ultra (旧称：Deluxe) エヌディーエルオーシーアール・ライト・ウェブ・エーアイ・ウルトラ
 
 **前処理機能・AI校正機能付き ブラウザ完結型 日本語OCRツール**
 
