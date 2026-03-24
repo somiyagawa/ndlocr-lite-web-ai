@@ -125,27 +125,21 @@ export const Header = memo(function Header({
       {/* Drawer overlay - mobile only */}
       {menuOpen && <div className="drawer-overlay visible" onClick={() => setMenuOpen(false)} />}
 
-      {/* Actions Section */}
+      {/* Actions Section — becomes slide-out drawer on mobile */}
       <div className={`header-actions${menuOpen ? ' header-actions-open' : ''}`}>
+        {/* Close button — visible only inside drawer on mobile */}
+        <button className="drawer-close-btn" onClick={() => setMenuOpen(false)} aria-label="Close">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+
         {/* AI Status + Settings Group */}
         <div className="header-actions-group">
           {aiConnectionStatus === 'disconnected' || aiConnectionStatus === 'error' ? (
             <button
               className={`${statusClass} ai-status-clickable`}
-              title={L(lang, {
-                ja: 'クリックしてAI接続方法を表示',
-                en: 'Click to see how to connect AI',
-                'zh-CN': '点击查看AI连接方法',
-                'zh-TW': '點擊查看AI連接方法',
-                ko: '클릭하여 AI 연결 방법 보기',
-                la: 'Preme ut connexionem AI videas',
-                eo: 'Alklaku por vidi kiel konekti AI',
-              es: 'Haz clic para ver cómo conectar la AI',
-              de: 'Klicken Sie, um die KI-Verbindung zu sehen',
-              ar: 'انقر لمعرفة كيفية اتصال AI',
-              hi: 'AI कनेक्ट करने का तरीका देखने के लिए क्लिक करें'
-              })}
-              onClick={onAIStatusClick}
+              onClick={() => { onAIStatusClick(); setMenuOpen(false) }}
             >
               <span className="ai-status-dot" />
               <span className="ai-status-text">{statusText}</span>
@@ -157,22 +151,23 @@ export const Header = memo(function Header({
             </span>
           )}
           <button
-            className="btn-icon"
-            onClick={onOpenSettings}
+            className="btn-icon drawer-menu-item"
+            onClick={() => { onOpenSettings(); setMenuOpen(false) }}
             title={THEME_LABELS.settings[lang] ?? 'Settings'}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <circle cx="12" cy="12" r="3" />
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
             </svg>
+            <span className="drawer-label">{THEME_LABELS.settings[lang] ?? 'Settings'}</span>
           </button>
         </div>
 
-        {/* Help & Theme & Language Group */}
+        {/* Help & Theme & History & Language Group */}
         <div className="header-actions-group">
           <button
-            className="btn-icon"
-            onClick={onOpenHelp}
+            className="btn-icon drawer-menu-item"
+            onClick={() => { onOpenHelp(); setMenuOpen(false) }}
             title={THEME_LABELS.help[lang] ?? 'User Guide'}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -180,9 +175,10 @@ export const Header = memo(function Header({
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
               <line x1="12" y1="17" x2="12.01" y2="17" />
             </svg>
+            <span className="drawer-label">{THEME_LABELS.help[lang] ?? 'User Guide'}</span>
           </button>
           <button
-            className="btn-icon btn-theme-toggle"
+            className="btn-icon btn-theme-toggle drawer-menu-item"
             onClick={onToggleTheme}
             aria-label={themeTitle}
             title={themeTitle}
@@ -204,23 +200,35 @@ export const Header = memo(function Header({
                 <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
               </svg>
             )}
+            <span className="drawer-label">{themeTitle}</span>
           </button>
           <button
-            className="btn-icon"
-            onClick={onOpenHistory}
+            className="btn-icon drawer-menu-item"
+            onClick={() => { onOpenHistory(); setMenuOpen(false) }}
             title={THEME_LABELS.history[lang] ?? 'History'}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 8v4l3 3" />
               <circle cx="12" cy="12" r="10" />
             </svg>
+            <span className="drawer-label">{THEME_LABELS.history[lang] ?? 'History'}</span>
           </button>
+
+          {/* Language section label */}
+          <div className="drawer-lang-label">{L(lang, {
+            ja: '言語', en: 'Language', 'zh-CN': '语言', 'zh-TW': '語言', ko: '언어',
+            la: 'Lingua', eo: 'Lingvo', es: 'Idioma', de: 'Sprache', ar: 'اللغة', hi: 'भाषा'
+          })}</div>
+
           <div className="lang-flags" role="radiogroup" aria-label="Language">
             {LANGUAGES.map(code => (
               <button
                 key={code}
                 className={`lang-flag-btn${lang === code ? ' lang-flag-active' : ''}`}
-                onClick={() => onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)}
+                onClick={() => {
+                  onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)
+                  setMenuOpen(false)
+                }}
                 title={LANGUAGE_LABELS[code]}
                 aria-label={LANGUAGE_LABELS[code]}
                 role="radio"

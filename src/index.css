@@ -3097,15 +3097,37 @@ button.ai-status-clickable .ai-status-text {
     display: none;
   }
 
+  /* ── Mobile: header-actions becomes a slide-out drawer ── */
   .header-actions {
-    order: 2;
-    width: 100%;
-    justify-content: space-between;
-    gap: 0.25rem;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 80%;
+    max-width: 300px;
+    height: 100vh;
+    height: 100dvh;
+    background: var(--color-surface);
+    box-shadow: -4px 0 16px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 1.25rem 1rem;
+    overflow-y: auto;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    pointer-events: none;
+  }
+
+  .header-actions-open {
+    transform: translateX(0);
+    pointer-events: auto;
   }
 
   .header-actions-group {
-    gap: 0.2rem;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem 0;
   }
 
   .header-actions-group + .header-actions-group {
@@ -3113,19 +3135,48 @@ button.ai-status-clickable .ai-status-text {
     margin-left: 0;
     padding-left: 0;
     border-top: 1px solid var(--color-border-light);
-    padding-top: 0.3rem;
+    margin-top: 0.25rem;
   }
 
+  /* AI status in drawer: full-width block */
+  .header-actions .ai-status {
+    width: 100%;
+    justify-content: flex-start;
+    padding: 0.6rem 0.5rem;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Icon buttons in drawer: show as full-width rows with labels */
+  .header-actions .btn-icon {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.6rem 0.5rem;
+    border-radius: var(--radius-sm);
+    justify-content: flex-start;
+  }
+
+  .header-actions .btn-icon:active {
+    background: var(--color-primary-light);
+  }
+
+  /* Language flags in drawer: grid layout */
   .lang-flags {
-    flex-wrap: wrap;
-    gap: 0.15rem;
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.35rem;
+    padding: 0.5rem 0;
   }
 
   .lang-flag-btn {
-    width: 32px;
-    height: 32px;
-    min-width: 32px;
-    min-height: 32px;
+    width: 100%;
+    height: 44px;
+    min-width: 44px;
+    min-height: 44px;
+    font-size: 1.3rem;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
   /* ── Hamburger Menu ── */
@@ -4275,6 +4326,62 @@ button.ai-status-clickable .ai-status-text {
   opacity: 1;
 }
 
+/* ── Drawer menu labels (hidden on desktop, shown on mobile in drawer) ── */
+.drawer-label {
+  display: none;
+}
+
+.drawer-close-btn {
+  display: none;
+}
+
+.drawer-lang-label {
+  display: none;
+}
+
+@media (max-width: 480px) {
+  .drawer-label {
+    display: inline;
+    font-size: 0.9rem;
+    margin-left: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .drawer-close-btn {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    background: none;
+    border: none;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    padding: 0.25rem;
+    margin-bottom: 0.5rem;
+    min-height: 40px;
+  }
+
+  .drawer-close-btn:active {
+    color: var(--color-text);
+  }
+
+  .drawer-menu-item {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .drawer-lang-label {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0.5rem 0.5rem 0.25rem;
+  }
+}
+
 /* ── Drawer Navigation Menu ── */
 .drawer {
   position: fixed;
@@ -4739,9 +4846,27 @@ button.ai-status-clickable .ai-status-text {
 
 .camera-error {
   color: var(--color-danger);
-  font-size: 0.8rem;
-  margin-top: 0.5rem;
+  font-size: 0.82rem;
   text-align: center;
+  line-height: 1.5;
+  padding: 0.6rem 1rem;
+  background: var(--color-danger-light);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  /* Position at bottom of upload-section */
+  position: absolute;
+  bottom: 1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 2rem);
+  max-width: 500px;
+  z-index: 10;
+  animation: camera-error-in 0.3s ease;
+}
+
+@keyframes camera-error-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
 @media (min-width: 769px) {

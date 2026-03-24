@@ -156,7 +156,7 @@ export function CameraCapture({ onCapture, lang, disabled = false }: CameraCaptu
             hi: 'फ़ोटो लें',
           })}
         </button>
-        {error && <p className="camera-error" style={{ color: 'var(--color-danger)', fontSize: '0.8rem', marginTop: '0.5rem' }}>{error}</p>}
+        {error && <p className="camera-error">{error}</p>}
       </>
     )
   }
