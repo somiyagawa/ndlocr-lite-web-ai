@@ -645,31 +645,51 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
 .landing-title {
   text-align: center;
   margin-bottom: 0.25rem;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-radius: var(--radius);
+  padding: 0.8rem 1.5rem;
 }
 .landing-title-main {
   font-size: clamp(1.8rem, 5vw, 2.8rem);
   font-weight: 800;
   letter-spacing: 0.12em;
-  color: var(--color-text);
+  color: #1a3550;
   margin: 0;
-  text-shadow: 0 1px 8px rgba(58, 158, 201, 0.15);
+  text-shadow: 0 1px 4px rgba(255, 255, 255, 0.6);
 }
 .landing-title-sub {
   font-size: clamp(0.7rem, 1.5vw, 0.9rem);
   letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: var(--color-text-secondary);
+  color: #2d5a7b;
   margin: 0.15rem 0 0;
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5);
 }
 .landing-title-desc {
-  font-size: clamp(0.68rem, 1.3vw, 0.82rem);
-  color: var(--color-text-secondary);
-  opacity: 0.8;
+  font-size: clamp(0.72rem, 1.3vw, 0.85rem);
+  color: #34607e;
   margin: 0.4rem 0 0;
   line-height: 1.5;
+  text-shadow: 0 1px 3px rgba(255, 255, 255, 0.5);
+}
+[data-theme="dark"] .landing-title {
+  background: rgba(15, 20, 30, 0.65);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
 }
 [data-theme="dark"] .landing-title-main {
-  text-shadow: 0 1px 12px rgba(58, 158, 201, 0.3);
+  color: #e0ecf5;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.5);
+}
+[data-theme="dark"] .landing-title-sub {
+  color: #a0c4dd;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+[data-theme="dark"] .landing-title-desc {
+  color: #90b8d4;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
 }
 
 .bluepond-credit {
