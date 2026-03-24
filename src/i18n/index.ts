@@ -5,8 +5,12 @@ import { zhTW } from './zh-TW'
 import { ko } from './ko'
 import { la } from './la'
 import { eo } from './eo'
+import { es } from './es'
+import { de } from './de'
+import { ar } from './ar'
+import { hi } from './hi'
 
-export type Language = 'ja' | 'en' | 'zh-CN' | 'zh-TW' | 'ko' | 'la' | 'eo'
+export type Language = 'ja' | 'en' | 'zh-CN' | 'zh-TW' | 'ko' | 'la' | 'eo' | 'es' | 'de' | 'ar' | 'hi'
 export type TranslationParams = Record<string, string | number>
 
 /** Display labels for the language selector */
@@ -18,10 +22,14 @@ export const LANGUAGE_LABELS: Record<Language, string> = {
   ko: '한국어',
   la: 'Latina',
   eo: 'Esperanto',
+  es: 'Español',
+  de: 'Deutsch',
+  ar: 'العربية',
+  hi: 'हिन्दी',
 }
 
 /** All supported language codes, in display order */
-export const LANGUAGES: Language[] = ['ja', 'en', 'zh-CN', 'zh-TW', 'ko', 'la', 'eo']
+export const LANGUAGES: Language[] = ['ja', 'en', 'zh-CN', 'zh-TW', 'ko', 'es', 'de', 'ar', 'hi', 'la', 'eo']
 
 const translations: Record<Language, Record<string, Record<string, string>>> = {
   ja,
@@ -31,6 +39,10 @@ const translations: Record<Language, Record<string, Record<string, string>>> = {
   ko,
   la,
   eo,
+  es,
+  de,
+  ar,
+  hi,
 }
 
 function getNestedValue(obj: Record<string, unknown>, key: string): string {
@@ -68,6 +80,10 @@ export function getStoredLang(): Language {
   const browserLang = navigator.language
   if (browserLang.startsWith('ja')) return 'ja'
   if (browserLang.startsWith('ko')) return 'ko'
+  if (browserLang.startsWith('es')) return 'es'
+  if (browserLang.startsWith('de')) return 'de'
+  if (browserLang.startsWith('ar')) return 'ar'
+  if (browserLang.startsWith('hi')) return 'hi'
   if (browserLang.startsWith('la')) return 'la'
   if (browserLang.startsWith('eo')) return 'eo'
   if (browserLang === 'zh-TW' || browserLang === 'zh-Hant') return 'zh-TW'

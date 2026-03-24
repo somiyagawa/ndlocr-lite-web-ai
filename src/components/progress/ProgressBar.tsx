@@ -58,6 +58,34 @@ const MODEL_LABELS: Record<Language, { layout: string; rec30: string; rec50: str
     rec100: 'Signorekona modelo (≤100 signoj)',
     downloading: 'Ŝarĝas modelon',
   },
+  es: {
+    layout: 'Modelo de detección de diseño',
+    rec30: 'Modelo de reconocimiento (≤30 car.)',
+    rec50: 'Modelo de reconocimiento (≤50 car.)',
+    rec100: 'Modelo de reconocimiento (≤100 car.)',
+    downloading: 'Descargando modelo',
+  },
+  de: {
+    layout: 'Layouterkennungsmodell',
+    rec30: 'Erkennungsmodell (≤30 Zeichen)',
+    rec50: 'Erkennungsmodell (≤50 Zeichen)',
+    rec100: 'Erkennungsmodell (≤100 Zeichen)',
+    downloading: 'Modell wird heruntergeladen',
+  },
+  ar: {
+    layout: 'نموذج اكتشاف التخطيط',
+    rec30: 'نموذج التعرف (≤30 حرف)',
+    rec50: 'نموذج التعرف (≤50 حرف)',
+    rec100: 'نموذج التعرف (≤100 حرف)',
+    downloading: 'جارٍ تنزيل النموذج',
+  },
+  hi: {
+    layout: 'लेआउट पहचान मॉडल',
+    rec30: 'पहचान मॉडल (≤30 अक्षर)',
+    rec50: 'पहचान मॉडल (≤50 अक्षर)',
+    rec100: 'पहचान मॉडल (≤100 अक्षर)',
+    downloading: 'मॉडल डाउनलोड हो रहा है',
+  },
 }
 
 export const ProgressBar = memo(function ProgressBar({ jobState, lang }: ProgressBarProps) {
@@ -119,6 +147,10 @@ export const ProgressBar = memo(function ProgressBar({ jobState, lang }: Progres
             ko: `${currentFileIndex} / ${totalFiles} 파일`,
             la: `${currentFileIndex} / ${totalFiles} fasciculi`,
             eo: `${currentFileIndex} / ${totalFiles} dosieroj`,
+            es: `${currentFileIndex} / ${totalFiles} archivos`,
+            de: `${currentFileIndex} / ${totalFiles} Dateien`,
+            ar: `${currentFileIndex} / ${totalFiles} ملفات`,
+            hi: `${currentFileIndex} / ${totalFiles} फ़ाइलें`,
           })}
         </div>
       )}

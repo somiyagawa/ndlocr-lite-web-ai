@@ -5,10 +5,10 @@ import type { AIConnectionStatus } from '../../hooks/useAISettings'
 import type { Theme } from '../../hooks/useTheme'
 
 const STATUS_LABELS: Record<AIConnectionStatus, Record<string, string>> = {
-  connected:    { ja: 'AI接続済み', en: 'AI Connected', 'zh-CN': 'AI已连接', 'zh-TW': 'AI已連接', ko: 'AI 연결됨', la: 'AI connexum', eo: 'AI konektita' },
-  connecting:   { ja: 'AI接続中...', en: 'AI Connecting...', 'zh-CN': 'AI连接中...', 'zh-TW': 'AI連接中...', ko: 'AI 연결 중...', la: 'AI conectens...', eo: 'AI konektanta...' },
-  error:        { ja: 'AI接続エラー', en: 'AI Error', 'zh-CN': 'AI连接错误', 'zh-TW': 'AI連接錯誤', ko: 'AI 오류', la: 'AI error', eo: 'AI eraro' },
-  disconnected: { ja: 'AI未接続', en: 'AI Disconnected', 'zh-CN': 'AI未连接', 'zh-TW': 'AI未連接', ko: 'AI 미연결', la: 'AI disiunctum', eo: 'AI malkonektita' },
+  connected:    { ja: 'AI接続済み', en: 'AI Connected', 'zh-CN': 'AI已连接', 'zh-TW': 'AI已連接', ko: 'AI 연결됨', la: 'AI connexum', eo: 'AI konektita', es: 'AI conectado', de: 'AI verbunden', ar: 'AI متصل', hi: 'AI जुड़ा' },
+  connecting:   { ja: 'AI接続中...', en: 'AI Connecting...', 'zh-CN': 'AI连接中...', 'zh-TW': 'AI連接中...', ko: 'AI 연결 중...', la: 'AI conectens...', eo: 'AI konektanta...', es: 'AI conectando...', de: 'AI verbindet...', ar: 'AI يتصل...', hi: 'AI जुड़ रहा है...' },
+  error:        { ja: 'AI接続エラー', en: 'AI Error', 'zh-CN': 'AI连接错误', 'zh-TW': 'AI連接錯誤', ko: 'AI 오류', la: 'AI error', eo: 'AI eraro', es: 'Error de AI', de: 'AI-Fehler', ar: 'خطأ AI', hi: 'AI त्रुटि' },
+  disconnected: { ja: 'AI未接続', en: 'AI Disconnected', 'zh-CN': 'AI未连接', 'zh-TW': 'AI未連接', ko: 'AI 미연결', la: 'AI disiunctum', eo: 'AI malkonektita', es: 'AI desconectado', de: 'AI getrennt', ar: 'AI غير متصل', hi: 'AI डिस्कनेक्ट' },
 }
 
 interface HeaderProps {
@@ -42,11 +42,11 @@ export const Header = memo(function Header({
     ?? ''
 
   const THEME_LABELS: Record<string, Record<string, string>> = {
-    toLight: { ja: 'ライトモードに切替', en: 'Switch to Light Mode', 'zh-CN': '切换到浅色模式', 'zh-TW': '切換到淺色模式', ko: '라이트 모드로 전환', la: 'Mutu ad Lucem', eo: 'Ŝanĝi al Hela Reĝimo' },
-    toDark:  { ja: 'ダークモードに切替', en: 'Switch to Dark Mode', 'zh-CN': '切换到深色模式', 'zh-TW': '切換到深色模式', ko: '다크 모드로 전환', la: 'Mutu ad Obscuram', eo: 'Ŝanĝi al Malluma Reĝimo' },
-    history: { ja: '処理履歴', en: 'History', 'zh-CN': '处理历史', 'zh-TW': '處理紀錄', ko: '처리 기록', la: 'Historia', eo: 'Historio' },
-    settings: { ja: '設定', en: 'Settings', 'zh-CN': '设置', 'zh-TW': '設定', ko: '설정', la: 'Optiones', eo: 'Agordoj' },
-    help: { ja: '使い方ガイド', en: 'User Guide', 'zh-CN': '使用指南', 'zh-TW': '使用指南', ko: '사용 안내', la: 'Auxilium', eo: 'Helpo' },
+    toLight: { ja: 'ライトモードに切替', en: 'Switch to Light Mode', 'zh-CN': '切换到浅色模式', 'zh-TW': '切換到淺色模式', ko: '라이트 모드로 전환', la: 'Mutu ad Lucem', eo: 'Ŝanĝi al Hela Reĝimo', es: 'Modo claro', de: 'Hellmodus', ar: 'الوضع الفاتح', hi: 'लाइट मोड' },
+    toDark:  { ja: 'ダークモードに切替', en: 'Switch to Dark Mode', 'zh-CN': '切换到深色模式', 'zh-TW': '切換到深色模式', ko: '다크 모드로 전환', la: 'Mutu ad Obscuram', eo: 'Ŝanĝi al Malluma Reĝimo', es: 'Modo oscuro', de: 'Dunkelmodus', ar: 'الوضع الداكن', hi: 'डार्क मोड' },
+    history: { ja: '処理履歴', en: 'History', 'zh-CN': '处理历史', 'zh-TW': '處理紀錄', ko: '처리 기록', la: 'Historia', eo: 'Historio', es: 'Historial', de: 'Verlauf', ar: 'السجل', hi: 'इतिहास' },
+    settings: { ja: '設定', en: 'Settings', 'zh-CN': '设置', 'zh-TW': '設定', ko: '설정', la: 'Optiones', eo: 'Agordoj', es: 'Configuración', de: 'Einstellungen', ar: 'الإعدادات', hi: 'सेटिंग्स' },
+    help: { ja: '使い方ガイド', en: 'User Guide', 'zh-CN': '使用指南', 'zh-TW': '使用指南', ko: '사용 안내', la: 'Auxilium', eo: 'Helpo', es: 'Guía', de: 'Hilfe', ar: 'الدليل', hi: 'मार्गदर्शिका' },
   }
 
   const FLAG_EMOJI: Record<string, string> = {
@@ -55,6 +55,10 @@ export const Header = memo(function Header({
     'zh-CN': '\u{1F1E8}\u{1F1F3}', // 🇨🇳
     'zh-TW': '\u{1F1ED}\u{1F1F0}', // 🇭🇰
     ko: '\u{1F1F0}\u{1F1F7}',      // 🇰🇷
+    es: '\u{1F1EA}\u{1F1F8}',      // 🇪🇸
+    de: '\u{1F1E9}\u{1F1EA}',      // 🇩🇪
+    ar: '\u{1F1F8}\u{1F1E6}',      // 🇸🇦
+    hi: '\u{1F1EE}\u{1F1F3}',      // 🇮🇳
     la: '\u{1F3DB}\uFE0F',          // 🏛️
     eo: '\u{1F30D}',                // 🌍
   }

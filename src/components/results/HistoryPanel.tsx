@@ -31,6 +31,10 @@ export function HistoryPanel({ runs, onSelect, onClear, onClose, lang }: History
       'zh-CN': 'zh-CN',
       'zh-TW': 'zh-TW',
       ko: 'ko-KR',
+      es: 'es-ES',
+      de: 'de-DE',
+      ar: 'ar-SA',
+      hi: 'hi-IN',
       la: 'en-US',
       eo: 'en-US',
     }
