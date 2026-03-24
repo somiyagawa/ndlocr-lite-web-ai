@@ -4501,7 +4501,11 @@ button.ai-status-clickable .ai-status-text {
 }
 
 .text-editor-textarea.font-ud-kyokasho {
-  font-family: 'UD Digi Kyokasho NK-R', 'UD Digi Kyokasho NP-R', 'UD デジタル 教科書体 NK-R', 'UD デジタル 教科書体 NP-R', 'Noto Sans JP', sans-serif;
+  font-family: 'Klee One', 'UD Digi Kyokasho NK-R', 'UD Digi Kyokasho NP-R', 'UD デジタル 教科書体 NK-R', 'UD デジタル 教科書体 NP-R', sans-serif;
+}
+
+.text-editor-textarea.font-biz-ud {
+  font-family: 'BIZ UDGothic', 'Noto Sans JP', sans-serif;
 }
 
 /* ── Font select dropdown in status bar ── */

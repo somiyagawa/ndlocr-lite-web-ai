@@ -1008,7 +1008,8 @@ export function TextEditor({
               <option value="mono">Monospace</option>
               <option value="serif">Serif (明朝)</option>
               <option value="sans">Sans (ゴシック)</option>
-              <option value="ud-kyokasho">UD教科書体</option>
+              <option value="ud-kyokasho">教科書体 (Klee One)</option>
+              <option value="biz-ud">BIZ UDゴシック</option>
             </select>
             <span className="text-editor-font-value-compact">{fontSize}px</span>
             <input
