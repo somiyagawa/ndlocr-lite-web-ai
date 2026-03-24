@@ -380,47 +380,82 @@ export default function App() {
   const hasResults = sessionResults.length > 0
   const hasPendingImages = processedImages.length > 0 && !isWorking && !hasResults
 
-  // ページナビゲーション（結果表示時）
+  // ページナビゲーション（結果表示時）— ページ番号付きパジネーション
   const renderPageNav = (
     index: number,
     setIndex: (fn: (prev: number) => number) => void,
     total: number,
     maxIndex: number,
-  ) => (
-    <div className="result-page-nav">
-      <button
-        className="btn-nav"
-        onClick={() => { setIndex((prev) => prev - 1); setSelectedBlock(null); setSelectedPageBlock(null); setSelectedRegion(null) }}
-        disabled={index === 0}
-        title={L(lang, { ja: '前のファイル', en: 'Previous file', 'zh-CN': '上一个文件', 'zh-TW': '上一個檔案', ko: '이전 파일', la: 'Fasciculus prior', eo: 'Antaŭa dosiero', es: 'Archivo anterior', de: 'Vorherige Datei', ar: 'الملف السابق', hi: 'पिछली फ़ाइल' })}
-      >←</button>
-      <select
-        className="result-page-select"
-        value={index}
-        onChange={(e) => {
-          setIndex(() => Number(e.target.value))
-          setSelectedBlock(null)
-          setSelectedPageBlock(null)
-          setSelectedRegion(null)
-        }}
-      >
-        {processedImages.map((img, i) => {
-          const label = img.pageIndex ? `${img.fileName} (p.${img.pageIndex})` : img.fileName
-          return (
-            <option key={i} value={i} disabled={i > maxIndex}>
-              {i + 1} / {total}　{label}
-            </option>
-          )
-        })}
-      </select>
-      <button
-        className="btn-nav"
-        onClick={() => { setIndex((prev) => prev + 1); setSelectedBlock(null); setSelectedPageBlock(null); setSelectedRegion(null) }}
-        disabled={index >= maxIndex}
-        title={L(lang, { ja: '次のファイル', en: 'Next file', 'zh-CN': '下一个文件', 'zh-TW': '下一個檔案', ko: '다음 파일', la: 'Fasciculus proximus', eo: 'Sekva dosiero', es: 'Siguiente archivo', de: 'Nächste Datei', ar: 'الملف التالي', hi: 'अगली फ़ाइल' })}
-      >→</button>
-    </div>
-  )
+  ) => {
+    const goTo = (i: number) => {
+      setIndex(() => i)
+      setSelectedBlock(null)
+      setSelectedPageBlock(null)
+      setSelectedRegion(null)
+    }
+
+    // ページ番号リスト生成（省略記号付き）
+    const getPageNumbers = (): (number | '...')[] => {
+      if (total <= 9) {
+        return Array.from({ length: total }, (_, i) => i)
+      }
+      const pages: (number | '...')[] = []
+      // 常に最初のページ
+      pages.push(0)
+      // 現在ページ周辺
+      const start = Math.max(1, index - 2)
+      const end = Math.min(total - 2, index + 2)
+      if (start > 1) pages.push('...')
+      for (let i = start; i <= end; i++) pages.push(i)
+      if (end < total - 2) pages.push('...')
+      // 常に最後のページ
+      pages.push(total - 1)
+      return pages
+    }
+
+    const currentImg = processedImages[index]
+    const currentLabel = currentImg
+      ? (currentImg.pageIndex ? `${currentImg.fileName} (p.${currentImg.pageIndex})` : currentImg.fileName)
+      : ''
+
+    return (
+      <div className="result-page-nav">
+        <button
+          className="btn-page-arrow"
+          onClick={() => goTo(index - 1)}
+          disabled={index === 0}
+          title={L(lang, { ja: '前のファイル', en: 'Previous', 'zh-CN': '上一个', 'zh-TW': '上一個', ko: '이전', la: 'Prior', eo: 'Antaŭa', es: 'Anterior', de: 'Zurück', ar: 'السابق', hi: 'पिछला' })}
+        >‹</button>
+        <div className="page-numbers">
+          {getPageNumbers().map((p, i) =>
+            p === '...' ? (
+              <span key={`e${i}`} className="page-ellipsis">…</span>
+            ) : (
+              <button
+                key={p}
+                className={`btn-page-num${p === index ? ' btn-page-active' : ''}`}
+                onClick={() => goTo(p)}
+                disabled={p > maxIndex}
+              >
+                {p + 1}
+              </button>
+            )
+          )}
+        </div>
+        <button
+          className="btn-page-arrow"
+          onClick={() => goTo(index + 1)}
+          disabled={index >= maxIndex}
+          title={L(lang, { ja: '次のファイル', en: 'Next', 'zh-CN': '下一个', 'zh-TW': '下一個', ko: '다음', la: 'Proximus', eo: 'Sekva', es: 'Siguiente', de: 'Weiter', ar: 'التالي', hi: 'अगला' })}
+        >›</button>
+        {total > 1 && (
+          <span className="page-current-label" title={currentLabel}>
+            {currentLabel}
+          </span>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="app">
