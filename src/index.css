@@ -2477,7 +2477,7 @@ button.ai-status-clickable .ai-status-text {
   flex-direction: column;
   background: var(--color-bg);
   border-right: 1px solid var(--color-border-light);
-  padding: 0.75rem 0.5rem;
+  padding: 0.75rem 0;
   overflow: hidden;
   flex-shrink: 0;
   user-select: none;
@@ -2490,9 +2490,10 @@ button.ai-status-clickable .ai-status-text {
   justify-content: flex-end;
   color: var(--color-text-tertiary);
   padding-right: 0.5rem;
-  min-width: 2rem;
+  padding-left: 0.5rem;
+  min-width: 2.5rem;
   white-space: nowrap;
-  font-size: 0.7rem;
+  font-size: inherit;
   box-sizing: border-box;
 }
 
@@ -5061,8 +5062,8 @@ button.ai-status-clickable .ai-status-text {
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: 1.5rem 2rem 2.5rem;
-  background: linear-gradient(transparent, rgba(0,0,0,0.6));
+  padding: 1.2rem 2rem calc(1.2rem + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(transparent, rgba(0,0,0,0.7));
 }
 
 .camera-btn {
@@ -5135,25 +5136,39 @@ button.ai-status-clickable .ai-status-text {
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
-@media (min-width: 769px) {
-  .camera-controls {
-    max-width: 500px;
-    margin: 0 auto;
-    left: 50%;
-    transform: translateX(-50%);
-    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-  }
-  .camera-video {
-    object-fit: contain;
-  }
-}
-
 /* Camera right controls group */
 .camera-right-controls {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   align-items: center;
+}
+
+@media (min-width: 769px) {
+  .camera-controls {
+    max-width: 640px;
+    margin: 0 auto;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    padding: 1rem 2.5rem 1.5rem;
+  }
+  .camera-video {
+    object-fit: contain;
+  }
+  .camera-btn-capture {
+    width: 64px;
+    height: 64px;
+  }
+  .camera-btn-close,
+  .camera-btn-switch {
+    width: 44px;
+    height: 44px;
+  }
+  .camera-right-controls {
+    flex-direction: row;
+    gap: 0.6rem;
+  }
 }
 
 /* Scan mode toggle button */

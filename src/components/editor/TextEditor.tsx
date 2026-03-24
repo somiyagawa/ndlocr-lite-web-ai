@@ -264,6 +264,35 @@ export function TextEditor({
     }
   }, [selectedBlock, selectedPageBlockText]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // 検索マッチへのスクロール＆ハイライト
+  useEffect(() => {
+    const ta = textareaRef.current
+    if (!ta || searchMatches.length === 0) return
+
+    const match = searchMatches[currentMatchIndex]
+    if (!match) return
+
+    // テキストエリアにフォーカスして選択範囲を設定
+    ta.focus()
+    ta.setSelectionRange(match.start, match.end)
+
+    // 対象箇所がビューポート中央に来るようスクロール
+    const textBefore = displayText.slice(0, match.start)
+    const lineIndex = textBefore.split('\n').length - 1
+    const computedStyle = window.getComputedStyle(ta)
+    const lineHeight = parseFloat(computedStyle.lineHeight) || (parseFloat(computedStyle.fontSize) * 1.9)
+
+    if (isVertical) {
+      const colOffset = lineIndex * lineHeight
+      const targetScrollLeft = ta.scrollWidth - colOffset - ta.clientWidth / 2
+      ta.scrollLeft = Math.max(0, targetScrollLeft)
+    } else {
+      const targetY = lineIndex * lineHeight
+      const centerOffset = ta.clientHeight / 2
+      ta.scrollTop = Math.max(0, targetY - centerOffset)
+    }
+  }, [currentMatchIndex, searchMatches, displayText, isVertical])
+
   const applyOptions = (text: string) =>
     ignoreNewlines ? text.replace(/\n/g, '') : text
 
@@ -884,7 +913,14 @@ export function TextEditor({
         ) : (
           <div className={`line-numbers-container ${isVertical ? 'text-editor-vertical' : ''}`}>
             {showLineNumbers && !isVertical && (
-              <div className="line-numbers-gutter" ref={gutterRef}>
+              <div
+                className="line-numbers-gutter"
+                ref={gutterRef}
+                style={{
+                  fontSize: `${Math.max(10, fontSize * 0.75)}px`,
+                  lineHeight: `${lineSpacing}`,
+                }}
+              >
                 {Array.from({ length: lineCount }).map((_, i) => (
                   <span
                     key={i}
