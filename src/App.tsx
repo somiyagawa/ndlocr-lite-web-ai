@@ -64,6 +64,7 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
       <div className="splash-content">
         <div className="splash-title">Model BLUEPOND</div>
         <div className="splash-subtitle">NDLOCR-lite Web AI</div>
+        <div className="splash-description">国立国会図書館の日本語自動書き起こしソフトを使いやすくしたもの</div>
         <div className="splash-line" />
       </div>
     </div>
@@ -486,6 +487,23 @@ export default function App() {
         {/* ===== アップロード画面 ===== */}
         {!hasResults && !isWorking && !isModelLoading && !hasPendingImages && (
           <section className="upload-section">
+            <div className="landing-title">
+              <h1 className="landing-title-main">Model BLUEPOND</h1>
+              <p className="landing-title-sub">NDLOCR-lite Web AI</p>
+              <p className="landing-title-desc">{L(lang, {
+                ja: '国立国会図書館の日本語自動書き起こしソフトを使いやすくしたもの',
+                en: 'A user-friendly adaptation of the National Diet Library\'s Japanese automatic transcription software',
+                'zh-CN': '基于日本国立国会图书馆日语自动转录软件的易用版本',
+                'zh-TW': '基於日本國立國會圖書館日語自動轉錄軟體的易用版本',
+                ko: '일본 국립국회도서관의 일본어 자동 전사 소프트웨어를 사용하기 쉽게 개선한 것',
+                la: 'Instrumentum transcriptionis Iaponicae automaticae Bibliothecae Diaetae Nationalis facilius redditum',
+                eo: 'Pli facile uzebla versio de la aŭtomata japana transskriba programo de la Nacia Dieta Biblioteko',
+                es: 'Una versión más accesible del software de transcripción automática japonesa de la Biblioteca Nacional de la Dieta',
+                de: 'Eine benutzerfreundliche Anpassung der automatischen japanischen Transkriptionssoftware der Nationalen Parlamentsbibliothek',
+                ar: 'نسخة سهلة الاستخدام من برنامج النسخ التلقائي الياباني لمكتبة البرلمان الوطني',
+                hi: 'राष्ट्रीय डाइट पुस्तकालय के जापानी स्वचालित प्रतिलेखन सॉफ़्टवेयर का उपयोग में आसान संस्करण'
+              })}</p>
+            </div>
             <FileDropZone onFilesSelected={handleFilesSelected} lang={lang} disabled={isWorking} />
             <div className="upload-actions">
               <DirectoryPicker onFilesSelected={handleFilesSelected} lang={lang} disabled={isWorking} />
@@ -599,6 +617,7 @@ export default function App() {
             <div className="processing-bluepond-title">
               <span className="processing-bluepond-main">Model BLUEPOND</span>
               <span className="processing-bluepond-sub">NDLOCR-lite Web AI</span>
+              <span className="processing-bluepond-desc">国立国会図書館の日本語自動書き起こしソフトを使いやすくしたもの</span>
             </div>
             {isLoadingFiles && fileLoadingState && (
               <div className="file-loading-status">

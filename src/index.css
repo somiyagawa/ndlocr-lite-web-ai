@@ -52,6 +52,15 @@
   animation: splash-sub-in 0.6s ease 0.4s both;
 }
 
+.splash-description {
+  font-size: clamp(0.65rem, 1.5vw, 0.85rem);
+  letter-spacing: 0.08em;
+  color: rgba(200, 225, 255, 0.65);
+  opacity: 0;
+  margin-top: 0.5rem;
+  animation: splash-sub-in 0.6s ease 0.6s both;
+}
+
 .splash-line {
   width: 0;
   height: 2px;
@@ -632,6 +641,37 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   background: linear-gradient(rgba(20,24,30,0.6), rgba(20,24,30,0.6)),
               url('/bluepond.jpg') center / cover no-repeat;
 }
+/* Landing page title */
+.landing-title {
+  text-align: center;
+  margin-bottom: 0.25rem;
+}
+.landing-title-main {
+  font-size: clamp(1.8rem, 5vw, 2.8rem);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--color-text);
+  margin: 0;
+  text-shadow: 0 1px 8px rgba(58, 158, 201, 0.15);
+}
+.landing-title-sub {
+  font-size: clamp(0.7rem, 1.5vw, 0.9rem);
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--color-text-secondary);
+  margin: 0.15rem 0 0;
+}
+.landing-title-desc {
+  font-size: clamp(0.68rem, 1.3vw, 0.82rem);
+  color: var(--color-text-secondary);
+  opacity: 0.8;
+  margin: 0.4rem 0 0;
+  line-height: 1.5;
+}
+[data-theme="dark"] .landing-title-main {
+  text-shadow: 0 1px 12px rgba(58, 158, 201, 0.3);
+}
+
 .bluepond-credit {
   position: absolute;
   bottom: 0.5rem;
@@ -771,6 +811,13 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   letter-spacing: 0.2em;
   color: var(--color-text-secondary);
   margin-top: 0.3rem;
+}
+.processing-bluepond-desc {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  opacity: 0.7;
+  margin-top: 0.25rem;
 }
 @keyframes fade-in-down {
   from { opacity: 0; transform: translateY(-12px); }
