@@ -52,6 +52,10 @@ export function ImageViewer({
   // Keep panOffset ref in sync
   useEffect(() => { panOffsetRef.current = panOffset }, [panOffset])
 
+  // Touch gesture tracking
+  const touchStartRef = useRef<{ x: number; y: number; dist: number; zoom: number }>({ x: 0, y: 0, dist: 0, zoom: 1 })
+  const lastTouchRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
+
   // Compute fit-to-container zoom
   const computeFitZoom = useCallback(() => {
     if (!containerRef.current || naturalSize.width === 0) return 1
@@ -103,6 +107,19 @@ export function ImageViewer({
     if (!rect) return { x: 0, y: 0 }
     return { x: e.clientX - rect.left, y: e.clientY - rect.top }
   }
+
+  // ─── Touch gesture helpers ───
+  const getTouchDistance = (touches: React.TouchList) => {
+    if (touches.length < 2) return 0
+    const dx = touches[0].clientX - touches[1].clientX
+    const dy = touches[0].clientY - touches[1].clientY
+    return Math.sqrt(dx * dx + dy * dy)
+  }
+
+  const getTouchCenter = (touches: React.TouchList) => ({
+    x: (touches[0].clientX + touches[1].clientX) / 2,
+    y: (touches[0].clientY + touches[1].clientY) / 2,
+  })
 
   // ─── Zoom towards a point ───
   // When zooming, keep the point under the cursor fixed in place.
@@ -247,6 +264,61 @@ export function ImageViewer({
     setTimeout(() => setSmooth(false), 300)
   }
 
+  // ─── Touch interactions ───
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    e.preventDefault()
+    if (e.touches.length === 2) {
+      // Pinch zoom start
+      const dist = getTouchDistance(e.touches)
+      const center = getTouchCenter(e.touches)
+      const currentZoom = zoom === FIT_ZOOM ? computeFitZoom() : zoom
+      touchStartRef.current = {
+        x: center.x,
+        y: center.y,
+        dist,
+        zoom: currentZoom,
+      }
+    } else if (e.touches.length === 1) {
+      // Single touch pan start
+      lastTouchRef.current = { x: e.touches[0].clientX, y: e.touches[0].clientY }
+      setIsPanning(true)
+      panStartRef.current = { x: e.touches[0].clientX - panOffset.x, y: e.touches[0].clientY - panOffset.y }
+    }
+  }, [zoom, computeFitZoom, panOffset])
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    e.preventDefault()
+    if (e.touches.length === 2) {
+      // Pinch zoom
+      const dist = getTouchDistance(e.touches)
+      if (touchStartRef.current.dist > 0) {
+        const scale = dist / touchStartRef.current.dist
+        const newZoom = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, touchStartRef.current.zoom * scale))
+        const container = containerRef.current
+        if (container) {
+          // Zoom towards the center point between the two fingers
+          zoomTowards(touchStartRef.current.x, touchStartRef.current.y, newZoom)
+        }
+      }
+    } else if (e.touches.length === 1 && isPanning) {
+      // Pan with single touch
+      setPanOffset({
+        x: e.touches[0].clientX - panStartRef.current.x,
+        y: e.touches[0].clientY - panStartRef.current.y,
+      })
+    }
+  }, [isPanning, zoomTowards])
+
+  const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    e.preventDefault()
+    if (e.touches.length === 0) {
+      // All touches released
+      setIsPanning(false)
+      touchStartRef.current = { x: 0, y: 0, dist: 0, zoom: 1 }
+      lastTouchRef.current = { x: 0, y: 0 }
+    }
+  }, [])
+
   // ─── Derived state ───
   const selectionRect = dragStart && dragCurrent ? {
     left: Math.min(dragStart.x, dragCurrent.x),
@@ -324,7 +396,10 @@ export function ImageViewer({
         onMouseUp={handleMouseUp}
         onMouseLeave={handleMouseUp}
         onDoubleClick={handleDoubleClick}
-        style={{ cursor: cursorStyle, overflow: 'hidden' }}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        style={{ cursor: cursorStyle, overflow: 'hidden', touchAction: 'none' }}
       >
         <div className="image-viewer-transform" style={transformStyle}>
           <img

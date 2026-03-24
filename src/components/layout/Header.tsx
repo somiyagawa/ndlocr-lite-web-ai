@@ -1,4 +1,4 @@
-import { memo } from 'react'
+import { memo, useState } from 'react'
 import { LANGUAGES, LANGUAGE_LABELS, L } from '../../i18n'
 import type { Language } from '../../i18n'
 import type { AIConnectionStatus } from '../../hooks/useAISettings'
@@ -67,6 +67,8 @@ export const Header = memo(function Header({
     ? (THEME_LABELS.toLight[lang] ?? THEME_LABELS.toLight.en)
     : (THEME_LABELS.toDark[lang] ?? THEME_LABELS.toDark.en)
 
+  const [menuOpen, setMenuOpen] = useState(false)
+
   return (
     <header className="header">
       {/* Logo & Title Section */}
@@ -98,8 +100,33 @@ export const Header = memo(function Header({
         <span className="header-version header-version-pulse">v0.2.0</span>
       </button>
 
+      {/* Hamburger button - visible on mobile only */}
+      <button
+        className="header-hamburger"
+        onClick={() => setMenuOpen(!menuOpen)}
+        aria-label="Menu"
+      >
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          {menuOpen ? (
+            <>
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </>
+          ) : (
+            <>
+              <line x1="3" y1="6" x2="21" y2="6" />
+              <line x1="3" y1="12" x2="21" y2="12" />
+              <line x1="3" y1="18" x2="21" y2="18" />
+            </>
+          )}
+        </svg>
+      </button>
+
+      {/* Drawer overlay - mobile only */}
+      {menuOpen && <div className="drawer-overlay visible" onClick={() => setMenuOpen(false)} />}
+
       {/* Actions Section */}
-      <div className="header-actions">
+      <div className={`header-actions${menuOpen ? ' header-actions-open' : ''}`}>
         {/* AI Status + Settings Group */}
         <div className="header-actions-group">
           {aiConnectionStatus === 'disconnected' || aiConnectionStatus === 'error' ? (

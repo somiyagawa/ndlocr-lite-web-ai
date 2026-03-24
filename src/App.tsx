@@ -14,6 +14,7 @@ import { SplitView } from './components/layout/SplitView'
 import { BottomToolbar } from './components/layout/BottomToolbar'
 import { FileDropZone } from './components/upload/FileDropZone'
 import { DirectoryPicker } from './components/upload/DirectoryPicker'
+import { CameraCapture } from './components/upload/CameraCapture'
 import { ProgressBar } from './components/progress/ProgressBar'
 import { ImageViewer } from './components/viewer/ImageViewer'
 import { TextEditor } from './components/editor/TextEditor'
@@ -425,25 +426,6 @@ export default function App() {
     <div className="app">
       {showSplash && <SplashScreen onDone={handleSplashDone} />}
 
-      {/* モバイル警告メッセージ（768px未満） */}
-      <div className="mobile-warning">
-        <p>
-          {L(lang, {
-            ja: 'このアプリはPC環境（画面幅768px以上）での利用を推奨しています。スマートフォンでは画面が狭く、一部機能が正常に動作しない場合があります。',
-            en: 'This app is designed for desktop use (screen width 768px or wider). Some features may not work properly on smartphones.',
-            'zh-CN': '本应用建议在电脑环境（屏幕宽度768px以上）使用。智能手机上部分功能可能无法正常工作。',
-            'zh-TW': '本應用建議在電腦環境（螢幕寬度768px以上）使用。智慧型手機上部分功能可能無法正常運作。',
-            ko: '이 앱은 PC 환경(화면 너비 768px 이상)에서 사용하는 것을 권장합니다. 스마트폰에서는 일부 기능이 제대로 작동하지 않을 수 있습니다.',
-            la: 'Haec applicatio ad usum in computatro (latitudo 768px vel plus) commendatur.',
-            eo: 'Ĉi tiu aplikaĵo estas desegnita por labortabla uzo (ekranlarĝo 768px aŭ pli). Iuj funkcioj eble ne funkcias ĝuste sur inteligentaj telefonoj.',
-          es: 'Esta aplicación está diseñada para uso en escritorio (ancho de pantalla 768px o más). Algunas funciones pueden no funcionar correctamente en smartphones.',
-          de: 'Diese App ist für die Desktop-Nutzung konzipiert (Bildschirmbreite 768px oder mehr). Einige Funktionen funktionieren möglicherweise nicht korrekt auf Smartphones.',
-          ar: 'هذا التطبيق مصمم للاستخدام على سطح المكتب (عرض الشاشة 768 بكسل أو أكثر). قد لا تعمل بعض الميزات بشكل صحيح على الهواتف الذكية.',
-          hi: 'यह ऐप डेस्कटॉप उपयोग के लिए डिज़ाइन किया गया है (स्क्रीन चौड़ाई 768px या अधिक)। स्मार्टफ़ोन पर कुछ सुविधाएँ ठीक से काम नहीं कर सकतीं।'
-          })}
-        </p>
-      </div>
-
       <Header
         lang={lang}
         onToggleLanguage={toggleLanguage}
@@ -464,6 +446,11 @@ export default function App() {
             <FileDropZone onFilesSelected={handleFilesSelected} lang={lang} disabled={isWorking} />
             <div className="upload-actions">
               <DirectoryPicker onFilesSelected={handleFilesSelected} lang={lang} disabled={isWorking} />
+              <CameraCapture
+                onCapture={(file) => handleFilesSelected([file])}
+                lang={lang}
+                disabled={isWorking}
+              />
               <button className="btn btn-secondary" onClick={handlePasteFromClipboard} disabled={isWorking}>
                 {L(lang, { ja: 'クリップボードから貼り付け', en: 'Paste from Clipboard', 'zh-CN': '从剪贴板粘贴', 'zh-TW': '從剪貼簿貼上', ko: '클립보드에서 붙여넣기', la: 'Glutinare ex tabulā', eo: 'Alglui el tondujo', es: 'Pegar desde portapapeles', de: 'Aus Zwischenablage einfügen', ar: 'لصق من الحافظة', hi: 'क्लिपबोर्ड से पेस्ट करें' })}
               </button>
@@ -649,6 +636,7 @@ export default function App() {
 
               {/* 左右分割ビュー */}
               <SplitView
+                lang={lang}
                 left={
                   <div className="split-image-panel">
                     {currentResult && (
@@ -735,6 +723,41 @@ export default function App() {
               />
             </div>
           </section>
+        )}
+        {/* FAB - mobile upload button */}
+        {sessionResults.length > 0 && (
+          <button
+            className="fab"
+            onClick={() => {
+              // Trigger the same upload flow
+              const input = document.createElement('input')
+              input.type = 'file'
+              input.multiple = true
+              input.accept = 'image/jpeg,image/png,image/tiff,image/heic,image/heif,.tif,.tiff,.heic,.heif,application/pdf'
+              input.onchange = (e) => {
+                const files = (e.target as HTMLInputElement).files
+                if (files && files.length > 0) {
+                  handleFilesSelected(Array.from(files).filter(f =>
+                    f.type === 'application/pdf' || f.type.startsWith('image/') ||
+                    ['tif', 'tiff', 'heic', 'heif'].includes(f.name.toLowerCase().split('.').pop() ?? '')
+                  ))
+                }
+              }
+              input.click()
+            }}
+            title={L(lang, {
+              ja: '新しいファイルをアップロード', en: 'Upload new files',
+              'zh-CN': '上传新文件', 'zh-TW': '上傳新檔案',
+              ko: '새 파일 업로드', la: 'Fasciculos novos imponere',
+              eo: 'Alŝuti novajn dosierojn', es: 'Subir nuevos archivos',
+              de: 'Neue Dateien hochladen', ar: 'رفع ملفات جديدة', hi: 'नई फ़ाइलें अपलोड करें'
+            })}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
         )}
       </main>
 
