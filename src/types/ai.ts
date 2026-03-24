@@ -45,7 +45,7 @@ export interface AIConnector {
 
 /** デフォルトのプロバイダモデル */
 export const DEFAULT_MODELS: Record<AIProvider, string[]> = {
-  anthropic: ['claude-sonnet-4-20250514', 'claude-haiku-4-20250414'],
+  anthropic: ['claude-haiku-4-5-20251001', 'claude-sonnet-4-20250514', 'claude-haiku-4-20250414'],
   openai: ['gpt-4o', 'gpt-4o-mini'],
   google: ['gemini-2.0-flash', 'gemini-2.5-pro-preview-06-05'],
   groq: ['llama-3.3-70b-versatile', 'gemma2-9b-it'],
@@ -76,7 +76,7 @@ export const DEFAULT_AI_SETTINGS: AISettings = {
   directApi: {
     provider: 'anthropic',
     apiKey: '',
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-haiku-4-5-20251001',
   },
   mcp: {
     serverUrl: '',

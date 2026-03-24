@@ -1,5 +1,4 @@
 import type { Language } from '../../i18n'
-import { L } from '../../i18n'
 
 interface AIConnectHelpProps {
   lang: Language

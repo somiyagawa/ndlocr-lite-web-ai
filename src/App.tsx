@@ -47,8 +47,32 @@ function cropRegion(srcDataUrl: string, bbox: BoundingBox) {
   })
 }
 
+function SplashScreen({ onDone }: { onDone: () => void }) {
+  const [phase, setPhase] = useState<'enter' | 'hold' | 'exit'>('enter')
+
+  useEffect(() => {
+    // enter → hold (0.8s) → exit (1.2s later) → done (0.8s fade out)
+    const t1 = setTimeout(() => setPhase('hold'), 800)
+    const t2 = setTimeout(() => setPhase('exit'), 2000)
+    const t3 = setTimeout(() => onDone(), 2800)
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
+  }, [onDone])
+
+  return (
+    <div className={`splash-screen splash-${phase}`}>
+      <div className="splash-content">
+        <div className="splash-title">Model BLUEPOND</div>
+        <div className="splash-subtitle">NDLOCR-lite Web AI</div>
+        <div className="splash-line" />
+      </div>
+    </div>
+  )
+}
+
 export default function App() {
   const { lang, toggleLanguage } = useI18n()
+  const [showSplash, setShowSplash] = useState(true)
+  const handleSplashDone = useCallback(() => setShowSplash(false), [])
   const { isReady, jobState, processImage, processRegion, resetState } = useOCRWorker()
   const { processedImages, isLoading: isLoadingFiles, processFiles, clearImages, fileLoadingState } = useFileProcessor()
   const { runs: historyRuns, saveRun, clearResults } = useResultCache()
@@ -238,13 +262,20 @@ export default function App() {
       if (successItems.length > 0) {
         const runEntry: DBRunEntry = {
           id: runId,
-          files: successItems.map(({ result, thumbnailDataUrl }) => ({
-            fileName: result.fileName,
-            imageDataUrl: thumbnailDataUrl,
-            textBlocks: result.textBlocks,
-            fullText: result.fullText,
-            processingTimeMs: result.processingTimeMs,
-          })),
+          files: successItems.map(({ result, thumbnailDataUrl }) => {
+            // 元画像サイズを取得（ブロック座標のスケーリング基準）
+            const img = new Image()
+            img.src = result.imageDataUrl
+            return {
+              fileName: result.fileName,
+              imageDataUrl: thumbnailDataUrl,
+              textBlocks: result.textBlocks,
+              fullText: result.fullText,
+              processingTimeMs: result.processingTimeMs,
+              originalWidth: img.naturalWidth || img.width || 0,
+              originalHeight: img.naturalHeight || img.height || 0,
+            }
+          }),
           createdAt: runCreatedAt,
         }
         await saveRun(runEntry)
@@ -295,23 +326,49 @@ export default function App() {
     setSelectedRegion(null)
   }, [])
 
-  const handleHistorySelect = (run: DBRunEntry) => {
-    const restoredResults: OCRResult[] = run.files.map((file, i) => ({
-      id: `${run.id}-${i}`,
-      fileName: file.fileName,
-      imageDataUrl: file.imageDataUrl,
-      textBlocks: file.textBlocks,
-      fullText: file.fullText,
-      processingTimeMs: file.processingTimeMs,
-      createdAt: run.createdAt,
-    }))
+  const handleHistorySelect = useCallback(async (run: DBRunEntry) => {
+    // サムネイル画像の実サイズを取得し、ブロック座標をスケーリング
+    const restoredResults: OCRResult[] = await Promise.all(
+      run.files.map(async (file, i) => {
+        let textBlocks = file.textBlocks
+        // 元画像サイズが記録されている場合、サムネイルとの比率でブロック座標を変換
+        if (file.originalWidth && file.originalHeight && file.originalWidth > 0) {
+          const thumbSize = await new Promise<{ w: number; h: number }>((resolve) => {
+            const img = new Image()
+            img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight })
+            img.onerror = () => resolve({ w: file.originalWidth!, h: file.originalHeight! })
+            img.src = file.imageDataUrl
+          })
+          const scaleX = thumbSize.w / file.originalWidth
+          const scaleY = thumbSize.h / file.originalHeight
+          if (Math.abs(scaleX - 1) > 0.01 || Math.abs(scaleY - 1) > 0.01) {
+            textBlocks = file.textBlocks.map(b => ({
+              ...b,
+              x: b.x * scaleX,
+              y: b.y * scaleY,
+              width: b.width * scaleX,
+              height: b.height * scaleY,
+            }))
+          }
+        }
+        return {
+          id: `${run.id}-${i}`,
+          fileName: file.fileName,
+          imageDataUrl: file.imageDataUrl,
+          textBlocks,
+          fullText: file.fullText,
+          processingTimeMs: file.processingTimeMs,
+          createdAt: run.createdAt,
+        }
+      })
+    )
     setSessionResults(restoredResults)
     setSelectedResultIndex(0)
     setSelectedBlock(null)
     setSelectedPageBlock(null)
     setSelectedRegion(null)
     setShowHistory(false)
-  }
+  }, [])
 
   const isModelLoading = jobState.status === 'loading_model'
   const isWorking = isLoadingFiles || isProcessing
@@ -362,6 +419,8 @@ export default function App() {
 
   return (
     <div className="app">
+      {showSplash && <SplashScreen onDone={handleSplashDone} />}
+
       {/* モバイル警告メッセージ（768px未満） */}
       <div className="mobile-warning">
         <p>

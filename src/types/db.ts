@@ -14,6 +14,10 @@ export interface DBRunFile {
   textBlocks: TextBlock[]
   fullText: string
   processingTimeMs: number
+  /** 元画像の幅（ブロック座標スケーリング用） */
+  originalWidth?: number
+  /** 元画像の高さ（ブロック座標スケーリング用） */
+  originalHeight?: number
 }
 
 // 1回の実行（複数ファイルをまとめた単位）

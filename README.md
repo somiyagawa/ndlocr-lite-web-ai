@@ -237,7 +237,7 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 | NDLOCR-Lite（OCRモデル・アルゴリズム） | CC BY 4.0 | 国立国会図書館 |
 | ndlocrlite-web（Web移植） | LICENSE準拠 | 橋本雄太氏 |
 | NDLOCR-Lite Web AI（AI校正機能） | MIT | 小形克宏氏（一般社団法人ビブリオスタイル） |
-| NDLOCR-Lite Web AI Ultra（Ultra機能） | MIT | 宮川創（筑波大学） |
+| NDLOCR-lite Web AI: Model BLUEPOND（その他蛇足機能） | MIT | 宮川創（筑波大学） |
 
 ---
 
@@ -253,9 +253,9 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 [NDLOCR-Lite Web AI](https://github.com/ogwata/ndlocr-lite-web-ai) — 小形克宏氏（一般社団法人ビブリオスタイル）
 AI校正機能（Direct API / MCP Server接続、差分表示、accept/reject UI）、AI設定パネル、APIキー暗号化保存（Web Crypto API）の設計・実装
 
-**Ultra機能**
+**その他蛇足機能**
 [宮川創](https://researchmap.jp/SoMiyagawa)（筑波大学）
-ダークモード（OS自動追従・CSSカスタムプロパティ）、UIデザイン全面改修（ヘッダー、ツールバー、SplitView、モーダル、ガラスモーフィズム、アニメーション）、画像前処理パネル（明るさ・コントラスト・シャープネス、グレースケール、二値化〔大津の方法〕、ノイズ除去〔メディアン〕、色反転、回転、自動傾き補正〔射影プロファイル〕、自動クロップ、ページ分割〔中心線・自動検出〕）、画像ビューア（カーソル中心ズーム、ピンチズーム、ダブルクリック、ドラッグパン、スペースキーパン、10%–800%範囲）、縦書き表示（vertical-rl切替、縦書き行番号）、テキストエディタ拡張（フォント切替、行番号〔横/縦〕、検索置換〔Ctrl+F〕、空行削除、行結合、Undo/Redo〔カーソル復元〕、文字数/行数カウント）、ブロック選択連動（自動スクロール＋ハイライト）、多言語UI（日本語・英語・簡体字中国語・繁体字中国語・韓国語、ロケール自動検出）、エクスポート（TXT、TEI XML〔P5〕、hOCR、テキスト付きPDF）、処理履歴パネル（IndexedDB、最大100件）、Google Analytics 4、ユニバーサルデザイン（WCAG準拠、aria-label）、レスポンシブレイアウト、キーボードショートカット（Ctrl+F/S/Z/Shift+Z/Esc）
+ダークモード（OS自動追従・CSSカスタムプロパティ）、UIデザイン全面改修（ヘッダー、ツールバー、SplitView、モーダル、ガラスモーフィズム、アニメーション）、画像前処理パネル（明るさ・コントラスト・シャープネス、グレースケール、二値化〔大津の方法〕、ノイズ除去〔メディアン〕、色反転、回転、自動傾き補正〔射影プロファイル〕、自動クロップ、ページ分割〔中心線・自動検出〕）、画像ビューア（カーソル中心ズーム、ピンチズーム、ダブルクリック、ドラッグパン、スペースキーパン、10%–800%範囲）、縦書き表示（vertical-rl切替、縦書き行番号、行間調整）、テキストエディタ拡張（フォント切替、行番号〔横/縦〕、検索置換〔Ctrl+F〕、空行削除、行結合、Undo/Redo〔カーソル復元〕、文字数/行数カウント）、ブロック選択連動（自動スクロール＋ハイライト）、多言語UI（日本語・英語・簡体字中国語・繁体字中国語・韓国語・ラテン語・エスペラント語、ロケール自動検出）、エクスポート（TXT、TEI XML〔P5〕、hOCR、テキスト付きPDF）、処理履歴パネル（IndexedDB、最大100件）、Google Analytics 4、ユニバーサルデザイン（WCAG準拠、aria-label）、レスポンシブレイアウト、キーボードショートカット（Ctrl+F/S/Z/Shift+Z/Esc）
 
 **機械学習モデル**
 [DEIMv2](https://github.com/ShihuaHuang95/DEIM) · [PARSeq](https://github.com/baudm/parseq) · 文字セット NDLmoji.yaml（国立国会図書館）

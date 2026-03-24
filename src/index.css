@@ -4,6 +4,85 @@
   padding: 0;
 }
 
+/* ══════════════════════════════════════
+   Splash Screen — Model BLUEPOND
+   ══════════════════════════════════════ */
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(rgba(10, 20, 35, 0.55), rgba(10, 20, 35, 0.55)),
+    url('/bluepond.jpg') center / cover no-repeat;
+  transition: opacity 0.8s ease;
+}
+.splash-enter {
+  opacity: 1;
+}
+.splash-hold {
+  opacity: 1;
+}
+.splash-exit {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.splash-content {
+  text-align: center;
+  color: #fff;
+}
+
+.splash-title {
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-shadow: 0 2px 30px rgba(0,100,180,0.5), 0 0 60px rgba(50,150,220,0.25);
+  animation: splash-title-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.splash-subtitle {
+  font-size: clamp(0.75rem, 2vw, 1.1rem);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  opacity: 0;
+  color: rgba(200, 225, 255, 0.85);
+  animation: splash-sub-in 0.6s ease 0.4s both;
+}
+
+.splash-line {
+  width: 0;
+  height: 2px;
+  margin: 1rem auto 0;
+  background: linear-gradient(90deg, transparent, rgba(150,200,255,0.6), transparent);
+  animation: splash-line-in 0.8s ease 0.6s both;
+}
+
+@keyframes splash-title-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.92);
+    letter-spacing: 0.4em;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    letter-spacing: 0.18em;
+  }
+}
+
+@keyframes splash-sub-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes splash-line-in {
+  from { width: 0; }
+  to   { width: min(300px, 60vw); }
+}
+
 :root {
   /* ── Color Palette (Light) — Scholarly Teal/Stone ── */
   --color-bg: #faf9f7;

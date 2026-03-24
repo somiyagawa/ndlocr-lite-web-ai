@@ -122,13 +122,13 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
         </div>
         <div className="footer-credit-line">
           {L(lang, {
-            ja: 'Ultra機能（ダークモード、UIデザイン改修、画像前処理、縦書き表示、多言語UI、エクスポート拡張、処理履歴等）: ',
-            en: 'Ultra features (dark mode, UI design, image preprocessing, vertical text, i18n, export, history, etc.): ',
-            'zh-CN': 'Ultra功能（深色模式、UI设计改进、图像预处理、竖排文字、多语言UI、导出扩展、处理历史等）：',
-            'zh-TW': 'Ultra功能（深色模式、UI設計改進、影像前處理、直書顯示、多語言UI、匯出擴充、處理紀錄等）：',
-            ko: 'Ultra 기능 (다크모드, UI 디자인 개선, 이미지 전처리, 세로쓰기, 다국어 UI, 내보내기 확장, 처리 기록 등): ',
-            la: 'Functiones Ultra (modus obscurus, designatio UI, praeparatio imaginum, textus verticalis, UI multilingue, exportatio, historia, etc.): ',
-            eo: 'Ultra-funkcioj (malluma reĝimo, UI-dezajno, bildpretigo, vertikala teksto, plurlingva UI, eksporto, historio, ktp.): '
+            ja: 'その他蛇足機能（ダークモード、UIデザイン改修、画像前処理、縦書き表示、多言語UI、エクスポート拡張、処理履歴等）: ',
+            en: 'Other bells & whistles (dark mode, UI design, image preprocessing, vertical text, i18n, export, history, etc.): ',
+            'zh-CN': '其他锦上添花功能（深色模式、UI设计改进、图像预处理、竖排文字、多语言UI、导出扩展、处理历史等）：',
+            'zh-TW': '其他錦上添花功能（深色模式、UI設計改進、影像前處理、直書顯示、多語言UI、匯出擴充、處理紀錄等）：',
+            ko: '기타 부가 기능 (다크모드, UI 디자인 개선, 이미지 전처리, 세로쓰기, 다국어 UI, 내보내기 확장, 처리 기록 등): ',
+            la: 'Alia additamenta (modus obscurus, designatio UI, praeparatio imaginum, textus verticalis, UI multilingue, exportatio, historia, etc.): ',
+            eo: 'Aliaj aldonaĵoj (malluma reĝimo, UI-dezajno, bildpretigo, vertikala teksto, plurlingva UI, eksporto, historio, ktp.): '
           })}
           <a href="https://researchmap.jp/SoMiyagawa" target="_blank" rel="noopener noreferrer">
             {L(lang, {
