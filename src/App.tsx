@@ -28,6 +28,7 @@ const HistoryPanel = lazy(() => import('./components/results/HistoryPanel').then
 const SettingsModal = lazy(() => import('./components/settings/SettingsModal').then(m => ({ default: m.SettingsModal })))
 const HelpPage = lazy(() => import('./components/help/HelpPage').then(m => ({ default: m.HelpPage })))
 const AIConnectHelp = lazy(() => import('./components/help/AIConnectHelp').then(m => ({ default: m.AIConnectHelp })))
+const BugReportModal = lazy(() => import('./components/help/BugReportModal').then(m => ({ default: m.BugReportModal })))
 
 function cropRegion(srcDataUrl: string, bbox: BoundingBox) {
   return new Promise<{ previewDataUrl: string; imageData: ImageData }>((resolve) => {
@@ -98,6 +99,7 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false)
   const [showHelp, setShowHelp] = useState(false)
   const [showAIConnectHelp, setShowAIConnectHelp] = useState(false)
+  const [showBugReport, setShowBugReport] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [isReadyToProcess, setIsReadyToProcess] = useState(false)
   const cancelRef = useRef(false)
@@ -265,7 +267,7 @@ export default function App() {
 
       const runId = crypto.randomUUID()
       const runCreatedAt = Date.now()
-      const successItems: Array<{ result: OCRResult; thumbnailDataUrl: string }> = []
+      const successItems: Array<{ result: OCRResult; thumbnailDataUrl: string; originalWidth: number; originalHeight: number }> = []
       const sessionResultsAccum: OCRResult[] = []
 
       for (let i = 0; i < processedImages.length; i++) {
@@ -273,7 +275,12 @@ export default function App() {
         const image = processedImages[i]
         try {
           const result = await processImage(image, i, processedImages.length)
-          successItems.push({ result, thumbnailDataUrl: image.thumbnailDataUrl })
+          successItems.push({
+            result,
+            thumbnailDataUrl: image.thumbnailDataUrl,
+            originalWidth: image.imageData.width,
+            originalHeight: image.imageData.height,
+          })
           sessionResultsAccum.push(result)
           setSessionResults([...sessionResultsAccum])
           setSelectedResultIndex(sessionResultsAccum.length - 1)
@@ -285,20 +292,15 @@ export default function App() {
       if (successItems.length > 0) {
         const runEntry: DBRunEntry = {
           id: runId,
-          files: successItems.map(({ result, thumbnailDataUrl }) => {
-            // 元画像サイズを取得（ブロック座標のスケーリング基準）
-            const img = new Image()
-            img.src = result.imageDataUrl
-            return {
-              fileName: result.fileName,
-              imageDataUrl: thumbnailDataUrl,
-              textBlocks: result.textBlocks,
-              fullText: result.fullText,
-              processingTimeMs: result.processingTimeMs,
-              originalWidth: img.naturalWidth || img.width || 0,
-              originalHeight: img.naturalHeight || img.height || 0,
-            }
-          }),
+          files: successItems.map(({ result, thumbnailDataUrl, originalWidth, originalHeight }) => ({
+            fileName: result.fileName,
+            imageDataUrl: thumbnailDataUrl,
+            textBlocks: result.textBlocks,
+            fullText: result.fullText,
+            processingTimeMs: result.processingTimeMs,
+            originalWidth,
+            originalHeight,
+          })),
           createdAt: runCreatedAt,
         }
         await saveRun(runEntry)
@@ -884,7 +886,7 @@ export default function App() {
         hasResults={hasResults}
       />
 
-      <Footer lang={lang} />
+      <Footer lang={lang} onBugReport={() => setShowBugReport(true)} />
 
       <Suspense fallback={null}>
         {showHistory && (
@@ -918,6 +920,12 @@ export default function App() {
             lang={lang}
             onClose={() => setShowAIConnectHelp(false)}
             onOpenSettings={() => { setShowAIConnectHelp(false); setShowSettings(true) }}
+          />
+        )}
+        {showBugReport && (
+          <BugReportModal
+            lang={lang}
+            onClose={() => setShowBugReport(false)}
           />
         )}
       </Suspense>

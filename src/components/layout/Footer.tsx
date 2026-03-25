@@ -4,9 +4,10 @@ import { L } from '../../i18n'
 
 interface FooterProps {
   lang: Language
+  onBugReport?: () => void
 }
 
-export const Footer = memo(function Footer({ lang }: FooterProps) {
+export const Footer = memo(function Footer({ lang, onBugReport }: FooterProps) {
   return (
     <footer className="footer">
       <div className="footer-privacy">
@@ -158,6 +159,30 @@ export const Footer = memo(function Footer({ lang }: FooterProps) {
           return <>🐸 The Choju-giga background pattern is a tribute to {link} (National Diet Library of Japan), developer of NDLOCR</>
         })()}
       </div>
+      {onBugReport && (
+        <div className="footer-bug-report">
+          <button className="footer-bug-report-btn" onClick={onBugReport} type="button">
+            {L(lang, {
+              ja: '🐛 バグ報告・機能要望',
+              en: '🐛 Bug Report / Feature Request',
+              'zh-CN': '🐛 错误报告 / 功能建议',
+              'zh-TW': '🐛 錯誤報告 / 功能建議',
+              ko: '🐛 버그 보고 / 기능 요청',
+              la: '🐛 Nuntia errorem',
+              eo: '🐛 Raporti cimon',
+              es: '🐛 Reportar error',
+              de: '🐛 Fehler melden',
+              ar: '🐛 تقرير خطأ',
+              hi: '🐛 बग रिपोर्ट',
+              ru: '🐛 Сообщить об ошибке',
+              el: '🐛 Αναφορά σφάλματος',
+              syc: '🐛 ܡܘܕܥܢܘܬ ܛܥܝܘܬ',
+              cop: '🐛 ⲙⲉⲧⲙⲉⲑⲣⲉ ⲛⲧⲉ ⲡⲓⲥⲟⲃⲓ',
+              sa: '🐛 दोषनिवेदनम्',
+            })}
+          </button>
+        </div>
+      )}
     </footer>
   )
 })
