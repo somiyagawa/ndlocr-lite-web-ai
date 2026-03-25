@@ -215,10 +215,27 @@ export function ImageViewer({
     }
   }, [zoom, computeFitZoom, zoomTowards])
 
-  // ─── Perspective corner hit-test helper ───
-  const hitTestPerspCorner = useCallback((pos: { x: number; y: number }): string | null => {
+  // Displayed image dimensions (needed before hooks that depend on them)
+  const displayedWidth = naturalSize.width * effectiveZoom
+  const displayedHeight = naturalSize.height * effectiveZoom
+
+  // ─── Image offset within viewer (centering + pan) ───
+  const getImgOffsetInViewer = useCallback(() => {
+    if (!containerRef.current) return { x: 0, y: 0 }
+    const cw = containerRef.current.clientWidth
+    const ch = containerRef.current.clientHeight
+    return {
+      x: (cw - displayedWidth) / 2 + panOffset.x,
+      y: (ch - displayedHeight) / 2 + panOffset.y,
+    }
+  }, [displayedWidth, displayedHeight, panOffset])
+
+  // ─── Perspective corner hit-test helper (viewer-relative coords) ───
+  // Use effectiveZoom directly (not scaleX/scaleY from ResizeObserver) for consistency with SVG overlay
+  const hitTestPerspCorner = useCallback((viewerPos: { x: number; y: number }): string | null => {
     if (!perspectiveCorners) return null
-    const hitRadius = 18 // pixels in displayed coords
+    const off = getImgOffsetInViewer()
+    const hitRadius = 22 // pixels — generous for usability
     const corners = [
       { key: 'topLeft', pt: perspectiveCorners.topLeft },
       { key: 'topRight', pt: perspectiveCorners.topRight },
@@ -226,21 +243,28 @@ export function ImageViewer({
       { key: 'bottomLeft', pt: perspectiveCorners.bottomLeft },
     ]
     for (const { key, pt } of corners) {
-      const dx = pos.x - pt.x * scaleX
-      const dy = pos.y - pt.y * scaleY
+      const dx = viewerPos.x - (off.x + pt.x * effectiveZoom)
+      const dy = viewerPos.y - (off.y + pt.y * effectiveZoom)
       if (Math.sqrt(dx * dx + dy * dy) < hitRadius) return key
     }
     return null
-  }, [perspectiveCorners, scaleX, scaleY])
+  }, [perspectiveCorners, effectiveZoom, getImgOffsetInViewer])
+
+  // ─── Get position relative to viewer container ───
+  const getViewerRelativePos = (e: React.MouseEvent) => {
+    const rect = containerRef.current?.getBoundingClientRect()
+    if (!rect) return { x: 0, y: 0 }
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top }
+  }
 
   // ─── Mouse interactions ───
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button !== 0) return
     e.preventDefault()
-    // Perspective corner drag takes priority
+    // Perspective corner drag takes priority (use viewer-relative coords)
     if (perspectiveMode && perspectiveCorners && onPerspectiveCornersChange) {
-      const pos = getRelativePos(e)
-      const hit = hitTestPerspCorner(pos)
+      const viewerPos = getViewerRelativePos(e)
+      const hit = hitTestPerspCorner(viewerPos)
       if (hit) {
         setPerspDragging(hit)
         return
@@ -257,11 +281,12 @@ export function ImageViewer({
   }
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    // Perspective corner dragging
+    // Perspective corner dragging (convert viewer coords → natural image coords)
     if (perspDragging && perspectiveCorners && onPerspectiveCornersChange) {
-      const pos = getRelativePos(e)
-      const x = Math.max(0, Math.min(naturalSize.width, Math.round(pos.x / scaleX)))
-      const y = Math.max(0, Math.min(naturalSize.height, Math.round(pos.y / scaleY)))
+      const viewerPos = getViewerRelativePos(e)
+      const off = getImgOffsetInViewer()
+      const x = Math.max(0, Math.min(naturalSize.width, Math.round((viewerPos.x - off.x) / effectiveZoom)))
+      const y = Math.max(0, Math.min(naturalSize.height, Math.round((viewerPos.y - off.y) / effectiveZoom)))
       onPerspectiveCornersChange({ ...perspectiveCorners, [perspDragging]: { x, y } })
       return
     }
@@ -449,8 +474,6 @@ export function ImageViewer({
     height: Math.abs(dragCurrent.y - dragStart.y),
   } : null
 
-  const displayedWidth = naturalSize.width * effectiveZoom
-  const displayedHeight = naturalSize.height * effectiveZoom
   const zoomPercent = Math.round(effectiveZoom * 100)
   const isFit = zoom === FIT_ZOOM
   const cursorStyle = perspDragging ? 'grabbing'
@@ -601,61 +624,57 @@ export function ImageViewer({
                 width: selectedRegion.width * scaleX, height: selectedRegion.height * scaleY,
               }} />
             )}
-            {/* Perspective crop overlay */}
-            {perspectiveMode && perspectiveCorners && (
-              <svg
-                className="perspective-overlay-svg"
-                style={{ position: 'absolute', left: 0, top: 0, width: imgSize.width, height: imgSize.height, pointerEvents: 'none' }}
-                viewBox={`0 0 ${imgSize.width} ${imgSize.height}`}
-              >
-                {/* Semi-transparent mask outside the quad */}
-                <defs>
-                  <mask id="persp-mask">
-                    <rect width={imgSize.width} height={imgSize.height} fill="white" />
-                    <polygon
-                      points={[
-                        `${perspectiveCorners.topLeft.x * scaleX},${perspectiveCorners.topLeft.y * scaleY}`,
-                        `${perspectiveCorners.topRight.x * scaleX},${perspectiveCorners.topRight.y * scaleY}`,
-                        `${perspectiveCorners.bottomRight.x * scaleX},${perspectiveCorners.bottomRight.y * scaleY}`,
-                        `${perspectiveCorners.bottomLeft.x * scaleX},${perspectiveCorners.bottomLeft.y * scaleY}`,
-                      ].join(' ')}
-                      fill="black"
-                    />
-                  </mask>
-                </defs>
-                <rect width={imgSize.width} height={imgSize.height} fill="rgba(0,0,0,0.35)" mask="url(#persp-mask)" />
-                {/* Quad border */}
-                <polygon
-                  points={[
-                    `${perspectiveCorners.topLeft.x * scaleX},${perspectiveCorners.topLeft.y * scaleY}`,
-                    `${perspectiveCorners.topRight.x * scaleX},${perspectiveCorners.topRight.y * scaleY}`,
-                    `${perspectiveCorners.bottomRight.x * scaleX},${perspectiveCorners.bottomRight.y * scaleY}`,
-                    `${perspectiveCorners.bottomLeft.x * scaleX},${perspectiveCorners.bottomLeft.y * scaleY}`,
-                  ].join(' ')}
-                  fill="none"
-                  stroke="#00b4d8"
-                  strokeWidth="2"
-                />
-                {/* Corner handles */}
-                {(['topLeft', 'topRight', 'bottomRight', 'bottomLeft'] as const).map(key => {
-                  const pt = perspectiveCorners[key]
-                  return (
-                    <circle
-                      key={key}
-                      cx={pt.x * scaleX}
-                      cy={pt.y * scaleY}
-                      r={10}
-                      fill={perspDragging === key ? '#ff6b6b' : '#00b4d8'}
-                      stroke="#fff"
-                      strokeWidth="2"
-                      style={{ pointerEvents: 'all', cursor: 'grab' }}
-                    />
-                  )
-                })}
-              </svg>
-            )}
           </div>
         </div>
+        {/* Perspective crop overlay — rendered at viewer level to avoid clipping */}
+        {perspectiveMode && perspectiveCorners && (() => {
+          const cw = containerRef.current?.clientWidth ?? 0
+          const ch = containerRef.current?.clientHeight ?? 0
+          // Compute image offset within viewer (centering + pan)
+          const ox = (cw - displayedWidth) / 2 + panOffset.x
+          const oy = (ch - displayedHeight) / 2 + panOffset.y
+          const cornerPt = (key: 'topLeft' | 'topRight' | 'bottomRight' | 'bottomLeft') => ({
+            x: ox + perspectiveCorners[key].x * effectiveZoom,
+            y: oy + perspectiveCorners[key].y * effectiveZoom,
+          })
+          const tl = cornerPt('topLeft'), tr = cornerPt('topRight')
+          const br = cornerPt('bottomRight'), bl = cornerPt('bottomLeft')
+          const pts = `${tl.x},${tl.y} ${tr.x},${tr.y} ${br.x},${br.y} ${bl.x},${bl.y}`
+          return (
+            <svg
+              className="perspective-overlay-svg"
+              style={{ position: 'absolute', left: 0, top: 0, width: cw, height: ch, pointerEvents: 'none', zIndex: 5 }}
+              viewBox={`0 0 ${cw} ${ch}`}
+            >
+              <defs>
+                <mask id="persp-mask">
+                  <rect width={cw} height={ch} fill="white" />
+                  <polygon points={pts} fill="black" />
+                </mask>
+              </defs>
+              <rect width={cw} height={ch} fill="rgba(0,0,0,0.35)" mask="url(#persp-mask)" />
+              <polygon points={pts} fill="none" stroke="#00b4d8" strokeWidth="2.5" />
+              {/* Edge midpoint lines for visibility */}
+              {[
+                { key: 'topLeft' as const, pt: tl },
+                { key: 'topRight' as const, pt: tr },
+                { key: 'bottomRight' as const, pt: br },
+                { key: 'bottomLeft' as const, pt: bl },
+              ].map(({ key, pt }) => (
+                <circle
+                  key={key}
+                  cx={pt.x}
+                  cy={pt.y}
+                  r={12}
+                  fill={perspDragging === key ? '#ff6b6b' : '#00b4d8'}
+                  stroke="#fff"
+                  strokeWidth="2.5"
+                  style={{ pointerEvents: 'all', cursor: perspDragging === key ? 'grabbing' : 'grab' }}
+                />
+              ))}
+            </svg>
+          )
+        })()}
       </div>
 
       {/* Page info */}
