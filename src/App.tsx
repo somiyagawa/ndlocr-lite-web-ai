@@ -426,6 +426,41 @@ export default function App() {
     setSelectedRegion(null)
   }, [])
 
+  // ページ再OCR（結果ビューで画像補正後に現在のページだけOCRをやり直す）
+  const [isReOCRing, setIsReOCRing] = useState(false)
+  const handleReOCRPage = useCallback(async () => {
+    const result = currentResult
+    if (!result || isReOCRing) return
+    setIsReOCRing(true)
+    try {
+      // 補正済み画像があればそれを使う、なければ元画像
+      const imgUrl = preprocessedUrls[selectedResultIndex + 10000] ?? result.imageDataUrl
+      const procImg = await dataUrlToProcessedImage(imgUrl, result.fileName)
+      const ocrResult = await processImage(procImg, 0, 1)
+      // 結果を差し替え（imageDataUrl は補正済み画像を使う）
+      setSessionResults(prev => {
+        const next = [...prev]
+        next[selectedResultIndex] = {
+          ...ocrResult,
+          imageDataUrl: imgUrl,
+        }
+        return next
+      })
+      // 補正済みURLをクリア（画像はもう結果に組み込まれたため）
+      setPreprocessedUrls(prev => {
+        const next = { ...prev }
+        delete next[selectedResultIndex + 10000]
+        return next
+      })
+      setSelectedBlock(null)
+      setSelectedPageBlock(null)
+    } catch (err) {
+      console.error('Re-OCR failed:', err)
+    } finally {
+      setIsReOCRing(false)
+    }
+  }, [currentResult, selectedResultIndex, preprocessedUrls, processImage, isReOCRing])
+
   const handleHistorySelect = useCallback(async (run: DBRunEntry) => {
     // サムネイル画像の実サイズを取得し、ブロック座標をスケーリング
     const restoredResults: OCRResult[] = await Promise.all(
@@ -850,15 +885,27 @@ export default function App() {
                               lang={lang}
                             />
                             {preprocessedUrls[selectedResultIndex + 10000] && (
-                              <p className="region-select-hint" style={{ color: 'var(--color-warning, #e67700)', fontWeight: 500 }}>
-                                {L(lang, {
-                                  ja: '画像補正済み — 領域を選択して「選択領域のOCRを開始」で再認識してください',
-                                  en: 'Image adjusted — select a region and re-run OCR to update text blocks',
-                                  'zh-CN': '图像已校正 — 请选择区域并重新运行OCR以更新文字块',
-                                  'zh-TW': '影像已校正 — 請選取區域並重新執行OCR以更新文字區塊',
-                                  ko: '이미지 보정됨 — 영역을 선택하고 OCR을 다시 실행하여 텍스트 블록을 업데이트하세요',
-                                })}
-                              </p>
+                              <div className="region-action-bar" style={{ flexDirection: 'column', gap: '6px', alignItems: 'flex-start' }}>
+                                <p className="region-select-hint" style={{ color: 'var(--color-warning, #e67700)', fontWeight: 500, margin: 0 }}>
+                                  {L(lang, {
+                                    ja: '画像補正済み — ページ全体を再OCRするか、領域を選択して再認識してください',
+                                    en: 'Image adjusted — re-OCR the full page or select a region to re-recognize',
+                                    'zh-CN': '图像已校正 — 重新OCR整页或选择区域重新识别',
+                                    'zh-TW': '影像已校正 — 重新OCR整頁或選取區域重新辨識',
+                                    ko: '이미지 보정됨 — 전체 페이지를 재OCR하거나 영역을 선택하여 재인식하세요',
+                                  })}
+                                </p>
+                                <button
+                                  className="btn btn-primary btn-sm"
+                                  onClick={handleReOCRPage}
+                                  disabled={isReOCRing}
+                                >
+                                  {isReOCRing
+                                    ? L(lang, { ja: '再OCR中…', en: 'Re-OCR in progress…', 'zh-CN': '重新OCR中…', 'zh-TW': '重新OCR中…', ko: '재OCR 중…', la: 'Re-OCR in cursu…', eo: 'Re-OCR progesas…', es: 'Re-OCR en curso…', de: 'Re-OCR läuft…', ar: '…إعادة OCR جارية', hi: 'पुनः OCR चल रहा है…', ru: 'Повторное OCR…', el: 'Επανάληψη OCR…', syc: '…OCR ܡܢ ܕܪܝܫ' })
+                                    : L(lang, { ja: 'ページを再OCR', en: 'Re-OCR Page', 'zh-CN': '重新OCR此页', 'zh-TW': '重新OCR此頁', ko: '페이지 재OCR', la: 'Paginam re-OCR', eo: 'Re-OCR paĝon', es: 'Re-OCR página', de: 'Seite erneut OCR', ar: 'إعادة OCR للصفحة', hi: 'पृष्ठ पुनः OCR', ru: 'Повторное OCR страницы', el: 'Επανάληψη OCR σελίδας', syc: 'OCR ܕܦܐ ܡܢ ܕܪܝܫ' })
+                                  }
+                                </button>
+                              </div>
                             )}
                             {selectedRegion && (
                               <div className="region-action-bar">
