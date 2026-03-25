@@ -1011,8 +1011,8 @@ export default function App() {
                               onReadingOrderChange={handleReadingOrderChange}
                             />
                             {preprocessedUrls[selectedResultIndex + 10000] && (
-                              <div className="region-action-bar" style={{ flexDirection: 'column', gap: '6px', alignItems: 'flex-start' }}>
-                                <p className="region-select-hint" style={{ color: 'var(--color-warning, #e67700)', fontWeight: 500, margin: 0 }}>
+                              <div className="region-action-bar" style={{ flexDirection: 'column', gap: '6px', alignItems: 'center' }}>
+                                <p className="region-select-hint" style={{ color: 'var(--color-warning, #e67700)', fontWeight: 500, margin: 0, textAlign: 'center' }}>
                                   {L(lang, {
                                     ja: '画像補正済み — ページ全体を再OCRするか、領域を選択して再認識してください',
                                     en: 'Image adjusted — re-OCR the full page or select a region to re-recognize',
