@@ -609,8 +609,13 @@ export function dewarpPage(imageData: ImageData): ImageData {
     // dark pixel density. The midpoint of (top, bottom) reveals page curvature.
     const minDarkRatio = 0.02
 
+    // Fused single-pass: edge detection + centroid per strip
     const stripMidYs = new Float32Array(numSegments)
+    const stripCentroidYs = new Float32Array(numSegments)
     const stripValid = new Uint8Array(numSegments)
+    const centroidValid = new Uint8Array(numSegments)
+    const yStart10 = Math.round(height * 0.1)
+    const yEnd90 = Math.round(height * 0.9)
 
     for (let s = 0; s < numSegments; s++) {
       const x0 = s * segWidth
@@ -618,22 +623,33 @@ export function dewarpPage(imageData: ImageData): ImageData {
       const sw = x1 - x0
       if (sw < 4) continue
 
-      // Row-wise dark pixel density within this strip
       let topEdge = -1, bottomEdge = -1
+      let sumY = 0, sumW = 0
+
       for (let y = 0; y < height; y++) {
         let darkCnt = 0
         for (let x = x0; x < x1; x++) {
           if (gray[y * width + x] < threshold) darkCnt++
         }
+        // Edge detection
         if (darkCnt / sw > minDarkRatio) {
           if (topEdge < 0) topEdge = y
           bottomEdge = y
+        }
+        // Centroid accumulation (within 10%-90% height range)
+        if (y >= yStart10 && y < yEnd90) {
+          sumY += y * darkCnt
+          sumW += darkCnt
         }
       }
 
       if (topEdge >= 0 && bottomEdge > topEdge + height * 0.1) {
         stripMidYs[s] = (topEdge + bottomEdge) / 2
         stripValid[s] = 1
+      }
+      if (sumW > 0) {
+        stripCentroidYs[s] = sumY / sumW
+        centroidValid[s] = 1
       }
     }
 
@@ -653,28 +669,7 @@ export function dewarpPage(imageData: ImageData): ImageData {
       }
     }
 
-    // Also cross-validate with Y-centroid of dark pixels per strip
-    // (complementary signal — robust for pages where text area is uniform)
-    const stripCentroidYs = new Float32Array(numSegments)
-    const centroidValid = new Uint8Array(numSegments)
-    for (let s = 0; s < numSegments; s++) {
-      const x0 = s * segWidth
-      const x1 = Math.min(x0 + segWidth, width)
-      let sumY = 0, sumW = 0
-      for (let y = Math.round(height * 0.1); y < Math.round(height * 0.9); y++) {
-        let darkCnt = 0
-        for (let x = x0; x < x1; x++) {
-          if (gray[y * width + x] < threshold) darkCnt++
-        }
-        sumY += y * darkCnt
-        sumW += darkCnt
-      }
-      if (sumW > 0) {
-        stripCentroidYs[s] = sumY / sumW
-        centroidValid[s] = 1
-      }
-    }
-
+    // Cross-validate with Y-centroid
     let meanCentroid = 0
     let centroidCnt = 0
     for (let s = 0; s < numSegments; s++) {
@@ -682,7 +677,6 @@ export function dewarpPage(imageData: ImageData): ImageData {
     }
     if (centroidCnt > numSegments * 0.3) {
       meanCentroid /= centroidCnt
-      // Average with the edge-based signal for robustness
       for (let s = 0; s < numSegments; s++) {
         if (centroidValid[s]) {
           const centroidShift = stripCentroidYs[s] - meanCentroid
@@ -744,34 +738,43 @@ export function dewarpPage(imageData: ImageData): ImageData {
   }
 
   // 6. Remap pixels — Y-shift always varies by X-position (for both orientations)
+  // Precompute per-column shift to avoid repeated segment interpolation in the hot loop
+  const colShift = new Float32Array(width)
+  const invW = (numSegments - 1) / width
+  for (let x = 0; x < width; x++) {
+    const segF = x * invW
+    const s0 = segF | 0 // fast floor
+    const s1 = s0 < numSegments - 1 ? s0 + 1 : s0
+    const t = segF - s0
+    colShift[x] = smoothShifts[s0] * (1 - t) + smoothShifts[s1] * t
+  }
+
   const { ctx } = createCanvas(width, height)
   const outImageData = ctx.createImageData(width, height)
   const outData = outImageData.data
+  const w4 = width * 4
 
   for (let y = 0; y < height; y++) {
+    const rowOut = y * w4
     for (let x = 0; x < width; x++) {
-      const segF = (x / width) * (numSegments - 1)
-      const s0 = Math.floor(segF)
-      const s1 = Math.min(s0 + 1, numSegments - 1)
-      const t = segF - s0
-      const shift = smoothShifts[s0] * (1 - t) + smoothShifts[s1] * t
-
-      const srcY = y + shift
-      const srcYi = Math.floor(srcY)
+      const srcY = y + colShift[x]
+      const srcYi = srcY | 0 // fast floor for positive values
       const frac = srcY - srcYi
 
+      const di = rowOut + x * 4
+
       if (srcYi < 0 || srcYi >= height - 1) {
-        const di = (y * width + x) * 4
         outData[di] = 255; outData[di + 1] = 255; outData[di + 2] = 255; outData[di + 3] = 255
         continue
       }
 
-      const di = (y * width + x) * 4
-      const si0 = (srcYi * width + x) * 4
-      const si1 = ((srcYi + 1) * width + x) * 4
-      for (let c = 0; c < 4; c++) {
-        outData[di + c] = Math.round(data[si0 + c] * (1 - frac) + data[si1 + c] * frac)
-      }
+      const si0 = srcYi * w4 + x * 4
+      const si1 = si0 + w4
+      const oneMinusFrac = 1 - frac
+      outData[di]     = data[si0]     * oneMinusFrac + data[si1]     * frac + 0.5 | 0
+      outData[di + 1] = data[si0 + 1] * oneMinusFrac + data[si1 + 1] * frac + 0.5 | 0
+      outData[di + 2] = data[si0 + 2] * oneMinusFrac + data[si1 + 2] * frac + 0.5 | 0
+      outData[di + 3] = data[si0 + 3] * oneMinusFrac + data[si1 + 3] * frac + 0.5 | 0
     }
   }
 

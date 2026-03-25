@@ -110,9 +110,13 @@ export function TextEditor({
     return matches
   }, [searchQuery, displayText, shouldShowDiff])
 
-  // Line numbers
+  // Line numbers — count newlines without creating a temporary array
   const lineCount = useMemo(() => {
-    return displayText.split('\n').length
+    let count = 1
+    for (let i = 0; i < displayText.length; i++) {
+      if (displayText.charCodeAt(i) === 10) count++
+    }
+    return count
   }, [displayText])
 
   // Character count
@@ -121,14 +125,32 @@ export function TextEditor({
   const prevDisplayTextRef = useRef(displayText)
   prevDisplayTextRef.current = displayText
 
+  // Debounced undo: batch rapid keystrokes into one undo entry (500ms idle)
+  const undoTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pendingUndoRef = useRef<string | null>(null)
+
+  const flushUndo = useCallback(() => {
+    if (pendingUndoRef.current !== null) {
+      const text = pendingUndoRef.current
+      setUndoStack(prev => [...prev, { text, cursorPos: textareaRef.current?.selectionStart }])
+      pendingUndoRef.current = null
+    }
+  }, [])
+
   const handleTextChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       const newText = e.target.value
       const currentText = prevDisplayTextRef.current
 
-      // Add current text to undo stack before changing
       if (currentText !== newText) {
-        setUndoStack(prev => [...prev, { text: currentText, cursorPos: textareaRef.current?.selectionStart }])
+        // Only record the first snapshot of a burst of keystrokes
+        if (pendingUndoRef.current === null) {
+          pendingUndoRef.current = currentText
+        }
+        // Reset the timer on each keystroke; flush after 500ms idle
+        if (undoTimerRef.current) clearTimeout(undoTimerRef.current)
+        undoTimerRef.current = setTimeout(flushUndo, 500)
+
         setRedoStack([])
         setSaved(false)
       }
@@ -136,7 +158,7 @@ export function TextEditor({
       setEditedText(newText)
       onTextChange?.(newText)
     },
-    [onTextChange],
+    [onTextChange, flushUndo],
   )
 
   // Scroll sync for line numbers
@@ -308,6 +330,10 @@ export function TextEditor({
   }
 
   const handleUndo = useCallback(() => {
+    // Flush any pending debounced undo entry first
+    if (undoTimerRef.current) { clearTimeout(undoTimerRef.current); undoTimerRef.current = null }
+    flushUndo()
+
     setUndoStack(prev => {
       if (prev.length === 0) return prev
       const newStack = [...prev]
@@ -329,7 +355,7 @@ export function TextEditor({
 
       return newStack
     })
-  }, [onTextChange])
+  }, [onTextChange, flushUndo])
 
   const handleRedo = useCallback(() => {
     setRedoStack(prev => {

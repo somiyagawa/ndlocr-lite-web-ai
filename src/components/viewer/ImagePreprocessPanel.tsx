@@ -50,6 +50,8 @@ type TranslationStrings = {
   binarizeThreshold: string
   denoise: string
   invertColors: string
+  dewarp: string
+  dewarpTip: string
   deskewAuto: string
   autoCrop: string
   splitCenter: string
@@ -75,6 +77,8 @@ const t: Record<Language, TranslationStrings> = {
     binarizeThreshold: '二値化閾値',
     denoise: 'ノイズ除去',
     invertColors: '反転',
+    dewarp: '湾曲補正',
+    dewarpTip: '本の見開きページの湾曲を平らに補正します',
     deskewAuto: '自動傾き補正',
     autoCrop: '自動裁ち落とし',
     splitCenter: 'センター分割',
@@ -98,6 +102,8 @@ const t: Record<Language, TranslationStrings> = {
     binarizeThreshold: 'Binarize Threshold',
     denoise: 'Denoise',
     invertColors: 'Invert Colors',
+    dewarp: 'Dewarp',
+    dewarpTip: 'Flatten curved book page spread',
     deskewAuto: 'Deskew (auto)',
     autoCrop: 'Auto Crop',
     splitCenter: 'Split Center',
@@ -121,6 +127,8 @@ const t: Record<Language, TranslationStrings> = {
     binarizeThreshold: '二值化阈值',
     denoise: '降噪',
     invertColors: '反转颜色',
+    dewarp: '弯曲校正',
+    dewarpTip: '将弯曲的书页展平',
     deskewAuto: '自动去斜',
     autoCrop: '自动裁剪',
     splitCenter: '中心分割',
@@ -144,6 +152,8 @@ const t: Record<Language, TranslationStrings> = {
     binarizeThreshold: '二值化閾值',
     denoise: '降噪',
     invertColors: '反轉顏色',
+    dewarp: '彎曲校正',
+    dewarpTip: '將彎曲的書頁展平',
     deskewAuto: '自動去斜',
     autoCrop: '自動裁剪',
     splitCenter: '中心分割',
@@ -167,6 +177,8 @@ const t: Record<Language, TranslationStrings> = {
     binarizeThreshold: '이진화 임계값',
     denoise: '노이즈 제거',
     invertColors: '색 반전',
+    dewarp: '곡면 보정',
+    dewarpTip: '구부러진 책 페이지를 평평하게 보정합니다',
     deskewAuto: '자동 기울기 보정',
     autoCrop: '자동 자르기',
     splitCenter: '중심 분할',
@@ -190,6 +202,8 @@ const t: Record<Language, TranslationStrings> = {
     binarizeThreshold: 'Limen binarizationis',
     denoise: 'Strepitum removere',
     invertColors: 'Colores invertere',
+    dewarp: 'Complanare',
+    dewarpTip: 'Paginam libri curvam complanare',
     deskewAuto: 'Automatice corrigere',
     autoCrop: 'Automatice secare',
     splitCenter: 'In medio dividere',
@@ -213,6 +227,8 @@ const t: Record<Language, TranslationStrings> = {
     binarizeThreshold: 'Sojlo de binarigo',
     denoise: 'Forigi bruon',
     invertColors: 'Inversigi kolorojn',
+    dewarp: 'Platigi',
+    dewarpTip: 'Platigi kurban libran paĝon',
     deskewAuto: 'Aŭtomate korekti',
     autoCrop: 'Aŭtomate tondi',
     splitCenter: 'Dividi centre',
@@ -236,6 +252,8 @@ const t: Record<Language, TranslationStrings> = {
     binarizeThreshold: 'Umbral',
     denoise: 'Reducir ruido',
     invertColors: 'Invertir colores',
+    dewarp: 'Aplanar',
+    dewarpTip: 'Aplanar página curva de libro',
     deskewAuto: 'Corrección automática',
     autoCrop: 'Recorte automático',
     splitCenter: 'Dividir al centro',
@@ -259,6 +277,8 @@ const t: Record<Language, TranslationStrings> = {
     binarizeThreshold: 'Schwellenwert',
     denoise: 'Rauschunterdrückung',
     invertColors: 'Farben invertieren',
+    dewarp: 'Entzerren',
+    dewarpTip: 'Gewölbte Buchseite begradigen',
     deskewAuto: 'Automatische Entzerrung',
     autoCrop: 'Automatischer Zuschnitt',
     splitCenter: 'Mittig teilen',
@@ -282,6 +302,8 @@ const t: Record<Language, TranslationStrings> = {
     binarizeThreshold: 'العتبة',
     denoise: 'إزالة الضوضاء',
     invertColors: 'عكس الألوان',
+    dewarp: 'تسطيح',
+    dewarpTip: 'تسطيح صفحة الكتاب المنحنية',
     deskewAuto: 'تصحيح تلقائي',
     autoCrop: 'قص تلقائي',
     splitCenter: 'تقسيم من المنتصف',
@@ -305,6 +327,8 @@ const t: Record<Language, TranslationStrings> = {
     binarizeThreshold: 'सीमा',
     denoise: 'शोर कम करें',
     invertColors: 'रंग उलटें',
+    dewarp: 'समतलीकरण',
+    dewarpTip: 'मुड़े हुए पुस्तक पृष्ठ को सपाट करें',
     deskewAuto: 'स्वचालित सुधार',
     autoCrop: 'स्वचालित काट-छाँट',
     splitCenter: 'केंद्र से विभाजन',
@@ -328,6 +352,8 @@ const t: Record<Language, TranslationStrings> = {
     binarizeThreshold: 'Пороговое значение',
     denoise: 'Удаление шума',
     invertColors: 'Инверсия цветов',
+    dewarp: 'Выпрямить',
+    dewarpTip: 'Выпрямить изогнутую страницу книги',
     deskewAuto: 'Автоматическое выравнивание',
     autoCrop: 'Автоматическая обрезка',
     splitCenter: 'Разделение по центру',
@@ -351,6 +377,8 @@ const t: Record<Language, TranslationStrings> = {
     binarizeThreshold: 'Όριο δυαδοποίησης',
     denoise: 'Αφαίρεση θορύβου',
     invertColors: 'Αντιστροφή χρωμάτων',
+    dewarp: 'Ισιώνω',
+    dewarpTip: 'Ισιώστε τη λυγισμένη σελίδα βιβλίου',
     deskewAuto: 'Αυτόματη διόρθωση κλίσης',
     autoCrop: 'Αυτόματη αποκοπή',
     splitCenter: 'Διαίρεση κέντρου',
@@ -374,6 +402,8 @@ const t: Record<Language, TranslationStrings> = {
     binarizeThreshold: 'ܚܕܓܐ ܕܕܪܪܓ ܬܘܪܠܢܐ',
     denoise: 'ܡܦܩ ܦܪܝܫܐ',
     invertColors: 'ܘܬܪܐ ܓܢܘܢܐ',
+    dewarp: 'ܦܫܘܛ',
+    dewarpTip: 'ܦܫܘܛ ܕ̈ܦ̈ܐ ܕ̈ܟ̈ܬ̈ܒ̈ ܡ̈ܥ̈ܩ̈ܡ̈ܐ',
     deskewAuto: 'ܬܘܦܪܐ ܓܢܒܐ',
     autoCrop: 'ܩܛܝܥܐ ܓܢܒܐ',
     splitCenter: 'ܦܠܓܐ ܒܡܨܥܬܐ',
@@ -397,6 +427,8 @@ const t: Record<Language, TranslationStrings> = {
     binarizeThreshold: 'ⲡⲓⲣⲟ',
     denoise: 'ⲃⲱⲗ ⲉⲃⲟⲗ ⲙⲡⲓⲑⲣⲱⲟⲩ',
     invertColors: 'ⲫⲟⲛϩ ⲛⲛⲓⲱⲛ',
+    dewarp: 'ⲁⲣⲓⲥⲟⲩⲧⲉⲛ',
+    dewarpTip: 'ⲁⲣⲓⲥⲟⲩⲧⲉⲛ ⲛⲧⲉ ⲡⲓϫⲱⲙ ⲉⲧⲕⲩⲗϫ',
     deskewAuto: 'ⲥⲟⲩⲧⲉⲛ',
     autoCrop: 'ϣⲁⲧ',
     splitCenter: 'ⲫⲱϣ ϧⲉⲛ ⲑⲙⲏⲧⲓ',
@@ -420,6 +452,8 @@ const t: Record<Language, TranslationStrings> = {
     binarizeThreshold: 'द्विमानसीमा',
     denoise: 'शब्दापनयनम्',
     invertColors: 'वर्णव्युत्क्रमणम्',
+    dewarp: 'समतलीकरणम्',
+    dewarpTip: 'वक्रं पुस्तकपृष्ठं समतलं कुरुत',
     deskewAuto: 'स्वतः ऋजूकरणम्',
     autoCrop: 'स्वतः कर्तनम्',
     splitCenter: 'मध्ये विभागः',
@@ -512,6 +546,18 @@ export function ImagePreprocessPanel({
       setIsProcessing(false)
     }
   }, [imageDataUrl, options, onProcessed])
+
+  const handleDewarp = useCallback(async () => {
+    setIsProcessing(true)
+    try {
+      const result = await dewarpImage(imageDataUrl)
+      onProcessed(result)
+    } catch (err) {
+      console.error('Dewarp error:', err)
+    } finally {
+      setIsProcessing(false)
+    }
+  }, [imageDataUrl, onProcessed])
 
   const handleReset = useCallback(() => {
     setOptions(DEFAULT_PREPROCESS_OPTIONS)
@@ -662,6 +708,15 @@ export function ImagePreprocessPanel({
 
           {/* Action Buttons */}
           <div className="preprocess-actions">
+            <button
+              className="preprocess-btn preprocess-btn-secondary"
+              onClick={handleDewarp}
+              disabled={isProcessing}
+              type="button"
+              title={strings.dewarpTip}
+            >
+              {isProcessing ? strings.processing : strings.dewarp}
+            </button>
             <button
               className="preprocess-btn preprocess-btn-secondary"
               onClick={handleDeskew}
@@ -888,6 +943,36 @@ function applyDenoise(imageData: ImageData): void {
       }
     }
   }
+}
+
+async function dewarpImage(imageDataUrl: string): Promise<string> {
+  const { dewarpPage } = await import('../../utils/documentScanner')
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      try {
+        const canvas = document.createElement('canvas')
+        canvas.width = img.width
+        canvas.height = img.height
+        const ctx = canvas.getContext('2d')
+        if (!ctx) throw new Error('Failed to get canvas context')
+        ctx.drawImage(img, 0, 0)
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+        const result = dewarpPage(imageData)
+        const outCanvas = document.createElement('canvas')
+        outCanvas.width = result.width
+        outCanvas.height = result.height
+        const outCtx = outCanvas.getContext('2d')!
+        outCtx.putImageData(result, 0, 0)
+        resolve(outCanvas.toDataURL('image/jpeg', 0.92))
+      } catch (err) {
+        reject(err)
+      }
+    }
+    img.onerror = () => reject(new Error('Failed to load image'))
+    img.src = imageDataUrl
+  })
 }
 
 async function deskewImage(imageDataUrl: string): Promise<string> {

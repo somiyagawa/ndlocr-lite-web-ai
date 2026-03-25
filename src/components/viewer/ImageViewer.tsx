@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState, useCallback } from 'react'
+import { useRef, useEffect, useState, useCallback, useMemo } from 'react'
 import type { TextBlock, BoundingBox, PageBlock } from '../../types/ocr'
 
 interface ImageViewerProps {
@@ -104,8 +104,8 @@ export function ImageViewer({
 
   const activeMode: InteractionMode = spaceHeld ? 'pan' : mode
 
-  const scaleX = naturalSize.width > 0 ? imgSize.width / naturalSize.width : 1
-  const scaleY = naturalSize.height > 0 ? imgSize.height / naturalSize.height : 1
+  const scaleX = useMemo(() => naturalSize.width > 0 ? imgSize.width / naturalSize.width : 1, [imgSize.width, naturalSize.width])
+  const scaleY = useMemo(() => naturalSize.height > 0 ? imgSize.height / naturalSize.height : 1, [imgSize.height, naturalSize.height])
 
   const getRelativePos = (e: React.MouseEvent) => {
     const rect = imgRef.current?.getBoundingClientRect()
@@ -324,6 +324,62 @@ export function ImageViewer({
     }
   }, [])
 
+  // ─── Memoized overlay elements ───
+  const pageBlockOverlays = useMemo(() => {
+    if (!pageBlocks) return null
+    return pageBlocks.map((block, i) => (
+      <div
+        key={`pb-${i}`}
+        className={`page-block-box ${selectedPageBlock === block ? 'selected' : ''}`}
+        style={{
+          left: block.x * scaleX, top: block.y * scaleY,
+          width: block.width * scaleX, height: block.height * scaleY,
+        }}
+        onClick={(e) => { e.stopPropagation(); onPageBlockSelect?.(block) }}
+        title={`Block ${i + 1}`}
+      />
+    ))
+  }, [pageBlocks, selectedPageBlock, scaleX, scaleY, onPageBlockSelect])
+
+  const textBlockOverlays = useMemo(() => {
+    return textBlocks.map((block, i) => {
+      const conf = block.confidence ?? 0.5
+      const confColor = showConfidence
+        ? `hsla(${Math.round(conf * 120)}, 85%, 50%, 0.5)`
+        : undefined
+      const confBorder = showConfidence
+        ? `2px solid hsla(${Math.round(conf * 120)}, 85%, 45%, 0.8)`
+        : undefined
+
+      return (
+        <div
+          key={i}
+          className={`region-box ${selectedBlock === block ? 'selected' : ''} ${showTextOverlay ? 'region-box-text-overlay' : ''}`}
+          style={{
+            left: block.x * scaleX, top: block.y * scaleY,
+            width: block.width * scaleX, height: block.height * scaleY,
+            ...(confColor ? { background: confColor, border: confBorder } : {}),
+          }}
+          onClick={() => onBlockSelect(block)}
+          title={`${block.text}${showConfidence ? ` (${Math.round(conf * 100)}%)` : ''}`}
+        >
+          {showReadingOrder && (
+            <span className="region-reading-order">{block.readingOrder}</span>
+          )}
+          {showTextOverlay && (
+            <span
+              className="region-text-label"
+              style={{
+                writingMode: block.height > block.width * 1.3 ? 'vertical-rl' : 'horizontal-tb',
+                textOrientation: block.height > block.width * 1.3 ? 'mixed' : undefined,
+              }}
+            >{block.text}</span>
+          )}
+        </div>
+      )
+    })
+  }, [textBlocks, selectedBlock, showConfidence, showTextOverlay, showReadingOrder, scaleX, scaleY, onBlockSelect])
+
   // ─── Derived state ───
   const selectionRect = dragStart && dragCurrent ? {
     left: Math.min(dragStart.x, dragCurrent.x),
@@ -452,55 +508,8 @@ export function ImageViewer({
 
           {/* Overlays */}
           <div className="viewer-overlay" style={{ width: imgSize.width, height: imgSize.height }}>
-            {pageBlocks?.map((block, i) => (
-              <div
-                key={`pb-${i}`}
-                className={`page-block-box ${selectedPageBlock === block ? 'selected' : ''}`}
-                style={{
-                  left: block.x * scaleX, top: block.y * scaleY,
-                  width: block.width * scaleX, height: block.height * scaleY,
-                }}
-                onClick={(e) => { e.stopPropagation(); onPageBlockSelect?.(block) }}
-                title={`Block ${i + 1}`}
-              />
-            ))}
-            {textBlocks.map((block, i) => {
-              // Confidence color: green (high) → yellow → red (low)
-              const conf = block.confidence ?? 0.5
-              const confColor = showConfidence
-                ? `hsla(${Math.round(conf * 120)}, 85%, 50%, 0.5)`
-                : undefined
-              const confBorder = showConfidence
-                ? `2px solid hsla(${Math.round(conf * 120)}, 85%, 45%, 0.8)`
-                : undefined
-
-              return (
-                <div
-                  key={i}
-                  className={`region-box ${selectedBlock === block ? 'selected' : ''} ${showTextOverlay ? 'region-box-text-overlay' : ''}`}
-                  style={{
-                    left: block.x * scaleX, top: block.y * scaleY,
-                    width: block.width * scaleX, height: block.height * scaleY,
-                    ...(confColor ? { background: confColor, border: confBorder } : {}),
-                  }}
-                  onClick={() => onBlockSelect(block)}
-                  title={`${block.text}${showConfidence ? ` (${Math.round(conf * 100)}%)` : ''}`}
-                >
-                  {showReadingOrder && (
-                    <span className="region-reading-order">{block.readingOrder}</span>
-                  )}
-                  {showTextOverlay && (
-                    <span
-                      className="region-text-label"
-                      style={{
-                        writingMode: block.height > block.width * 1.3 ? 'vertical-rl' : 'horizontal-tb',
-                        textOrientation: block.height > block.width * 1.3 ? 'mixed' : undefined,
-                      }}
-                    >{block.text}</span>
-                  )}
-                </div>
-              )
-            })}
+            {pageBlockOverlays}
+            {textBlockOverlays}
             {selectionRect && (
               <div className="drag-selection" style={{
                 left: selectionRect.left, top: selectionRect.top,
