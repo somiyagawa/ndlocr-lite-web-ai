@@ -1296,18 +1296,47 @@ function findContentBounds(imageData: ImageData): Bounds {
   const width = imageData.width
   const height = imageData.height
 
+  // まずグレースケールヒストグラムを構築
+  const histogram = new Uint32Array(256)
+  for (let i = 0; i < data.length; i += 4) {
+    const brightness = Math.round((data[i] + data[i + 1] + data[i + 2]) / 3)
+    histogram[brightness]++
+  }
+
+  // 大津の方法でコンテンツ/背景の閾値を自動算出
+  const totalPixels = width * height
+  let sumAll = 0
+  for (let i = 0; i < 256; i++) sumAll += i * histogram[i]
+
+  let sumBg = 0, weightBg = 0
+  let maxVariance = 0, threshold = 200
+
+  for (let t = 0; t < 256; t++) {
+    weightBg += histogram[t]
+    if (weightBg === 0) continue
+    const weightFg = totalPixels - weightBg
+    if (weightFg === 0) break
+
+    sumBg += t * histogram[t]
+    const meanBg = sumBg / weightBg
+    const meanFg = (sumAll - sumBg) / weightFg
+    const variance = weightBg * weightFg * (meanBg - meanFg) ** 2
+    if (variance > maxVariance) {
+      maxVariance = variance
+      threshold = t
+    }
+  }
+
+  // 閾値を少し余裕をもたせる（背景側に5加算、ただし最大250）
+  threshold = Math.min(250, threshold + 5)
+
   let minX = width, maxX = 0
   let minY = height, maxY = 0
-  const threshold = 240
 
   for (let y = 0; y < height; y++) {
     for (let x = 0; x < width; x++) {
       const idx = (y * width + x) * 4
-      const r = data[idx]
-      const g = data[idx + 1]
-      const b = data[idx + 2]
-      const brightness = (r + g + b) / 3
-
+      const brightness = (data[idx] + data[idx + 1] + data[idx + 2]) / 3
       if (brightness < threshold) {
         minX = Math.min(minX, x)
         maxX = Math.max(maxX, x)
@@ -1317,11 +1346,18 @@ function findContentBounds(imageData: ImageData): Bounds {
     }
   }
 
+  // コンテンツが検出されなかった場合は元画像の全域を返す
+  if (maxX <= minX || maxY <= minY) {
+    return { left: 0, right: width, top: 0, bottom: height }
+  }
+
+  // マージン（画像サイズの1%、最低5px）
+  const margin = Math.max(5, Math.round(Math.min(width, height) * 0.01))
   return {
-    left: Math.max(0, minX - 10),
-    right: Math.min(width, maxX + 10),
-    top: Math.max(0, minY - 10),
-    bottom: Math.min(height, maxY + 10),
+    left: Math.max(0, minX - margin),
+    right: Math.min(width, maxX + margin),
+    top: Math.max(0, minY - margin),
+    bottom: Math.min(height, maxY + margin),
   }
 }
 
