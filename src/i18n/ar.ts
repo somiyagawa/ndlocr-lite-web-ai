@@ -66,4 +66,7 @@ export const ar: Translations = {
     fileLoad: 'فشل تحميل الملف',
     clipboardNotSupported: 'لا يمكن الوصول إلى الحافظة',
   },
+  tooltip: {
+    dragPageReorder: 'اسحب لإعادة الترتيب',
+  },
 }

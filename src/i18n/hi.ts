@@ -66,4 +66,7 @@ export const hi: Translations = {
     fileLoad: 'फ़ाइल लोड करने में विफल',
     clipboardNotSupported: 'क्लिपबोर्ड तक पहुँचा नहीं जा सकता',
   },
+  tooltip: {
+    dragPageReorder: 'पुनः व्यवस्थित करने के लिए खींचें',
+  },
 }

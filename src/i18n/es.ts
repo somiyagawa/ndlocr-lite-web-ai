@@ -66,4 +66,7 @@ export const es: Translations = {
     fileLoad: 'Error al cargar el archivo',
     clipboardNotSupported: 'No se puede acceder al portapapeles',
   },
+  tooltip: {
+    dragPageReorder: 'Arrastrar para reordenar',
+  },
 }

@@ -66,4 +66,7 @@ export const sa: Translations = {
     fileLoad: 'सञ्चिकावहनम् अपराद्धम्',
     clipboardNotSupported: 'अङ्कपटलिका अलभ्या',
   },
+  tooltip: {
+    dragPageReorder: 'आकर्षयत पुनः व्यवस्थयनाय',
+  },
 }

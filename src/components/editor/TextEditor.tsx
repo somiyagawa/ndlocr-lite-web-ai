@@ -1,5 +1,5 @@
-import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
-import type { OCRResult, TextBlock } from '../../types/ocr'
+import { useState, useCallback, useEffect, useRef, useMemo, lazy, Suspense } from 'react'
+import type { OCRResult, TextBlock, TEIMetadata } from '../../types/ocr'
 import type { AIConnector } from '../../types/ai'
 import type { AIConnectionStatus } from '../../hooks/useAISettings'
 import { downloadText, copyToClipboard } from '../../utils/textExport'
@@ -11,6 +11,8 @@ import { DiffView } from './DiffView'
 import type { Language } from '../../i18n'
 import { L } from '../../i18n'
 
+const TEIMetadataModal = lazy(() => import('../settings/TEIMetadataModal').then(m => ({ default: m.TEIMetadataModal })))
+
 interface TextEditorProps {
   result: OCRResult | null
   allResults?: OCRResult[]
@@ -21,12 +23,19 @@ interface TextEditorProps {
   aiConnector: AIConnector | null
   aiConnectionStatus?: AIConnectionStatus
   imageDataUrl?: string
+  onBatchProofread?: (results: Map<number, string>) => void
 }
 
 type ProofreadState =
   | { status: 'idle' }
   | { status: 'loading' }
   | { status: 'done'; originalText: string; correctedText: string }
+  | { status: 'error'; message: string }
+
+type BatchProofreadState =
+  | { status: 'idle' }
+  | { status: 'loading'; current: number; total: number; message?: string }
+  | { status: 'done'; results: Map<number, { original: string; corrected: string }>; message?: string }
   | { status: 'error'; message: string }
 
 interface SearchMatch {
@@ -49,12 +58,14 @@ export function TextEditor({
   aiConnector,
   aiConnectionStatus = 'disconnected',
   imageDataUrl,
+  onBatchProofread,
 }: TextEditorProps) {
   const [editedText, setEditedText] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const [includeFileName, setIncludeFileName] = useState(false)
   const [ignoreNewlines, setIgnoreNewlines] = useState(false)
   const [proofreadState, setProofreadState] = useState<ProofreadState>({ status: 'idle' })
+  const [batchProofreadState, setBatchProofreadState] = useState<BatchProofreadState>({ status: 'idle' })
   const [fontSize, setFontSize] = useState(14)
   const [lineSpacing, setLineSpacing] = useState(1.9)
   const [fontFamily, setFontFamily] = useState<string>('mono')
@@ -70,6 +81,9 @@ export function TextEditor({
   const [showExportMenu, setShowExportMenu] = useState(false)
   const [highlightRange, setHighlightRange] = useState<{ start: number; end: number } | null>(null)
   const [computedLineHeight, setComputedLineHeight] = useState<number>(0)
+  const [showTEIMetadataModal, setShowTEIMetadataModal] = useState(false)
+  const [teiMetadataMode, setTeiMetadataMode] = useState<'single' | 'batch'>('single')
+  const [lastTEIMetadata, setLastTEIMetadata] = useState<TEIMetadata | undefined>(undefined)
 
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const gutterRef = useRef<HTMLDivElement>(null)
@@ -205,6 +219,7 @@ export function TextEditor({
     setPrevResultId(result.id)
     setEditedText(null)
     setProofreadState({ status: 'idle' })
+    setBatchProofreadState({ status: 'idle' })
     setUndoStack([])
     setRedoStack([])
     setSaved(true)
@@ -432,7 +447,8 @@ export function TextEditor({
         result.fileName,
       )
     } else if (format === 'tei') {
-      downloadTEI(result)
+      setTeiMetadataMode('single')
+      setShowTEIMetadataModal(true)
     } else if (format === 'hocr') {
       downloadHOCR(result)
     } else if (format === 'pdf') {
@@ -442,6 +458,18 @@ export function TextEditor({
     }
     setSaved(true)
   }, [result, editedText, imageDataUrl, includeFileName, ignoreNewlines]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  // TEI Metadata Modal handlers
+  const handleTEIMetadataSave = useCallback((metadata: TEIMetadata) => {
+    setLastTEIMetadata(metadata)
+    setShowTEIMetadataModal(false)
+
+    if (teiMetadataMode === 'single' && result) {
+      downloadTEI(result, metadata)
+    } else if (teiMetadataMode === 'batch' && allResults.length > 0) {
+      downloadBatchTEI(allResults, metadata)
+    }
+  }, [result, allResults, teiMetadataMode])
 
   // 全ページ一括エクスポート
   const handleBatchExport = useCallback((format: 'txt' | 'tei' | 'hocr' | 'pdf' | 'docx') => {
@@ -462,7 +490,8 @@ export function TextEditor({
       a.click()
       URL.revokeObjectURL(url)
     } else if (format === 'tei') {
-      downloadBatchTEI(allResults)
+      setTeiMetadataMode('batch')
+      setShowTEIMetadataModal(true)
     } else if (format === 'hocr') {
       downloadBatchHOCR(allResults)
     } else if (format === 'pdf') {
@@ -538,6 +567,126 @@ export function TextEditor({
   // 校正結果を全て却下
   const handleRejectAll = useCallback(() => {
     setProofreadState({ status: 'idle' })
+  }, [])
+
+  // バッチAI校正実行
+  const handleBatchProofread = useCallback(async () => {
+    if (!aiConnector || allResults.length <= 1) return
+
+    // AI未接続（接続テスト未実施）の場合、警告を表示
+    if (aiConnectionStatus !== 'connected') {
+      const msg = L(lang, {
+        ja: 'AI接続が確認されていません。設定画面で接続テストを実行してください。続行しますか？',
+        en: 'AI connection has not been verified. Please run a connection test in Settings. Continue anyway?',
+        'zh-CN': 'AI连接未验证。请在设置中运行连接测试。是否继续？',
+        'zh-TW': 'AI連接未驗證。請在設定中執行連接測試。是否繼續？',
+        ko: 'AI 연결이 확인되지 않았습니다. 설정에서 연결 테스트를 실행하십시오. 계속 진행하시겠습니까?',
+        la: 'Connexio AI non verificata est. Testem connexionis in Apparatibus praecipe. Pergere tamen?',
+        eo: 'AI-konekto ne estas verifikita. Bonvolu ruli ligpruvon en Agordoj. Ĉu daŭrigi?',
+        es: 'La conexión AI no ha sido verificada. Ejecute una prueba de conexión en Configuración. ¿Continuar de todos modos?',
+        de: 'Die KI-Verbindung wurde nicht überprüft. Bitte führen Sie einen Verbindungstest in den Einstellungen durch. Trotzdem fortfahren?',
+        ar: 'لم يتم التحقق من اتصال AI. يرجى إجراء اختبار الاتصال في الإعدادات. هل تريد المتابعة على أي حال؟',
+        hi: 'AI कनेक्शन सत्यापित नहीं हुआ है। कृपया सेटिंग्स में कनेक्शन टेस्ट चलाएँ। फिर भी जारी रखें?',
+        ru: 'AI-подключение не проверено. Выполните тест подключения в настройках. Продолжить?',
+        el: 'Η σύνδεση AI δεν έχει επαληθευτεί. Εκτελέστε δοκιμή σύνδεσης στις Ρυθμίσεις. Συνέχεια;',
+        syc: 'ܩܛܝܪܘܬ AI ܠܐ ܐܬܫܪܪܬ. ܦܪܘܣ ܒܘ̈ܚܢ ܩܛܝܪ̈ܬܐ ܒܛܘ̈ܟܣܐ. ܬܫܪ؟'
+      })
+      if (!window.confirm(msg)) return
+    }
+
+    const confirmMsg = L(lang, {
+      ja: `全${allResults.length}ページのAI校正を実行します。よろしいですか？`,
+      en: `Run AI proofreading for all ${allResults.length} pages. Continue?`,
+      'zh-CN': `对全部${allResults.length}页执行AI校正。是否继续？`,
+      'zh-TW': `對全部${allResults.length}頁執行AI校正。是否繼續？`,
+      ko: `전체 ${allResults.length}페이지에 대해 AI 교정을 실행합니다. 계속하시겠습니까?`,
+      la: `AI correctionem in omnibus ${allResults.length} paginis exsequi vis?`,
+      eo: `Ruli AI-korektadon por ĉiuj ${allResults.length} paĝoj. Ĉu daŭrigi?`,
+      es: `Ejecutar corrección AI para todas las ${allResults.length} páginas. ¿Continuar?`,
+      de: `KI-Korrektur für alle ${allResults.length} Seiten durchführen. Fortfahren?`,
+      ar: `تشغيل تصحيح AI لجميع ${allResults.length} صفحة. هل تريد المتابعة؟`,
+      hi: `सभी ${allResults.length} पृष्ठों के लिए AI प्रूफ़रीडिंग चलाएँ। जारी रखें?`,
+      ru: `Запустить корректуру AI для всех ${allResults.length} стр. Продолжить?`,
+      el: `Εκτέλεση διόρθωσης AI για όλες τις ${allResults.length} σελίδες. Συνέχεια;`,
+      syc: `ܪܨ AI ܠܟܠ ${allResults.length} ܕ̈ܦܐ. ܬܫܪ؟`
+    })
+    if (!window.confirm(confirmMsg)) return
+
+    setBatchProofreadState({ status: 'loading', current: 0, total: allResults.length })
+
+    const results = new Map<number, { original: string; corrected: string }>()
+
+    try {
+      for (let i = 0; i < allResults.length; i++) {
+        const ocrResult = allResults[i]
+        const progressMsg = L(lang, {
+          ja: `${i + 1}/${allResults.length} ページを処理中...`,
+          en: `Processing page ${i + 1}/${allResults.length}...`,
+          'zh-CN': `正在处理第 ${i + 1}/${allResults.length} 页...`,
+          'zh-TW': `正在處理第 ${i + 1}/${allResults.length} 頁...`,
+          ko: `${i + 1}/${allResults.length} 페이지 처리 중...`,
+          la: `Pagina ${i + 1}/${allResults.length} tractando...`,
+          eo: `Prilaborado de paĝo ${i + 1}/${allResults.length}...`,
+          es: `Procesando página ${i + 1}/${allResults.length}...`,
+          de: `Seite ${i + 1}/${allResults.length} wird verarbeitet...`,
+          ar: `جاري معالجة الصفحة ${i + 1}/${allResults.length}...`,
+          hi: `पृष्ठ ${i + 1}/${allResults.length} को संसाधित किया जा रहा है...`,
+          ru: `Обработка стр. ${i + 1}/${allResults.length}...`,
+          el: `Επεξεργασία σελίδας ${i + 1}/${allResults.length}...`,
+          syc: `ܦܠܚܢܐ ܕܦܦܐ ${i + 1}/${allResults.length}...`
+        })
+        setBatchProofreadState({ status: 'loading', current: i + 1, total: allResults.length, message: progressMsg })
+
+        const proofResult = await aiConnector.proofread(ocrResult.fullText, ocrResult.imageDataUrl ?? '')
+        results.set(i, {
+          original: ocrResult.fullText,
+          corrected: proofResult.correctedText,
+        })
+
+        // 控制速率，避免过度请求
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
+
+      const successMsg = L(lang, {
+        ja: `全${allResults.length}ページのAI校正が完了しました。`,
+        en: `AI proofreading completed for all ${allResults.length} pages.`,
+        'zh-CN': `全部${allResults.length}页的AI校正已完成。`,
+        'zh-TW': `全部${allResults.length}頁的AI校正已完成。`,
+        ko: `전체 ${allResults.length}페이지에 대한 AI 교정이 완료되었습니다.`,
+        la: `Correctio AI in omnibus ${allResults.length} paginis consumpta est.`,
+        eo: `AI-korektado por ĉiuj ${allResults.length} paĝoj estas kompleta.`,
+        es: `Corrección AI completada para todas las ${allResults.length} páginas.`,
+        de: `KI-Korrektur für alle ${allResults.length} Seiten abgeschlossen.`,
+        ar: `اكتمل تصحيح AI لجميع ${allResults.length} صفحة.`,
+        hi: `सभी ${allResults.length} पृष्ठों के लिए AI प्रूफ़रीडिंग पूरी हुई।`,
+        ru: `Корректура AI для всех ${allResults.length} стр. завершена.`,
+        el: `Η διόρθωση AI για όλες τις ${allResults.length} σελίδες ολοκληρώθηκε.`,
+        syc: `ܬܘܪܨ AI ܠܟܠ ${allResults.length} ܕ̈ܦܐ ܫܠܡܐ.`
+      })
+      setBatchProofreadState({ status: 'done', results, message: successMsg })
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : String(err)
+      setBatchProofreadState({
+        status: 'error',
+        message: errorMsg,
+      })
+    }
+  }, [aiConnector, aiConnectionStatus, lang, allResults])
+
+  // バッチ校正結果を全て適用
+  const handleBatchAcceptAll = useCallback(() => {
+    if (batchProofreadState.status !== 'done') return
+    const correctedMap = new Map<number, string>()
+    for (const [idx, data] of batchProofreadState.results.entries()) {
+      correctedMap.set(idx, data.corrected)
+    }
+    onBatchProofread?.(correctedMap)
+    setBatchProofreadState({ status: 'idle' })
+  }, [batchProofreadState, onBatchProofread])
+
+  // バッチ校正結果を却下
+  const handleBatchRejectAll = useCallback(() => {
+    setBatchProofreadState({ status: 'idle' })
   }, [])
 
   // Search and Replace handlers
@@ -620,6 +769,33 @@ export function TextEditor({
               </>
             )}
           </button>
+          {allResults.length > 1 && (
+            <button
+              className="btn btn-ai"
+              onClick={handleBatchProofread}
+              disabled={!aiConnector || batchProofreadState.status === 'loading' || allResults.some(r => r.textBlocks.length === 0)}
+              title={!aiConnector ? L(lang, { ja: '設定でAI接続を構成してください', en: 'Configure AI connection in Settings', 'zh-CN': '在设置中配置 AI 连接', 'zh-TW': '在設定中設定 AI 連接', ko: '설정에서 AI 연결 구성', la: 'In Apparatibus connexionem AI configura', eo: 'Agordu AI-konekton en Agordoj', es: 'Configure la conexión AI en Configuración', de: 'KI-Verbindung in Einstellungen konfigurieren', ar: 'قم بتكوين اتصال AI في الإعدادات', hi: 'सेटिंग्स में AI कनेक्शन कॉन्फ़िगर करें', ru: 'Настройте подключение AI в настройках', el: 'Ρυθμίστε σύνδεση AI στις Ρυθμίσεις', syc: 'ܐܪܕ ܩܛܝܪܘܬ AI ܒܛܘ̈ܟܣܐ' }) : ''}
+              style={{ marginLeft: '6px' }}
+            >
+              {batchProofreadState.status === 'loading' ? (
+                <>
+                  <span className="btn-ai-spinner" />
+                  {L(lang, { ja: `バッチ中... (${batchProofreadState.current}/${batchProofreadState.total})`, en: `Batch... (${batchProofreadState.current}/${batchProofreadState.total})`, 'zh-CN': `批处理中... (${batchProofreadState.current}/${batchProofreadState.total})`, 'zh-TW': `批處理中... (${batchProofreadState.current}/${batchProofreadState.total})`, ko: `배치 중... (${batchProofreadState.current}/${batchProofreadState.total})`, la: `Proletis... (${batchProofreadState.current}/${batchProofreadState.total})`, eo: `Aro... (${batchProofreadState.current}/${batchProofreadState.total})`, es: `Lote... (${batchProofreadState.current}/${batchProofreadState.total})`, de: `Stapel... (${batchProofreadState.current}/${batchProofreadState.total})`, ar: `الدفعة... (${batchProofreadState.current}/${batchProofreadState.total})`, hi: `बैच... (${batchProofreadState.current}/${batchProofreadState.total})`, ru: `Пакет... (${batchProofreadState.current}/${batchProofreadState.total})`, el: `Παρτίδα... (${batchProofreadState.current}/${batchProofreadState.total})`, syc: `ܟܘܡܐ... (${batchProofreadState.current}/${batchProofreadState.total})` })}
+                </>
+              ) : (
+                <>
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+                    <path d="M2 3h12v10H2zm1 1v8" />
+                    <line x1="4" y1="3" x2="4" y2="13" />
+                    <line x1="6" y1="3" x2="6" y2="13" />
+                    <line x1="8" y1="3" x2="8" y2="13" />
+                    <line x1="10" y1="3" x2="10" y2="13" />
+                  </svg>
+                  {L(lang, { ja: '全ページ校正', en: 'Batch Proofread', 'zh-CN': '全页校正', 'zh-TW': '全頁校正', ko: '배치 교정', la: 'Proletis Correctio', eo: 'Aro-Korektado', es: 'Corrección por lote', de: 'Stapel-Korrektur', ar: 'تصحيح دفعي', hi: 'बैच प्रूफ़रीडिंग', ru: 'Пакетная корректура', el: 'Διόρθωση Παρτίδας', syc: 'ܬܘܪܨ ܟܘܡܐ' })}
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
 
@@ -917,6 +1093,49 @@ export function TextEditor({
         </div>
       )}
 
+      {/* バッチAI校正ステータス表示 */}
+      {batchProofreadState.status === 'loading' && (
+        <div className="text-editor-ai-status">
+          <span className="ai-bar-spinner" />
+          <span className="ai-bar-hint">{batchProofreadState.message || L(lang, { ja: 'バッチ校正実行中...', en: 'Running batch proofread...', 'zh-CN': '批量校正中...', 'zh-TW': '批量校正中...', ko: '배치 교정 실행 중...', la: 'Proletis correctio...', eo: 'Ruli aro-korektadon...', es: 'Ejecutando corrección por lote...', de: 'Stapel-Korrektur läuft...', ar: 'جارٍ تصحيح دفعي...', hi: 'बैच प्रूफ़रीडिंग चल रही है...', ru: 'Пакетная корректура...', el: 'Εκτέλεση διόρθωσης παρτίδας...', syc: 'ܪܨ ܬܘܪܨ ܟܘܡܐ...' })}</span>
+        </div>
+      )}
+
+      {/* バッチAI校正完了メッセージ＆操作ボタン */}
+      {batchProofreadState.status === 'done' && (
+        <div className="text-editor-ai-status" style={{ backgroundColor: 'var(--batch-success-bg, rgba(34, 197, 94, 0.1))' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', width: '100%' }}>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M13.5 3.5L6 11 2.5 7.5" />
+            </svg>
+            <span className="ai-bar-hint" style={{ flex: 1 }}>{batchProofreadState.message}</span>
+            <button
+              className="btn btn-sm btn-secondary"
+              onClick={handleBatchAcceptAll}
+              style={{ whiteSpace: 'nowrap', marginRight: '4px' }}
+            >
+              {L(lang, { ja: '全て適用', en: 'Apply All', 'zh-CN': '全部应用', 'zh-TW': '全部套用', ko: '모두 적용', la: 'Omnes applicare', eo: 'Apliki ĉiujn', es: 'Aplicar todo', de: 'Alles anwenden', ar: 'تطبيق الكل', hi: 'सभी लागू करें', ru: 'Применить все', el: 'Εφαρμογή όλων', syc: 'ܐܚܕܘ ܟܠ' })}
+            </button>
+            <button
+              className="btn btn-sm btn-outline"
+              onClick={handleBatchRejectAll}
+              style={{ whiteSpace: 'nowrap' }}
+            >
+              {L(lang, { ja: 'キャンセル', en: 'Cancel', 'zh-CN': '取消', 'zh-TW': '取消', ko: '취소', la: 'Abscondere', eo: 'Nuligi', es: 'Cancelar', de: 'Abbrechen', ar: 'إلغاء', hi: 'रद्द करें', ru: 'Отмена', el: 'Ακύρωση', syc: 'ܒܛܠ' })}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* バッチAI校正エラー表示 */}
+      {batchProofreadState.status === 'error' && (
+        <div className="text-editor-ai-status">
+          <span className="ai-bar-error" title={batchProofreadState.message}>
+            {L(lang, { ja: 'バッチ校正エラー: ', en: 'Batch error: ', 'zh-CN': '批处理错误: ', 'zh-TW': '批處理錯誤: ', ko: '배치 오류: ', la: 'Error proletis: ', eo: 'Eraro aro: ', es: 'Error lote: ', de: 'Stapel-Fehler: ', ar: 'خطأ دفعي: ', hi: 'बैच त्रुटि: ', ru: 'Ошибка пакета: ', el: 'Σφάλμα παρτίδας: ', syc: 'ܦܘܪܫܢܐ ܟܘܡܐ: ' })}{batchProofreadState.message?.slice(0, 80)}
+          </span>
+        </div>
+      )}
+
       {/* メイン: テキストエリア or 差分表示 */}
       <div className="text-editor-body">
         {result.textBlocks.length === 0 ? (
@@ -1099,6 +1318,17 @@ export function TextEditor({
           </div>
         </div>
       </div>
+
+      {showTEIMetadataModal && (
+        <Suspense fallback={null}>
+          <TEIMetadataModal
+            onClose={() => setShowTEIMetadataModal(false)}
+            onSave={handleTEIMetadataSave}
+            lang={lang}
+            initialMetadata={lastTEIMetadata}
+          />
+        </Suspense>
+      )}
     </div>
   )
 }

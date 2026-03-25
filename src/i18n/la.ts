@@ -63,4 +63,7 @@ export const la: Translations = {
     fileLoad: 'Fichera Onerare Nequivit',
     clipboardNotSupported: 'Praetextus Attingere Nequit',
   },
+  tooltip: {
+    dragPageReorder: 'Trahere ut Reordinare',
+  },
 }

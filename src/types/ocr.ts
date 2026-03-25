@@ -64,3 +64,15 @@ export interface OCRJobState {
   errorMessage?: string
   modelProgress?: { layout: number; rec30: number; rec50: number; rec100: number }
 }
+
+export interface TEIMetadata {
+  title: string
+  author: string
+  editor: string
+  publisher: string
+  date: string
+  sourceInstitution: string
+  sourceIdno: string
+  language: string
+  notes: string
+}

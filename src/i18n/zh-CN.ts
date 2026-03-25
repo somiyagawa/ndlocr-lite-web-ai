@@ -63,4 +63,7 @@ export const zhCN: Translations = {
     fileLoad: '文件加载失败',
     clipboardNotSupported: '无法访问剪贴板',
   },
+  tooltip: {
+    dragPageReorder: '拖动重新排列',
+  },
 }

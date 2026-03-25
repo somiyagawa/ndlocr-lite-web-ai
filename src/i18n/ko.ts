@@ -63,4 +63,7 @@ export const ko: Translations = {
     fileLoad: '파일 로드 실패',
     clipboardNotSupported: '클립보드에 접근할 수 없습니다',
   },
+  tooltip: {
+    dragPageReorder: '끌어서 재정렬',
+  },
 }

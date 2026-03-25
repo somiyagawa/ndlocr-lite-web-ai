@@ -66,4 +66,7 @@ export const ru: Translations = {
     fileLoad: 'Не удалось загрузить файл',
     clipboardNotSupported: 'Нет доступа к буферу обмена',
   },
+  tooltip: {
+    dragPageReorder: 'Перетащите для переупорядочения',
+  },
 }

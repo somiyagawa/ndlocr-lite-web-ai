@@ -64,6 +64,9 @@ export const ja: Record<string, Record<string, string>> = {
     fileLoad: 'ファイルの読み込みに失敗しました',
     clipboardNotSupported: 'クリップボードへのアクセスができません',
   },
+  tooltip: {
+    dragPageReorder: 'ドラッグして並び替え可能',
+  },
 } as const
 
 export type Translations = Record<string, Record<string, string>>

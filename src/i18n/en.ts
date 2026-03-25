@@ -66,4 +66,7 @@ export const en: Translations = {
     fileLoad: 'Failed to load file',
     clipboardNotSupported: 'Cannot access clipboard',
   },
+  tooltip: {
+    dragPageReorder: 'Drag to reorder',
+  },
 }

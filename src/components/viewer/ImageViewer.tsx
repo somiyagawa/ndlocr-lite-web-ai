@@ -27,6 +27,10 @@ interface ImageViewerProps {
   adjustLabel?: string
   /** Language for toolbar labels */
   lang?: Language
+  /** Reading order edit mode */
+  readingOrderEditMode?: boolean
+  onReadingOrderCancel?: () => void
+  onReadingOrderChange?: (newBlocks: TextBlock[]) => void
 }
 
 const MIN_ZOOM = 0.1
@@ -55,6 +59,9 @@ export function ImageViewer({
   onAdjustToggle,
   adjustLabel,
   lang = 'ja',
+  readingOrderEditMode = false,
+  onReadingOrderCancel,
+  onReadingOrderChange,
 }: ImageViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
@@ -77,6 +84,10 @@ export function ImageViewer({
   // Perspective corner dragging
   const [perspDragging, setPerspDragging] = useState<string | null>(null)
 
+  // Reading order editing state
+  const [assignedOrder, setAssignedOrder] = useState<Map<number, number>>(new Map())
+  const [nextOrderNumber, setNextOrderNumber] = useState(1)
+
   const panStartRef = useRef({ x: 0, y: 0 })
   const panOffsetRef = useRef({ x: 0, y: 0 })
   // Keep panOffset ref in sync
@@ -95,12 +106,20 @@ export function ImageViewer({
 
   const effectiveZoom = zoom === FIT_ZOOM ? computeFitZoom() : zoom
 
-  // Reset on image change
+  // Reset on image change or reading order mode change
   useEffect(() => {
     setZoom(FIT_ZOOM)
     setPanOffset({ x: 0, y: 0 })
     setSmooth(false)
   }, [imageDataUrl])
+
+  // Reset reading order state when entering/exiting edit mode
+  useEffect(() => {
+    if (readingOrderEditMode) {
+      setAssignedOrder(new Map())
+      setNextOrderNumber(1)
+    }
+  }, [readingOrderEditMode])
 
   // Track image natural size
   useEffect(() => {
@@ -437,6 +456,9 @@ export function ImageViewer({
         ? `2px solid hsla(${Math.round(conf * 120)}, 85%, 45%, 0.8)`
         : undefined
 
+      const hasAssignedOrder = assignedOrder.has(i)
+      const assignedNum = assignedOrder.get(i)
+
       return (
         <div
           key={i}
@@ -446,10 +468,28 @@ export function ImageViewer({
             width: block.width * scaleX, height: block.height * scaleY,
             ...(confColor ? { background: confColor, border: confBorder } : {}),
           }}
-          onClick={() => onBlockSelect(block)}
+          onClick={() => {
+            if (readingOrderEditMode) {
+              setAssignedOrder(prev => {
+                const next = new Map(prev)
+                next.set(i, nextOrderNumber)
+                return next
+              })
+              setNextOrderNumber(prev => prev + 1)
+            } else {
+              onBlockSelect(block)
+            }
+          }}
           title={`${block.text}${showConfidence ? ` (${Math.round(conf * 100)}%)` : ''}`}
         >
-          {showReadingOrder && (
+          {readingOrderEditMode && (
+            <div className="reading-order-badge-container">
+              <div className={`reading-order-badge ${hasAssignedOrder ? 'assigned' : 'unassigned'}`}>
+                {hasAssignedOrder ? assignedNum : '?'}
+              </div>
+            </div>
+          )}
+          {(showReadingOrder && !readingOrderEditMode) && (
             <span className="region-reading-order">{block.readingOrder}</span>
           )}
           {showTextOverlay && (
@@ -464,7 +504,7 @@ export function ImageViewer({
         </div>
       )
     })
-  }, [textBlocks, selectedBlock, showConfidence, showTextOverlay, showReadingOrder, scaleX, scaleY, onBlockSelect])
+  }, [textBlocks, selectedBlock, showConfidence, showTextOverlay, showReadingOrder, scaleX, scaleY, onBlockSelect, readingOrderEditMode, assignedOrder, nextOrderNumber])
 
   // ─── Derived state ───
   const selectionRect = dragStart && dragCurrent ? {
@@ -492,6 +532,178 @@ export function ImageViewer({
 
   return (
     <div className="image-viewer-wrap">
+      {/* Reading order edit bar */}
+      {readingOrderEditMode && (
+        <div className="reading-order-edit-bar">
+          <span className="reading-order-edit-hint">
+            {L(lang, {
+              ja: 'ブロックを読み順にクリックしてください',
+              en: 'Click blocks in reading order',
+              'zh-CN': '按阅读顺序点击块',
+              'zh-TW': '按閱讀順序點擊塊',
+              ko: '읽기 순서대로 블록을 클릭하세요',
+              la: 'Regionum lege ordinare',
+              eo: 'Klaku blokojn en legordo',
+              es: 'Haz clic en bloques en orden de lectura',
+              de: 'Klicken Sie auf Blöcke in Leserichtung',
+              ar: 'انقر على الكتل بترتيب القراءة',
+              hi: 'पढ़ने के क्रम में ब्लॉक पर क्लिक करें',
+              ru: 'Нажмите блоки в порядке чтения',
+              el: 'Κάντε κλικ στα μπλοκ κατά σειρά ανάγνωσης',
+              syc: 'ܠܡܨ ܒܠܘܟܐ ܒܣܕܪ ܩܪܝܢܐ',
+            })}
+          </span>
+          <div className="reading-order-edit-buttons">
+            {assignedOrder.size > 0 && (
+              <button
+                className="btn-reading-order-action"
+                onClick={() => {
+                  if (assignedOrder.size > 0) {
+                    const lastIndex = Array.from(assignedOrder.entries()).sort((a, b) => b[1] - a[1])[0]?.[0]
+                    if (lastIndex !== undefined) {
+                      setAssignedOrder(prev => {
+                        const next = new Map(prev)
+                        next.delete(lastIndex)
+                        return next
+                      })
+                      setNextOrderNumber(prev => Math.max(1, prev - 1))
+                    }
+                  }
+                }}
+                title={L(lang, {
+                  ja: '最後の割り当てを取り消す',
+                  en: 'Undo last',
+                  'zh-CN': '撤销上一步',
+                  'zh-TW': '取消上一步',
+                  ko: '마지막 실행 취소',
+                  la: 'Ultima praefatio delere',
+                  eo: 'Malfari laste',
+                  es: 'Deshacer último',
+                  de: 'Letzten rückgängig machen',
+                  ar: 'تراجع الأخير',
+                  hi: 'अंतिम को पूर्ववत करें',
+                  ru: 'Отменить последнее',
+                  el: 'Αναίρεση τελευταίου',
+                  syc: 'ܡܦܩܕ ܕܒܬܪ',
+                })}
+              >
+                {L(lang, {
+                  ja: '最後を取消',
+                  en: 'Undo Last',
+                  'zh-CN': '撤销',
+                  'zh-TW': '撤銷',
+                  ko: '취소',
+                  la: 'Praefatio delere',
+                  eo: 'Malfari',
+                  es: 'Deshacer',
+                  de: 'Rückgängig',
+                  ar: 'تراجع',
+                  hi: 'पूर्ववत',
+                  ru: 'Отменить',
+                  el: 'Αναίρεση',
+                  syc: 'ܡܦܩܕ',
+                })}
+              </button>
+            )}
+            <button
+              className="btn-reading-order-action"
+              onClick={() => {
+                setAssignedOrder(new Map())
+                setNextOrderNumber(1)
+              }}
+              title={L(lang, {
+                ja: 'すべての割り当てをクリア',
+                en: 'Reset all assignments',
+                'zh-CN': '重置所有分配',
+                'zh-TW': '重設所有指派',
+                ko: '모든 할당 초기화',
+                la: 'Omnes abire',
+                eo: 'Restarigi ĉiojn',
+                es: 'Restablecer todo',
+                de: 'Alles zurücksetzen',
+                ar: 'إعادة تعيين الكل',
+                hi: 'सभी को रीसेट करें',
+                ru: 'Сбросить всё',
+                el: 'Επαναφορά όλων',
+                syc: 'ܩܘܡ ܕܡܕܡ ܕܠܐ',
+              })}
+            >
+              {L(lang, {
+                ja: 'リセット',
+                en: 'Reset',
+                'zh-CN': '重置',
+                'zh-TW': '重設',
+                ko: '초기화',
+                la: 'Abire',
+                eo: 'Restarigi',
+                es: 'Restablecer',
+                de: 'Zurücksetzen',
+                ar: 'إعادة تعيين',
+                hi: 'रीसेट',
+                ru: 'Сброс',
+                el: 'Επαναφορά',
+                syc: 'ܩܘܡ',
+              })}
+            </button>
+            <button
+              className="btn-reading-order-action btn-reading-order-done"
+              onClick={() => {
+                if (onReadingOrderChange && assignedOrder.size > 0) {
+                  const newBlocks = textBlocks.map((block, i) => ({
+                    ...block,
+                    readingOrder: assignedOrder.get(i) ?? block.readingOrder,
+                  }))
+                  onReadingOrderChange(newBlocks)
+                }
+              }}
+              disabled={assignedOrder.size === 0}
+            >
+              {L(lang, {
+                ja: '完了',
+                en: 'Done',
+                'zh-CN': '完成',
+                'zh-TW': '完成',
+                ko: '완료',
+                la: 'Finis',
+                eo: 'Farite',
+                es: 'Hecho',
+                de: 'Fertig',
+                ar: 'تم',
+                hi: 'पूर्ण',
+                ru: 'Готово',
+                el: 'Ολοκληρώθη',
+                syc: 'ܓܡܪ',
+              })}
+            </button>
+            <button
+              className="btn-reading-order-action"
+              onClick={() => {
+                setAssignedOrder(new Map())
+                setNextOrderNumber(1)
+                onReadingOrderCancel?.()
+              }}
+            >
+              {L(lang, {
+                ja: 'キャンセル',
+                en: 'Cancel',
+                'zh-CN': '取消',
+                'zh-TW': '取消',
+                ko: '취소',
+                la: 'Renuntiare',
+                eo: 'Rezigni',
+                es: 'Cancelar',
+                de: 'Abbrechen',
+                ar: 'إلغاء',
+                hi: 'रद्द करें',
+                ru: 'Отмена',
+                el: 'Ακύρωση',
+                syc: 'ܦܪܙܓܢܐ',
+              })}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Zoom + mode controls */}
       <div className="zoom-controls">
         {/* Reset / Fit */}

@@ -66,4 +66,7 @@ export const de: Translations = {
     fileLoad: 'Datei konnte nicht geladen werden',
     clipboardNotSupported: 'Zugriff auf Zwischenablage nicht möglich',
   },
+  tooltip: {
+    dragPageReorder: 'Zum Neuordnen ziehen',
+  },
 }

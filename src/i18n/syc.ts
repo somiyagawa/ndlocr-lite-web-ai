@@ -66,4 +66,7 @@ export const syc: Translations = {
     fileLoad: 'ܠܐ ܐܬܡܨܝ ܠܡܛܥܢ ܩܛܝܡܐ',
     clipboardNotSupported: 'ܠܐ ܡܬܡܨܝܢ ܠܡܡܛܐ ܠܠܘ̈ܚܐ ܕܢܣ̈ܚܐ',
   },
+  tooltip: {
+    dragPageReorder: 'ܥܛܘܦ ܠܬܘܟܡܐ ܕܪܗܝܛܐ',
+  },
 }

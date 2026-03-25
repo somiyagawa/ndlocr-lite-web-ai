@@ -66,4 +66,7 @@ export const cop: Translations = {
     fileLoad: 'ⲙⲡⲟⲩϣϣⲱⲡ ⲙⲡⲓⲫⲁⲓⲗ',
     clipboardNotSupported: 'ⲙⲙⲟⲛ ϣϫⲟⲙ ⲛⲉⲙ ⲡⲓ clipboard',
   },
+  tooltip: {
+    dragPageReorder: 'ⲥⲱⲕ ⲉⲃⲟⲗ ⲛⲧⲟ ⲁⲅⲟⲩⲛ',
+  },
 }

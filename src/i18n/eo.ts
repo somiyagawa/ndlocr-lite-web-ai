@@ -63,4 +63,7 @@ export const eo: Translations = {
     fileLoad: 'Malsukceso ŝargi dosieron',
     clipboardNotSupported: 'Ne eblas aliri poŝojon',
   },
+  tooltip: {
+    dragPageReorder: 'Treni por reordigi',
+  },
 }

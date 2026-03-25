@@ -63,4 +63,7 @@ export const zhTW: Translations = {
     fileLoad: '檔案載入失敗',
     clipboardNotSupported: '無法存取剪貼簿',
   },
+  tooltip: {
+    dragPageReorder: '拖動重新排列',
+  },
 }

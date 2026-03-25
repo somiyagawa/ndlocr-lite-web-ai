@@ -3179,6 +3179,24 @@ button.ai-status-clickable .ai-status-text {
   background: var(--color-primary);
 }
 
+/* ドラッグ&ドロップ状態 */
+.btn-page-num[draggable="true"] {
+  cursor: grab;
+}
+.btn-page-num[draggable="true"]:active {
+  cursor: grabbing;
+}
+.btn-page-num.page-dragging {
+  opacity: 0.4;
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-secondary) !important;
+}
+.btn-page-num.page-drag-over {
+  box-shadow: inset -2px 0 0 0 var(--color-primary), inset 2px 0 0 0 var(--color-primary);
+  background: var(--color-primary-light) !important;
+}
+
 .page-ellipsis {
   display: inline-flex;
   align-items: center;
@@ -4373,6 +4391,101 @@ button.ai-status-clickable .ai-status-text {
 @keyframes pulse-border {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
+}
+
+/* ── Reading order edit bar ── */
+.reading-order-edit-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.6rem 0.8rem;
+  background: var(--color-primary-light);
+  border-bottom: 2px solid var(--color-primary);
+  flex-wrap: wrap;
+}
+
+.reading-order-edit-hint {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--color-text);
+  flex: 1;
+  min-width: 200px;
+}
+
+.reading-order-edit-buttons {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn-reading-order-action {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.btn-reading-order-action:hover:not(:disabled) {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.btn-reading-order-action:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.btn-reading-order-done {
+  background: var(--color-success, #10b981);
+  border-color: var(--color-success, #10b981);
+  color: white;
+}
+
+.btn-reading-order-done:hover:not(:disabled) {
+  background: var(--color-success-dark, #059669);
+  border-color: var(--color-success-dark, #059669);
+}
+
+.btn-reading-order-done:disabled {
+  background: var(--color-success, #10b981);
+  opacity: 0.45;
+}
+
+/* ── Reading order badge container and badge ── */
+.reading-order-badge-container {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  pointer-events: none;
+}
+
+.reading-order-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: white;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+}
+
+.reading-order-badge.assigned {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.reading-order-badge.unassigned {
+  background: rgba(107, 114, 128, 0.6);
 }
 
 /* ── btn-zoom / zoom-level ── */

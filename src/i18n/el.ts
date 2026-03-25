@@ -66,4 +66,7 @@ export const el: Translations = {
     fileLoad: 'Αποτυχία φόρτωσης αρχείου',
     clipboardNotSupported: 'Δεν είναι δυνατή η πρόσβαση στο πρόχειρο',
   },
+  tooltip: {
+    dragPageReorder: 'Σύρετε για αναδιάταξη',
+  },
 }

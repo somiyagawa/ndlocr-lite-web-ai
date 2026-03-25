@@ -121,6 +121,13 @@ export default function App() {
   const [perspectiveActive, setPerspectiveActive] = useState(false)
   const [perspectiveCorners, setPerspectiveCorners] = useState<{topLeft:{x:number,y:number},topRight:{x:number,y:number},bottomRight:{x:number,y:number},bottomLeft:{x:number,y:number}} | null>(null)
 
+  // 読み順編集モード
+  const [readingOrderEditMode, setReadingOrderEditMode] = useState(false)
+
+  // ドラッグ&ドロップ状態（結果ページの並び替え用）
+  const [draggedPage, setDraggedPage] = useState<number | null>(null)
+  const [dragOverPage, setDragOverPage] = useState<number | null>(null)
+
   const handlePreprocessed = useCallback((index: number, dataUrl: string) => {
     setPreprocessedUrls(prev => ({ ...prev, [index]: dataUrl }))
   }, [])
@@ -211,6 +218,25 @@ export default function App() {
       console.error('Split pages error:', err)
     }
   }, [processedImages, pendingImageIndex, setProcessedImages])
+
+  // 結果ページ並び替えハンドラ（ドラッグ&ドロップ用）
+  const handleReorderResults = useCallback((fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return
+    setSessionResults(prev => {
+      const next = [...prev]
+      const [moved] = next.splice(fromIndex, 1)
+      next.splice(toIndex, 0, moved)
+      return next
+    })
+    // 選択されたページが移動した場合は追従
+    if (selectedResultIndex === fromIndex) {
+      setSelectedResultIndex(toIndex)
+    } else if (fromIndex < selectedResultIndex && toIndex >= selectedResultIndex) {
+      setSelectedResultIndex(prev => prev - 1)
+    } else if (fromIndex > selectedResultIndex && toIndex <= selectedResultIndex) {
+      setSelectedResultIndex(prev => prev + 1)
+    }
+  }, [selectedResultIndex])
 
   // processedImages が差し替わったらインデックスをリセット
   useEffect(() => { setPendingImageIndex(0) }, [processedImages])
@@ -461,6 +487,40 @@ export default function App() {
     }
   }, [currentResult, selectedResultIndex, preprocessedUrls, processImage, isReOCRing])
 
+  // 読み順編集完了ハンドラ
+  const handleReadingOrderChange = useCallback((newBlocks: TextBlock[]) => {
+    setSessionResults(prev => {
+      const next = [...prev]
+      next[selectedResultIndex] = {
+        ...next[selectedResultIndex],
+        textBlocks: newBlocks,
+        fullText: newBlocks
+          .sort((a, b) => a.readingOrder - b.readingOrder)
+          .map(b => b.text)
+          .join('\n'),
+      }
+      return next
+    })
+    setSelectedBlock(null)
+    setReadingOrderEditMode(false)
+  }, [selectedResultIndex])
+
+  // バッチAI校正の結果を適用（各ページのfullTextを更新）
+  const handleBatchProofread = useCallback((correctedTextsMap: Map<number, string>) => {
+    setSessionResults(prev => {
+      const next = [...prev]
+      for (const [pageIndex, correctedText] of correctedTextsMap.entries()) {
+        if (pageIndex >= 0 && pageIndex < next.length) {
+          next[pageIndex] = {
+            ...next[pageIndex],
+            fullText: correctedText,
+          }
+        }
+      }
+      return next
+    })
+  }, [])
+
   const handleHistorySelect = useCallback(async (run: DBRunEntry) => {
     // サムネイル画像の実サイズを取得し、ブロック座標をスケーリング
     const restoredResults: OCRResult[] = await Promise.all(
@@ -516,6 +576,7 @@ export default function App() {
     setIndex: (fn: (prev: number) => number) => void,
     total: number,
     maxIndex: number,
+    draggable: boolean = false,
   ) => {
     const goTo = (i: number) => {
       setIndex(() => i)
@@ -563,9 +624,34 @@ export default function App() {
             ) : (
               <button
                 key={p}
-                className={`btn-page-num${p === index ? ' btn-page-active' : ''}`}
+                className={`btn-page-num${p === index ? ' btn-page-active' : ''}${draggedPage === p ? ' page-dragging' : ''}${dragOverPage === p ? ' page-drag-over' : ''}`}
                 onClick={() => goTo(p)}
                 disabled={p > maxIndex}
+                draggable={draggable}
+                onDragStart={() => {
+                  if (draggable) setDraggedPage(p)
+                }}
+                onDragOver={(e) => {
+                  if (draggable) {
+                    e.preventDefault()
+                    setDragOverPage(p)
+                  }
+                }}
+                onDragEnd={() => {
+                  if (draggable) {
+                    setDraggedPage(null)
+                    setDragOverPage(null)
+                  }
+                }}
+                onDrop={(e) => {
+                  if (draggable && draggedPage !== null && draggedPage !== p) {
+                    e.preventDefault()
+                    handleReorderResults(draggedPage, p)
+                    setDraggedPage(null)
+                    setDragOverPage(null)
+                  }
+                }}
+                title={draggable && p <= maxIndex ? L(lang, { ja: 'ドラッグして並び替え可能', en: 'Drag to reorder', 'zh-CN': '拖动重新排列', 'zh-TW': '拖動重新排列', ko: '끌어서 재정렬', la: 'Trahere ut reordinare', eo: 'Treni por reordigi', es: 'Arrastrar para reordenar', de: 'Ziehen zum Neuordnen', ar: 'اسحب لإعادة الترتيب', hi: 'पुनः व्यवस्थित करने के लिए खींचें', ru: 'Перетащите для переупорядочения', el: 'Σύρετε για αναδιάταξη', syc: 'ܥܛܘܦ ܠܬܘܟܡܐ ܕܪܗܝܛܐ', cop: 'ⲟⲣ ⲉⲡⲓⲥⲧⲁⲙⲱⲣⲓ', sa: 'अन्यथा कर्तव्यं विषय्यते' }) : ''}
               >
                 {p + 1}
               </button>
@@ -841,9 +927,46 @@ export default function App() {
 
               {/* ページナビ + 新規処理ボタン */}
               <div className="result-toolbar">
-                {renderPageNav(selectedResultIndex, setSelectedResultIndex, sessionResults.length, sessionResults.length - 1)}
-                {!isProcessing && (
+                {renderPageNav(selectedResultIndex, setSelectedResultIndex, sessionResults.length, sessionResults.length - 1, true)}
+                {!isProcessing && !readingOrderEditMode && (
                   <>
+                    <button
+                      className="btn btn-secondary"
+                      onClick={() => setReadingOrderEditMode(true)}
+                      title={L(lang, {
+                        ja: '読み順を手動で編集',
+                        en: 'Edit reading order',
+                        'zh-CN': '编辑阅读顺序',
+                        'zh-TW': '編輯閱讀順序',
+                        ko: '읽기 순서 편집',
+                        la: 'Ordinem legendi mutare',
+                        eo: 'Redakti legordon',
+                        es: 'Editar orden de lectura',
+                        de: 'Lesereihenfolge bearbeiten',
+                        ar: 'تحرير ترتيب القراءة',
+                        hi: 'पढ़ने का क्रम संपादित करें',
+                        ru: 'Редактировать порядок чтения',
+                        el: 'Επεξεργασία σειράς ανάγνωσης',
+                        syc: 'ܫܠܦ ܣܕܪ ܩܪܝܢܐ',
+                      })}
+                    >
+                      {L(lang, {
+                        ja: '読み順編集',
+                        en: 'Edit Reading Order',
+                        'zh-CN': '编辑读序',
+                        'zh-TW': '編輯讀序',
+                        ko: '읽기 순서',
+                        la: 'Ordo legendi',
+                        eo: 'Legordo',
+                        es: 'Orden',
+                        de: 'Reihenfolge',
+                        ar: 'الترتيب',
+                        hi: 'क्रम',
+                        ru: 'Порядок',
+                        el: 'Σειρά',
+                        syc: 'ܣܕܪ',
+                      })}
+                    </button>
                     <button className="btn btn-secondary btn-new-file" onClick={handleClear}>
                       {L(lang, { ja: '新しいファイルを処理', en: 'Process New Files', 'zh-CN': '处理新文件', 'zh-TW': '處理新檔案', ko: '새 파일 처리', la: 'Fasciculos novos tractare', eo: 'Prilabori novajn dosierojn', es: 'Procesar nuevos archivos', de: 'Neue Dateien verarbeiten', ar: 'معالجة ملفات جديدة', hi: 'नई फ़ाइलें प्रोसेस करें', ru: 'Обработать новые файлы', el: 'Επεξεργασία νέων αρχείων', syc: 'ܦܠܘܚ ܩ̈ܛܝܡܐ ܚܕ̈ܬܐ' })}
                     </button>
@@ -883,6 +1006,9 @@ export default function App() {
                               onAdjustToggle={() => setShowPreprocessPanel(!showPreprocessPanel)}
                               adjustLabel={L(lang, { ja: '画像補正', en: 'Adjust', 'zh-CN': '图像校正', 'zh-TW': '影像校正', ko: '이미지 보정', la: 'Imaginem corrigere', eo: 'Korekti bildon', es: 'Ajustar', de: 'Anpassen', ar: 'ضبط', hi: 'समायोजन', ru: 'Коррекция', el: 'Ρύθμιση', syc: 'ܬܘܪܨ' })}
                               lang={lang}
+                              readingOrderEditMode={readingOrderEditMode}
+                              onReadingOrderCancel={() => setReadingOrderEditMode(false)}
+                              onReadingOrderChange={handleReadingOrderChange}
                             />
                             {preprocessedUrls[selectedResultIndex + 10000] && (
                               <div className="region-action-bar" style={{ flexDirection: 'column', gap: '6px', alignItems: 'flex-start' }}>
@@ -967,6 +1093,7 @@ export default function App() {
                     aiConnector={getConnector()}
                     aiConnectionStatus={aiConnectionStatus}
                     imageDataUrl={currentResult?.imageDataUrl}
+                    onBatchProofread={handleBatchProofread}
                   />
                 }
               />
