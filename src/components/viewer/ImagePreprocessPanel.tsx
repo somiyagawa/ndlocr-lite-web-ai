@@ -34,6 +34,10 @@ interface ImagePreprocessPanelProps {
   onReset: () => void
   /** Side panel mode: always open, no accordion header */
   sidePanel?: boolean
+  /** Total number of images available for batch processing */
+  totalImages?: number
+  /** Callback to apply current settings to ALL images */
+  onApplyAll?: (options: PreprocessOptions) => void
 }
 
 type TranslationStrings = {
@@ -54,6 +58,7 @@ type TranslationStrings = {
   splitAutoTip: string
   rotation: string
   apply: string
+  applyAll: string
   reset: string
   degrees: string
   processing: string
@@ -78,6 +83,7 @@ const t: Record<Language, TranslationStrings> = {
     splitAutoTip: '綴じ目（空白の多い縦線）を自動検出して左右2ページに分割します',
     rotation: '回転',
     apply: '適用',
+    applyAll: '全画像に適用',
     reset: 'リセット',
     degrees: '度',
     processing: '処理中...',
@@ -100,6 +106,7 @@ const t: Record<Language, TranslationStrings> = {
     splitAutoTip: 'Auto-detect the binding gap (whitespace column) and split into two pages',
     rotation: 'Rotation',
     apply: 'Apply',
+    applyAll: 'Apply to All',
     reset: 'Reset',
     degrees: '°',
     processing: 'Processing...',
@@ -122,6 +129,7 @@ const t: Record<Language, TranslationStrings> = {
     splitAutoTip: '自动检测装订缝（空白最多的纵列）并分割为左右两页',
     rotation: '旋转',
     apply: '应用',
+    applyAll: '应用到全部',
     reset: '重置',
     degrees: '°',
     processing: '处理中...',
@@ -144,6 +152,7 @@ const t: Record<Language, TranslationStrings> = {
     splitAutoTip: '自動偵測裝訂縫（空白最多的縱列）並分割為左右兩頁',
     rotation: '旋轉',
     apply: '應用',
+    applyAll: '套用到全部',
     reset: '重置',
     degrees: '°',
     processing: '處理中...',
@@ -166,6 +175,7 @@ const t: Record<Language, TranslationStrings> = {
     splitAutoTip: '제본 틈(공백이 가장 많은 세로줄)을 자동 감지하여 좌우 2페이지로 분할합니다',
     rotation: '회전',
     apply: '적용',
+    applyAll: '전체에 적용',
     reset: '재설정',
     degrees: '°',
     processing: '처리 중...',
@@ -188,6 +198,7 @@ const t: Record<Language, TranslationStrings> = {
     splitAutoTip: 'Rimam ligaturae automatice invenit et dividit',
     rotation: 'Rotatio',
     apply: 'Applicare',
+    applyAll: 'Omnibus applicare',
     reset: 'Restituere',
     degrees: '°',
     processing: 'Processus...',
@@ -210,6 +221,7 @@ const t: Record<Language, TranslationStrings> = {
     splitAutoTip: 'Aŭtomate detektu la bindron-fendron kaj dividu en du paĝojn',
     rotation: 'Rotacio',
     apply: 'Apliki',
+    applyAll: 'Apliki al ĉiuj',
     reset: 'Restarigi',
     degrees: '°',
     processing: 'Prilaboras...',
@@ -232,6 +244,7 @@ const t: Record<Language, TranslationStrings> = {
     splitAutoTip: 'Detecta automáticamente el lomo (línea vertical con espacio) y divide en dos páginas',
     rotation: 'Rotación',
     apply: 'Aplicar',
+    applyAll: 'Aplicar a todo',
     reset: 'Restablecer',
     degrees: '°',
     processing: 'Procesando...',
@@ -254,6 +267,7 @@ const t: Record<Language, TranslationStrings> = {
     splitAutoTip: 'Erkennt automatisch den Bundsteg (Whitespace-Spalte) und teilt in zwei Seiten',
     rotation: 'Drehung',
     apply: 'Anwenden',
+    applyAll: 'Auf alle anwenden',
     reset: 'Zurücksetzen',
     degrees: '°',
     processing: 'Verarbeitung...',
@@ -276,6 +290,7 @@ const t: Record<Language, TranslationStrings> = {
     splitAutoTip: 'التعرف تلقائياً على فجوة الدباسة (عمود المسافات البيضاء) والتقسيم إلى صفحتين',
     rotation: 'تدوير',
     apply: 'تطبيق',
+    applyAll: 'تطبيق على الكل',
     reset: 'إعادة تعيين',
     degrees: '°',
     processing: 'جارٍ المعالجة...',
@@ -298,6 +313,7 @@ const t: Record<Language, TranslationStrings> = {
     splitAutoTip: 'बाइंडिंग गैप (व्हाइटस्पेस कॉलम) को स्वचालित रूप से पहचानें और दो पृष्ठों में विभाजित करें',
     rotation: 'घुमाव',
     apply: 'लागू करें',
+    applyAll: 'सभी पर लागू करें',
     reset: 'रीसेट',
     degrees: '°',
     processing: 'संसाधन...',
@@ -320,6 +336,7 @@ const t: Record<Language, TranslationStrings> = {
     splitAutoTip: 'Автоматически обнаружить переплет (столбец пустого пространства) и разделить на две страницы',
     rotation: 'Поворот',
     apply: 'Применить',
+    applyAll: 'Применить ко всем',
     reset: 'Сброс',
     degrees: '°',
     processing: 'Обработка...',
@@ -342,6 +359,7 @@ const t: Record<Language, TranslationStrings> = {
     splitAutoTip: 'Αυτόματη ανίχνευση του κενού κόλλησης (στήλη κενού χώρου) και διαίρεση σε δύο σελίδες',
     rotation: 'Περιστροφή',
     apply: 'Εφαρμογή',
+    applyAll: 'Εφαρμογή σε όλα',
     reset: 'Επαναφορά',
     degrees: '°',
     processing: 'Επεξεργασία...',
@@ -364,6 +382,7 @@ const t: Record<Language, TranslationStrings> = {
     splitAutoTip: 'ܐܓܕ ܓܢܒܐ ܦܪܡܐ ܕܡܥܡܕܐ ܘܦܠܓ ܠܬܪܝܢ ܕܦܐ',
     rotation: 'ܓܪܓܦܐ',
     apply: 'ܐܦܠܘ',
+    applyAll: 'ܐܦܠܘ ܠܟܠ',
     reset: 'ܚܙܘܪ',
     degrees: '°',
     processing: 'ܦ̈ܘܠܥܢܐ...',
@@ -386,6 +405,7 @@ const t: Record<Language, TranslationStrings> = {
     splitAutoTip: 'ⲫⲱϣ ⲑⲓⲕⲱⲛ ⲛⲁⲩⲧⲟ',
     rotation: 'ⲡⲓⲕⲱⲗ',
     apply: 'ⲁⲓⲣⲓ',
+    applyAll: 'ⲁⲓⲣⲓ ⲉⲟⲩⲟⲛ ⲛⲓⲃⲉⲛ',
     reset: 'ⲧⲁⲥⲑⲟ',
     degrees: '°',
     processing: 'ⲥⲉⲉⲣϩⲱⲃ...',
@@ -408,6 +428,7 @@ const t: Record<Language, TranslationStrings> = {
     splitAutoTip: 'स्वतः चित्रं विभजतु',
     rotation: 'भ्रमणम्',
     apply: 'आरोपयतु',
+    applyAll: 'सर्वेषु आरोपयतु',
     reset: 'पुनःस्थापयतु',
     degrees: '°',
     processing: 'संस्क्रियते...',
@@ -434,6 +455,8 @@ export function ImagePreprocessPanel({
   onSplitPages,
   onReset,
   sidePanel = false,
+  totalImages,
+  onApplyAll,
 }: ImagePreprocessPanelProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [options, setOptions] = useState<PreprocessOptions>(DEFAULT_PREPROCESS_OPTIONS)
@@ -689,6 +712,17 @@ export function ImagePreprocessPanel({
             >
               {isProcessing ? strings.processing : strings.apply}
             </button>
+            {onApplyAll && totalImages != null && totalImages > 1 && (
+              <button
+                className="preprocess-btn preprocess-btn-accent"
+                onClick={() => onApplyAll(options)}
+                disabled={isProcessing}
+                type="button"
+                title={`${strings.applyAll} (${totalImages})`}
+              >
+                {isProcessing ? strings.processing : `${strings.applyAll} (${totalImages})`}
+              </button>
+            )}
             <button
               className="preprocess-btn preprocess-btn-secondary"
               onClick={handleReset}
@@ -708,7 +742,7 @@ export function ImagePreprocessPanel({
 // Image Processing Utility Functions
 // =====================================================
 
-async function applyPreprocess(
+export async function applyPreprocess(
   imageDataUrl: string,
   options: PreprocessOptions
 ): Promise<string> {

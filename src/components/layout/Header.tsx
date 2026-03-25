@@ -102,7 +102,7 @@ export const Header = memo(function Header({
           <span className="header-title-main">NDLOCR-lite Web AI</span>
           <span className="header-title-accent">Model BLUEPOND</span>
         </div>
-        <span className="header-version header-version-pulse">v3.2</span>
+        <span className="header-version header-version-pulse">v3.3</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}

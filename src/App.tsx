@@ -19,6 +19,7 @@ import { ProgressBar } from './components/progress/ProgressBar'
 import { ImageViewer } from './components/viewer/ImageViewer'
 import { TextEditor } from './components/editor/TextEditor'
 import { imageDataToDataUrl } from './utils/imageLoader'
+import type { PreprocessOptions } from './components/viewer/ImagePreprocessPanel'
 import './App.css'
 
 // Lazy-loaded modals & heavy panels (not needed at initial render)
@@ -128,6 +129,23 @@ export default function App() {
     () => processedImages.map((img) => imageDataToDataUrl(img.imageData)),
     [processedImages]
   )
+
+  // 全画像に一括で前処理を適用
+  const handlePreprocessAll = useCallback(async (opts: PreprocessOptions) => {
+    const { applyPreprocess } = await import('./components/viewer/ImagePreprocessPanel')
+    const results: Record<number, string> = {}
+    for (let i = 0; i < pendingDataUrls.length; i++) {
+      const url = pendingDataUrls[i]
+      if (url) {
+        try {
+          results[i] = await applyPreprocess(url, opts)
+        } catch (err) {
+          console.error(`Batch preprocess error on image ${i}:`, err)
+        }
+      }
+    }
+    setPreprocessedUrls(prev => ({ ...prev, ...results }))
+  }, [pendingDataUrls])
 
   // processedImages が差し替わったらインデックスをリセット
   useEffect(() => { setPendingImageIndex(0) }, [processedImages])
@@ -616,6 +634,8 @@ export default function App() {
                         onProcessed={(url) => handlePreprocessed(pendingImageIndex, url)}
                         onReset={() => handlePreprocessReset(pendingImageIndex)}
                         sidePanel
+                        totalImages={processedImages.length}
+                        onApplyAll={handlePreprocessAll}
                       />
                     </Suspense>
                   )}

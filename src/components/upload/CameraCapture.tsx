@@ -53,11 +53,13 @@ export function CameraCapture({ onCapture, lang, disabled = false }: CameraCaptu
         return
       }
 
+      // Request maximum resolution; on PCs this typically yields 1920x1080 (landscape).
+      // On mobile, the facingMode determines which camera and orientation is used.
       const mediaStream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode,
-          width: { ideal: 2048 },
-          height: { ideal: 2048 },
+          width: { ideal: 3840 },
+          height: { ideal: 2160 },
         },
         audio: false,
       })
