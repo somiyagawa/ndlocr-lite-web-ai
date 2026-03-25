@@ -18,7 +18,7 @@ import { CameraCapture } from './components/upload/CameraCapture'
 import { ProgressBar } from './components/progress/ProgressBar'
 import { ImageViewer } from './components/viewer/ImageViewer'
 import { TextEditor } from './components/editor/TextEditor'
-import { imageDataToDataUrl } from './utils/imageLoader'
+import { imageDataToDataUrl, dataUrlToProcessedImage } from './utils/imageLoader'
 import type { PreprocessOptions } from './components/viewer/ImagePreprocessPanel'
 import './App.css'
 
@@ -78,7 +78,7 @@ export default function App() {
   const [showSplash, setShowSplash] = useState(true)
   const handleSplashDone = useCallback(() => setShowSplash(false), [])
   const { isReady, jobState, processImage, processRegion, resetState } = useOCRWorker()
-  const { processedImages, isLoading: isLoadingFiles, processFiles, clearImages, fileLoadingState } = useFileProcessor()
+  const { processedImages, setProcessedImages, isLoading: isLoadingFiles, processFiles, clearImages, fileLoadingState } = useFileProcessor()
   const { runs: historyRuns, saveRun, clearResults } = useResultCache()
   const {
     settings: aiSettings,
@@ -177,6 +177,27 @@ export default function App() {
     }
     setPreprocessedUrls(prev => ({ ...prev, ...results }))
   }, [pendingDataUrls])
+
+  // ページ分割ハンドラ（pending用）：現在の画像を分割ページで差し替え
+  const handleSplitPages = useCallback(async (pages: string[]) => {
+    if (pages.length < 2) return
+    const currentImg = processedImages[pendingImageIndex]
+    if (!currentImg) return
+    try {
+      const newImages = await Promise.all(
+        pages.map((url, i) =>
+          dataUrlToProcessedImage(url, `${currentImg.fileName}_p${i + 1}`, i)
+        )
+      )
+      setProcessedImages(prev => {
+        const next = [...prev]
+        next.splice(pendingImageIndex, 1, ...newImages)
+        return next
+      })
+    } catch (err) {
+      console.error('Split pages error:', err)
+    }
+  }, [processedImages, pendingImageIndex, setProcessedImages])
 
   // processedImages が差し替わったらインデックスをリセット
   useEffect(() => { setPendingImageIndex(0) }, [processedImages])
@@ -662,6 +683,7 @@ export default function App() {
                         lang={lang}
                         imageDataUrl={pendingDataUrls[pendingImageIndex] ?? ''}
                         onProcessed={(url) => handlePreprocessed(pendingImageIndex, url)}
+                        onSplitPages={handleSplitPages}
                         onReset={() => handlePreprocessReset(pendingImageIndex)}
                         sidePanel
                         totalImages={processedImages.length}
@@ -862,6 +884,7 @@ export default function App() {
                                 onProcessed={(url) => handlePreprocessed(selectedResultIndex + 10000, url)}
                                 onReset={() => handlePreprocessReset(selectedResultIndex + 10000)}
                                 sidePanel
+                                totalImages={sessionResults.length}
                                 perspectiveActive={perspectiveActive}
                                 onPerspectiveToggle={handlePerspectiveToggle}
                                 perspectiveCorners={perspectiveCorners}

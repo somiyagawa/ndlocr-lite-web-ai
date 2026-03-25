@@ -53,5 +53,5 @@ export function useFileProcessor() {
     setError(null)
   }, [])
 
-  return { processedImages, isLoading, error, processFiles, clearImages, fileLoadingState }
+  return { processedImages, setProcessedImages, isLoading, error, processFiles, clearImages, fileLoadingState }
 }

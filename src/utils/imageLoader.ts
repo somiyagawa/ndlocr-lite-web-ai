@@ -139,3 +139,31 @@ export function imageDataToDataUrl(imageData: ImageData): string {
   canvas.getContext('2d')!.putImageData(imageData, 0, 0)
   return canvas.toDataURL('image/jpeg', 0.85)
 }
+
+/**
+ * Convert a data URL to a ProcessedImage.
+ * Loads the image, extracts ImageData, and generates a thumbnail.
+ */
+export async function dataUrlToProcessedImage(
+  dataUrl: string,
+  fileName: string,
+  pageIndex?: number,
+): Promise<ProcessedImage> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = img.width
+      canvas.height = img.height
+      const ctx = canvas.getContext('2d')
+      if (!ctx) { reject(new Error('Failed to get canvas context')); return }
+      ctx.drawImage(img, 0, 0)
+      const imageData = ctx.getImageData(0, 0, img.width, img.height)
+      const thumbnailDataUrl = makeThumbnailDataUrl(imageData)
+      resolve({ fileName, pageIndex, imageData, thumbnailDataUrl })
+    }
+    img.onerror = () => reject(new Error('Failed to load image'))
+    img.src = dataUrl
+  })
+}
