@@ -23,6 +23,8 @@ export function CameraCapture({ onCapture, lang, disabled = false }: CameraCaptu
   const [enableDewarp, setEnableDewarp] = useState(false)
   const [enableSplit, setEnableSplit] = useState(false)
   const [scanMode, setScanMode] = useState(true)
+  const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([])
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string | null>(null)
 
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -53,14 +55,19 @@ export function CameraCapture({ onCapture, lang, disabled = false }: CameraCaptu
         return
       }
 
-      // Request maximum resolution; on PCs this typically yields 1920x1080 (landscape).
-      // On mobile, the facingMode determines which camera and orientation is used.
+      // Build video constraints: use specific deviceId if selected, otherwise facingMode
+      const videoConstraints: MediaTrackConstraints = {
+        width: { ideal: 3840 },
+        height: { ideal: 2160 },
+      }
+      if (selectedDeviceId) {
+        videoConstraints.deviceId = { exact: selectedDeviceId }
+      } else {
+        videoConstraints.facingMode = facingMode
+      }
+
       const mediaStream = await navigator.mediaDevices.getUserMedia({
-        video: {
-          facingMode,
-          width: { ideal: 3840 },
-          height: { ideal: 2160 },
-        },
+        video: videoConstraints,
         audio: false,
       })
       setStream(mediaStream)
@@ -68,6 +75,21 @@ export function CameraCapture({ onCapture, lang, disabled = false }: CameraCaptu
       setScanStep('camera')
       setCapturedDataUrl(null)
       setCorners(null)
+
+      // Enumerate available video devices after permission is granted
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices()
+        const vidDevices = devices.filter(d => d.kind === 'videoinput')
+        setVideoDevices(vidDevices)
+        // Set current device ID from the active track if not already set
+        if (!selectedDeviceId && mediaStream.getVideoTracks().length > 0) {
+          const activeTrack = mediaStream.getVideoTracks()[0]
+          const settings = activeTrack.getSettings()
+          if (settings.deviceId) {
+            setSelectedDeviceId(settings.deviceId)
+          }
+        }
+      } catch { /* ignore enumeration errors */ }
 
       requestAnimationFrame(() => {
         if (videoRef.current) {
@@ -116,7 +138,7 @@ export function CameraCapture({ onCapture, lang, disabled = false }: CameraCaptu
         }))
       }
     }
-  }, [lang, facingMode])
+  }, [lang, facingMode, selectedDeviceId])
 
   const stopCamera = useCallback(() => {
     if (stream) {
@@ -134,9 +156,24 @@ export function CameraCapture({ onCapture, lang, disabled = false }: CameraCaptu
     if (stream) {
       stream.getTracks().forEach(track => track.stop())
     }
+    setSelectedDeviceId(null)
     setFacingMode(prev => prev === 'environment' ? 'user' : 'environment')
-    setTimeout(() => startCamera(), 100)
-  }, [stream, startCamera])
+  }, [stream])
+
+  const handleDeviceChange = useCallback((deviceId: string) => {
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop())
+    }
+    setSelectedDeviceId(deviceId)
+  }, [stream])
+
+  // Restart camera when facingMode or selectedDeviceId changes while open
+  useEffect(() => {
+    if (isOpen && scanStep === 'camera') {
+      startCamera()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [facingMode, selectedDeviceId])
 
   const capturePhoto = useCallback(() => {
     const video = videoRef.current
@@ -473,6 +510,23 @@ export function CameraCapture({ onCapture, lang, disabled = false }: CameraCaptu
             <div className="scan-corner scan-corner-tr" />
             <div className="scan-corner scan-corner-bl" />
             <div className="scan-corner scan-corner-br" />
+          </div>
+        )}
+
+        {/* Camera device selector — shown when multiple cameras available */}
+        {videoDevices.length > 1 && (
+          <div className="camera-device-selector">
+            <select
+              className="camera-device-select"
+              value={selectedDeviceId ?? ''}
+              onChange={e => handleDeviceChange(e.target.value)}
+            >
+              {videoDevices.map((device, i) => (
+                <option key={device.deviceId} value={device.deviceId}>
+                  {device.label || `${L(lang, { ja: 'カメラ', en: 'Camera', 'zh-CN': '摄像头', 'zh-TW': '攝影機', ko: '카메라', la: 'Camera', eo: 'Kamerao', es: 'Cámara', de: 'Kamera', ar: 'كاميرا', hi: 'कैमरा', ru: 'Камера', el: 'Κάμερα', syc: 'ܡܨܠܡܢܐ', cop: 'ⲕⲁⲙⲉⲣⲁ', sa: 'छायाग्राहकः' })} ${i + 1}`}
+                </option>
+              ))}
+            </select>
           </div>
         )}
 

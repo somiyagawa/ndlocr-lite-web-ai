@@ -5683,6 +5683,35 @@ button.ai-status-clickable .ai-status-text {
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
+/* Camera device selector */
+.camera-device-selector {
+  position: absolute;
+  top: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+}
+.camera-device-select {
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.78rem;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  max-width: 260px;
+  text-overflow: ellipsis;
+}
+.camera-device-select:focus {
+  outline: none;
+  border-color: rgba(255, 255, 255, 0.6);
+}
+.camera-device-select option {
+  background: #222;
+  color: #fff;
+}
+
 /* Camera right controls group */
 .camera-right-controls {
   display: flex;
