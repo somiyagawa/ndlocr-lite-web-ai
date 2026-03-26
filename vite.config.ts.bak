@@ -1,0 +1,57 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vite.dev/config/
+export default defineConfig({
+  plugins: [react()],
+
+  // ONNX Runtime Web: Viteのesbuildプリバンドルを除外（WASMバイナリが壊れるのを防ぐ）
+  cacheDir: process.env.VITE_CACHE_DIR || 'node_modules/.vite',
+  optimizeDeps: {
+    exclude: ['onnxruntime-web', 'onnxruntime-web/wasm'],
+  },
+
+  // WASMとONNXファイルをアセットとして認識
+  assetsInclude: ['**/*.wasm', '**/*.onnx'],
+
+  build: {
+    target: 'esnext',
+    // CSSのコード分割を有効化（遅延ロードコンポーネントのCSSも遅延に）
+    cssCodeSplit: true,
+    // ソースマップはプロダクションでは無効（ビルド高速化）
+    sourcemap: false,
+    // minify設定（esbuildが最速）
+    minify: 'esbuild',
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // PDF読込（pdfjs-dist は大きいので独立）
+          'pdf-reader': ['pdfjs-dist'],
+          // PDF生成
+          'pdf-writer': ['jspdf'],
+          // HEIC変換（大きいが使用頻度低い）
+          'heic': ['heic2any'],
+          // 差分表示
+          'diff': ['diff-match-patch'],
+          // React本体（キャッシュ効率向上）
+          'react-vendor': ['react', 'react-dom'],
+          // TIFF処理
+          'tiff': ['utif'],
+        },
+      },
+    },
+  },
+
+  // Web WorkerをES moduleフォーマットで出力
+  worker: {
+    format: 'es',
+  },
+
+  server: {
+    // SharedArrayBuffer用のCOOP/COEPヘッダー（onnxruntime-webのマルチスレッド推論に必要）
+    headers: {
+      'Cross-Origin-Opener-Policy': 'same-origin',
+      'Cross-Origin-Embedder-Policy': 'require-corp',
+    },
+  },
+})
