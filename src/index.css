@@ -1005,7 +1005,7 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
 }
 
 .sample-tile-badge-koten {
-  background: #8b5e3c;
+  background: var(--color-primary);
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.3);
 }

@@ -8,6 +8,18 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '4.2.2',
+    date: '2026-03-26',
+    changes: {
+      ja: [
+        'くずし字サンプルタイルのバッジ色をpondblue（プライマリカラー）に変更',
+      ],
+      en: [
+        'Changed kuzushiji sample tile badge color to pondblue (primary color)',
+      ],
+    },
+  },
+  {
     version: '4.2.1',
     date: '2026-03-26',
     changes: {
@@ -381,7 +393,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.2.1</span>
+        >v4.2.2</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}

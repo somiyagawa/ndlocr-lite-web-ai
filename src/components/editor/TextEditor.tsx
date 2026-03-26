@@ -129,6 +129,51 @@ export function TextEditor({
     }
   }, [fontSize, lineSpacing, isVertical])
 
+  // Auto-fit: テキストの最長行に合わせてフォントサイズを自動拡大
+  const handleAutoFitFont = useCallback(() => {
+    const ta = textareaRef.current
+    if (!ta || !displayText) return
+    const lines = displayText.split('\n').filter(l => l.length > 0)
+    if (lines.length === 0) return
+
+    const style = window.getComputedStyle(ta)
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const refSize = fontSize
+    const families = style.fontFamily
+    ctx.font = `${refSize}px ${families}`
+
+    if (isVertical) {
+      // 縦書き: コンテナの高さに対して最長行（文字数）をフィット
+      const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom)
+      const availableHeight = ta.clientHeight - padding
+      if (availableHeight <= 0) return
+      // 縦書きの1行の高さ ≈ 文字数 × fontSize（lineSpacing含む）
+      const maxChars = Math.max(...lines.map(l => l.length))
+      const currentLineH = maxChars * refSize * lineSpacing
+      if (currentLineH <= 0) return
+      const scale = availableHeight / currentLineH
+      const newSize = Math.min(48, Math.max(10, Math.floor(refSize * scale)))
+      setFontSize(newSize)
+    } else {
+      // 横書き: コンテナの幅に対して最長行の文字幅をフィット
+      const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight)
+      const availableWidth = ta.clientWidth - padding
+      if (availableWidth <= 0) return
+      let maxWidth = 0
+      for (const line of lines) {
+        const w = ctx.measureText(line).width
+        if (w > maxWidth) maxWidth = w
+      }
+      if (maxWidth <= 0) return
+      const scale = availableWidth / maxWidth
+      const newSize = Math.min(48, Math.max(10, Math.floor(refSize * scale)))
+      setFontSize(newSize)
+    }
+  }, [displayText, fontSize, lineSpacing, isVertical])
+
   // Search matches calculation
   const searchMatches = useMemo<SearchMatch[]>(() => {
     if (!searchQuery || shouldShowDiff) return []
@@ -1350,11 +1395,21 @@ export function TextEditor({
               type="range"
               className="text-editor-font-slider-compact"
               min="10"
-              max="28"
+              max="48"
               value={fontSize}
               onChange={(e) => setFontSize(Number(e.target.value))}
               title={`${fontSize}px`}
             />
+            <button
+              className="text-editor-icon-btn"
+              onClick={handleAutoFitFont}
+              title={L(lang, { ja: '行幅に合わせて文字を拡大', en: 'Auto-fit font to line width', 'zh-CN': '自动适应行宽', 'zh-TW': '自動適應行寬', ko: '줄 너비에 맞춤' })}
+            >
+              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 4h12M2 12h12" />
+                <path d="M4 2l-2 2 2 2M12 10l2 2-2 2" />
+              </svg>
+            </button>
             <span className="text-editor-font-sep-compact">|</span>
             <span className="text-editor-font-label-compact">{L(lang, { ja: '行間', en: 'Spacing', 'zh-CN': '行距', 'zh-TW': '行距', ko: '행간', la: 'Interl.', eo: 'Interlinio', es: 'Espacio', de: 'Abstand', ar: 'التباعد', hi: 'अंतराल', ru: 'Интервал', el: 'Απόσταση', syc: 'ܦܚܘܩܐ' })}</span>
             <span className="text-editor-font-value-compact">{lineSpacing.toFixed(1)}</span>
