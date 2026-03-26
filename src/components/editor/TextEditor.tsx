@@ -81,7 +81,6 @@ export function TextEditor({
   const [saved, setSaved] = useState(true)
   const [showExportMenu, setShowExportMenu] = useState(false)
   const [highlightRange, setHighlightRange] = useState<{ start: number; end: number } | null>(null)
-  const [computedLineHeight, setComputedLineHeight] = useState<number>(0)
   const [showTEIMetadataModal, setShowTEIMetadataModal] = useState(false)
   const [teiMetadataMode, setTeiMetadataMode] = useState<'single' | 'batch'>('single')
   const [lastTEIMetadata, setLastTEIMetadata] = useState<TEIMetadata | undefined>(undefined)
@@ -114,20 +113,6 @@ export function TextEditor({
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result?.id])
-
-  // テキストエリアの実際の lineHeight を計測して行番号と同期する
-  useEffect(() => {
-    const ta = textareaRef.current
-    if (!ta) return
-    const style = window.getComputedStyle(ta)
-    const lh = parseFloat(style.lineHeight)
-    if (!isNaN(lh) && lh > 0) {
-      setComputedLineHeight(lh)
-    } else {
-      // fallback: fontSize × line-height ratio
-      setComputedLineHeight(fontSize * lineSpacing)
-    }
-  }, [fontSize, lineSpacing, isVertical])
 
   // Search matches calculation
   const searchMatches = useMemo<SearchMatch[]>(() => {
@@ -1200,19 +1185,12 @@ export function TextEditor({
                 className="line-numbers-gutter"
                 ref={gutterRef}
                 style={{
-                  fontSize: `${fontSize}px`,
-                  lineHeight: `${lineSpacing}`,
+                  fontSize: `${Math.max(10, fontSize * 0.75)}px`,
+                  lineHeight: `${fontSize * lineSpacing / Math.max(10, fontSize * 0.75)}`,
                 }}
               >
                 {Array.from({ length: lineCount }).map((_, i) => (
-                  <span
-                    key={i}
-                    className="line-number"
-                    style={{
-                      height: computedLineHeight > 0 ? `${computedLineHeight}px` : `${fontSize * lineSpacing}px`,
-                      fontSize: `${Math.max(10, fontSize * 0.75)}px`,
-                    }}
-                  >
+                  <span key={i} className="line-number">
                     {i + 1}
                   </span>
                 ))}
@@ -1223,8 +1201,6 @@ export function TextEditor({
                 className="line-numbers-gutter-vertical"
                 ref={gutterRef}
                 style={{
-                  fontSize: `${fontSize}px`,
-                  lineHeight: `${lineSpacing}`,
                   paddingRight: '0.75rem',
                   paddingLeft: '0.75rem',
                 }}
@@ -1234,7 +1210,7 @@ export function TextEditor({
                     key={i}
                     className="line-number-vertical"
                     style={{
-                      width: computedLineHeight > 0 ? `${computedLineHeight}px` : `${fontSize * lineSpacing}px`,
+                      width: `${fontSize * lineSpacing}px`,
                       fontSize: `${Math.max(8, fontSize * 0.6)}px`,
                     }}
                   >

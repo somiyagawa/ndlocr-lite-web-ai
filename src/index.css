@@ -2917,27 +2917,29 @@ button.ai-status-clickable .ai-status-text {
 }
 
 .line-numbers-gutter {
-  display: flex;
-  flex-direction: column;
+  display: block;
   background: var(--color-bg);
   border-right: 1px solid var(--color-border-light);
   padding: 0.75rem 0;
-  overflow: hidden;
+  overflow-y: scroll;
+  scrollbar-width: none;        /* Firefox: スクロールバー非表示 */
+  -ms-overflow-style: none;     /* IE/Edge: スクロールバー非表示 */
   flex-shrink: 0;
   user-select: none;
   font-family: 'Noto Sans Mono', 'Courier New', monospace;
 }
+.line-numbers-gutter::-webkit-scrollbar {
+  display: none;                /* Chrome/Safari: スクロールバー非表示 */
+}
 
 .line-number {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  display: block;
+  text-align: right;
   color: var(--color-text-tertiary);
   padding-right: 0.5rem;
   padding-left: 0.5rem;
   min-width: 2.5rem;
   white-space: nowrap;
-  font-size: inherit;
   box-sizing: border-box;
 }
 
