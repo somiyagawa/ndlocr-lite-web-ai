@@ -23,12 +23,10 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
     date: '2026-03-26',
     changes: {
       ja: [
-        '英語OCRのスペース認識を修正（PARSeqデコーダの特殊トークンオフセット補正）',
-        'PARSeqのオートリグレッシブ特性に合わせ、不要なCTC式連続重複除去を削除',
+        '英語OCRのスペース認識を修正（maxIndex=1をスペース文字として許可）',
       ],
       en: [
-        'Fixed English OCR space recognition (PARSeq decoder special token offset correction)',
-        'Removed incorrect CTC-style duplicate character removal for autoregressive PARSeq model',
+        'Fixed English OCR space recognition (allow maxIndex=1 as space character)',
       ],
     },
   },

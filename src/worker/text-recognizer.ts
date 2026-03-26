@@ -189,8 +189,9 @@ export class TextRecognizer {
 
         // <eos> (ID=0) で終了
         if (maxIndex === 0) break
-        // 特殊トークン (<s>=1, </s>=2, <pad>=3) をスキップ
-        if (maxIndex < 4) continue
+        // maxIndex=1 → charset[0]=スペース：英語テキストのために許可
+        // maxIndex=2,3 は特殊トークン（</s>, <pad>）としてスキップ
+        if (maxIndex === 2 || maxIndex === 3) continue
 
         resultClassIds.push(maxIndex - 1)
       }
