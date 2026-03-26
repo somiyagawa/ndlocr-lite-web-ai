@@ -8,6 +8,34 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '4.3.0',
+    date: '2026-03-27',
+    changes: {
+      ja: [
+        'IIIFサンプル追加: 玉水物語（京都大学附属図書館蔵）をサンプルタイルから直接読み込み可能に',
+        'IIIFLoaderに外部URL指定による自動フェッチ機能を追加（forwardRef + useImperativeHandle）',
+        'テキストエディタに文字サイズ自動フィット機能を追加（行幅に合わせてフォントサイズを自動拡大）',
+        '縦書きモードで「ー」等の縦書き字形が正しく表示されるようfont-feature-settings: "vert"を追加',
+        'くずし字サンプルを竹取物語に修正、バッジ色をpondblueに変更',
+        'ヘッダーサブタイトル「現代の活字からくずし字まで」をバッジ風の目立つデザインに変更',
+        'サンプルラベル「サンプル画像で試す:」の視認性を向上',
+        '携帯版: 結果ツールバー・AI校正・読み順編集・バグ報告ボタンをコンパクト化',
+        '携帯版: テキストエディタのヘッダー・ステータスバー・フォントコントロールを画面内に収まるよう最適化',
+      ],
+      en: [
+        'Added IIIF sample: Tamamizu Monogatari (Kyoto Univ. Library) loadable from sample tile',
+        'Added auto-fetch via external URL to IIIFLoader (forwardRef + useImperativeHandle)',
+        'Added auto-fit font size feature to text editor (scales font to fill line width)',
+        'Fixed vertical glyph rendering for "ー" etc. with font-feature-settings: "vert"',
+        'Corrected kuzushiji sample to Taketori Monogatari, changed badge color to pondblue',
+        'Made header subtitle more prominent with badge-style design',
+        'Improved visibility of sample tile label',
+        'Mobile: compacted result toolbar, AI proofread, reading order, and bug report buttons',
+        'Mobile: optimized text editor header, statusbar, and font controls to fit screen',
+      ],
+    },
+  },
+  {
     version: '4.2.2',
     date: '2026-03-26',
     changes: {
@@ -393,7 +421,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.2.2</span>
+        >v4.3.0</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}

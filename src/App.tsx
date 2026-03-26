@@ -18,7 +18,7 @@ import { FileDropZone } from './components/upload/FileDropZone'
 import { DirectoryPicker } from './components/upload/DirectoryPicker'
 import { CameraCapture } from './components/upload/CameraCapture'
 import { SampleTileSelector } from './components/SampleTileSelector'
-import { IIIFLoader } from './components/IIIFLoader'
+import { IIIFLoader, type IIIFLoaderHandle } from './components/IIIFLoader'
 import { ProgressBar } from './components/progress/ProgressBar'
 import { ImageViewer } from './components/viewer/ImageViewer'
 import { TextEditor } from './components/editor/TextEditor'
@@ -107,6 +107,7 @@ export default function App() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [isReadyToProcess, setIsReadyToProcess] = useState(false)
   const cancelRef = useRef(false)
+  const iiifLoaderRef = useRef<IIIFLoaderHandle>(null)
   const [pendingImageIndex, setPendingImageIndex] = useState(0)
 
   // 領域選択状態
@@ -731,6 +732,7 @@ export default function App() {
                 {L(lang, { ja: 'クリップボードから貼り付け', en: 'Paste from Clipboard', 'zh-CN': '从剪贴板粘贴', 'zh-TW': '從剪貼簿貼上', ko: '클립보드에서 붙여넣기', la: 'Glutinare ex tabulā', eo: 'Alglui el tondujo', es: 'Pegar desde portapapeles', de: 'Aus Zwischenablage einfügen', ar: 'لصق من الحافظة', hi: 'क्लिपबोर्ड से पेस्ट करें', ru: 'Вставить из буфера обмена', el: 'Επικόλληση από πρόχειρο', syc: 'ܐܠܨܘܩ ܡܢ ܠܘ̈ܚܐ ܕܢܣ̈ܚܐ' })}
               </button>
               <IIIFLoader
+                ref={iiifLoaderRef}
                 onImagesLoaded={handleFilesSelected}
                 lang={lang}
                 disabled={isWorking}
@@ -741,6 +743,7 @@ export default function App() {
               lang={lang}
               disabled={isWorking}
               onSampleSelected={handleSampleLoad}
+              onIIIFSampleSelected={(url) => iiifLoaderRef.current?.openWithUrl(url)}
             />
             <span className="bluepond-credit">
               {L(lang, {

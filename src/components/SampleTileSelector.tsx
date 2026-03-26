@@ -2,22 +2,37 @@
  * サンプル画像タイル選択コンポーネント
  * オートモードでは現代・古典籍の両方のサンプルをビジュアルタイルで表示し、
  * クリックで選択→OCR処理を開始できる。
+ * IIIF サンプルはクリック時にマニフェストURLをIIIFLoaderに渡す。
  */
 import { useCallback } from 'react'
 import type { OCRMode } from '../types/ocr'
 
-interface SampleTile {
+interface SampleTileBase {
   id: string
   label: Record<string, string>
   description: Record<string, string>
-  imagePath: string
-  fileName: string
-  mimeType: string
   category: 'modern' | 'koten'
 }
 
+interface LocalSampleTile extends SampleTileBase {
+  type: 'local'
+  imagePath: string
+  fileName: string
+  mimeType: string
+}
+
+interface IIIFSampleTile extends SampleTileBase {
+  type: 'iiif'
+  manifestUrl: string
+  /** サムネイル表示用の画像URL（IIIF Image API or 静的画像） */
+  thumbnailUrl: string
+}
+
+type SampleTile = LocalSampleTile | IIIFSampleTile
+
 const SAMPLES: SampleTile[] = [
   {
+    type: 'local',
     id: 'kumonoito',
     label: {
       ja: '蜘蛛の糸（現代）',
@@ -39,6 +54,7 @@ const SAMPLES: SampleTile[] = [
     category: 'modern',
   },
   {
+    type: 'local',
     id: 'taketori',
     label: {
       ja: '竹取物語（くずし字）',
@@ -59,6 +75,27 @@ const SAMPLES: SampleTile[] = [
     mimeType: 'image/jpeg',
     category: 'koten',
   },
+  {
+    type: 'iiif',
+    id: 'tamamizu',
+    label: {
+      ja: '玉水物語（IIIF・くずし字）',
+      en: 'Tamamizu Monogatari (IIIF / Kuzushiji)',
+      'zh-CN': '玉水物语（IIIF・草书）',
+      'zh-TW': '玉水物語（IIIF・草書）',
+      ko: '다마미즈 모노가타리 (IIIF / 흘림체)',
+    },
+    description: {
+      ja: '玉水物語 — 京都大学附属図書館蔵・彩色挿図付きお伽草子写本（IIIF Presentation API）',
+      en: 'The Tale of Tamamizu — Illustrated otogi-zōshi manuscript, Kyoto University Library (IIIF)',
+      'zh-CN': '玉水物语 — 京都大学图书馆藏・彩色插图御伽草子写本（IIIF）',
+      'zh-TW': '玉水物語 — 京都大學圖書館藏・彩色插圖御伽草子寫本（IIIF）',
+      ko: '다마미즈 모노가타리 — 교토대학 도서관 소장 채색 삽화 오토기조시 (IIIF)',
+    },
+    manifestUrl: 'https://rmda.kulib.kyoto-u.ac.jp/iiif/metadata_manifest/RB00013653/manifest.json',
+    thumbnailUrl: 'https://rmda.kulib.kyoto-u.ac.jp/iiif/RB00013653/canvas/3/thumbnail',
+    category: 'koten',
+  },
 ]
 
 interface SampleTileSelectorProps {
@@ -66,13 +103,14 @@ interface SampleTileSelectorProps {
   lang: string
   disabled: boolean
   onSampleSelected: (files: File[]) => Promise<void>
+  onIIIFSampleSelected?: (manifestUrl: string) => void
 }
 
 function L(lang: string, map: Record<string, string>): string {
   return map[lang] ?? map['en'] ?? map['ja'] ?? ''
 }
 
-export function SampleTileSelector({ ocrMode, lang, disabled, onSampleSelected }: SampleTileSelectorProps) {
+export function SampleTileSelector({ ocrMode, lang, disabled, onSampleSelected, onIIIFSampleSelected }: SampleTileSelectorProps) {
   // 表示するサンプルをモードに応じてフィルタ
   const visibleSamples = ocrMode === 'auto'
     ? SAMPLES // オート: 全サンプル表示
@@ -81,6 +119,10 @@ export function SampleTileSelector({ ocrMode, lang, disabled, onSampleSelected }
       : SAMPLES.filter(s => s.category === 'modern')
 
   const handleTileClick = useCallback(async (sample: SampleTile) => {
+    if (sample.type === 'iiif') {
+      onIIIFSampleSelected?.(sample.manifestUrl)
+      return
+    }
     try {
       const res = await fetch(sample.imagePath)
       const blob = await res.blob()
@@ -89,7 +131,7 @@ export function SampleTileSelector({ ocrMode, lang, disabled, onSampleSelected }
     } catch (error) {
       console.error('Failed to load sample:', error)
     }
-  }, [onSampleSelected])
+  }, [onSampleSelected, onIIIFSampleSelected])
 
   return (
     <div className="sample-tile-container">
@@ -112,18 +154,29 @@ export function SampleTileSelector({ ocrMode, lang, disabled, onSampleSelected }
             title={L(lang, sample.description)}
           >
             <div className="sample-tile-image-wrap">
-              <img
-                src={sample.imagePath}
-                alt={L(lang, sample.label)}
-                className="sample-tile-image"
-                width={270}
-                height={180}
-                loading="lazy"
-              />
-              <span className={`sample-tile-badge sample-tile-badge-${sample.category}`}>
-                {sample.category === 'modern'
-                  ? L(lang, { ja: '現代活字', en: 'Modern Print', 'zh-CN': '现代印刷', 'zh-TW': '現代活字', ko: '현대 활자' })
-                  : L(lang, { ja: 'くずし字', en: 'Kuzushiji', 'zh-CN': '草书', 'zh-TW': '草書', ko: '흘림체' })
+              {sample.type === 'iiif' ? (
+                <div className="sample-tile-iiif-placeholder">
+                  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.6">
+                    <path d="M21 12a9 9 0 0 1-9 9m9-9a9 9 0 0 0-9-9m9 9H3m9 9a9 9 0 0 1-9-9m9 9c1.66 0 3-4.03 3-9s-1.34-9-3-9m0 18c-1.66 0-3-4.03-3-9s1.34-9 3-9m-9 9a9 9 0 0 1 9-9" />
+                  </svg>
+                  <span className="sample-tile-iiif-text">IIIF</span>
+                </div>
+              ) : (
+                <img
+                  src={sample.imagePath}
+                  alt={L(lang, sample.label)}
+                  className="sample-tile-image"
+                  width={270}
+                  height={180}
+                  loading="lazy"
+                />
+              )}
+              <span className={`sample-tile-badge sample-tile-badge-${sample.category}${sample.type === 'iiif' ? ' sample-tile-badge-iiif' : ''}`}>
+                {sample.type === 'iiif'
+                  ? 'IIIF'
+                  : sample.category === 'modern'
+                    ? L(lang, { ja: '現代活字', en: 'Modern Print', 'zh-CN': '现代印刷', 'zh-TW': '現代活字', ko: '현대 활자' })
+                    : L(lang, { ja: 'くずし字', en: 'Kuzushiji', 'zh-CN': '草书', 'zh-TW': '草書', ko: '흘림체' })
                 }
               </span>
             </div>

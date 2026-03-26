@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.2.2-teal?style=for-the-badge" alt="v4.2.2" />
+  <img src="https://img.shields.io/badge/version-4.3.0-teal?style=for-the-badge" alt="v4.3.0" />
   <img src="https://img.shields.io/badge/license-CC_BY_4.0-blue?style=for-the-badge" alt="CC BY 4.0" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
@@ -205,6 +205,10 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 ### v4.2.2 — 2026-03-26
 
 **くずし字バッジ色変更** — サンプルタイルセレクタのくずし字バッジ色をpondblue（プライマリカラー）に変更。
+
+### v4.3.0 — 2026-03-27
+
+**IIIFサンプル・モバイル最適化・エディタ機能強化** — IIIFサンプルとして玉水物語（京都大学附属図書館蔵）をタイルから直接読み込み可能に。IIIFLoaderにforwardRefによる外部URL自動フェッチ機能を追加。テキストエディタに行幅に合わせた文字サイズ自動フィット機能を追加。縦書きモードでfont-feature-settings: "vert"により長音符「ー」等の縦書き字形を正しく表示。くずし字サンプルを竹取物語に修正。ヘッダーサブタイトルをバッジ風の目立つデザインに変更。携帯版で結果ツールバー・AI校正・読み順編集・バグ報告ボタン・フォントコントロールを画面内に収まるようコンパクト化。
 
 ### v4.2.1 — 2026-03-26
 
