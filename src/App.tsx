@@ -13,7 +13,6 @@ import { useTheme } from './hooks/useTheme'
 import { Header } from './components/layout/Header'
 import { Footer } from './components/layout/Footer'
 import { SplitView } from './components/layout/SplitView'
-import { BottomToolbar } from './components/layout/BottomToolbar'
 import { FileDropZone } from './components/upload/FileDropZone'
 import { DirectoryPicker } from './components/upload/DirectoryPicker'
 import { CameraCapture } from './components/upload/CameraCapture'
@@ -1161,13 +1160,6 @@ export default function App() {
           </button>
         )}
       </main>
-
-      <BottomToolbar
-        lang={lang}
-        onUpload={handleClear}
-        ocrTimeMs={currentResult?.processingTimeMs}
-        hasResults={hasResults}
-      />
 
       <Footer lang={lang} />
 
