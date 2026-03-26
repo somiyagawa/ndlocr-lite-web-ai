@@ -19,8 +19,10 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
         '携帯版: メニュー内の言語選択・OCRモード切替のレイアウトを改善',
         '携帯版: ドロップゾーンを超コンパクト化（フォーマット表記非表示）',
         '携帯版: 冗長なUpload image/PDFボタン（BottomToolbar）を削除',
-        '携帯版: フッターを非表示にしテキストエディタ領域を最大化',
+        '携帯版: フッターを非表示にし、フッター情報をメニューパネル下部に移動',
         '携帯版: テキストエディタの縦方向領域を拡大（80vh）',
+        '文字オーバーレイボタンを「□字」アイコンに変更',
+        '読み順ボタンを「①②」丸囲み数字アイコンに変更',
       ],
       en: [
         'Mobile: fixed zoom controls, overlay text, confidence, and reading order buttons not responding to touch (touch event propagation fix)',
@@ -30,8 +32,10 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
         'Mobile: improved language selector and OCR mode toggle layout in drawer menu',
         'Mobile: ultra-compact dropzone (format text hidden)',
         'Mobile: removed redundant Upload image/PDF button (BottomToolbar)',
-        'Mobile: hidden footer to maximize text editor space',
+        'Mobile: footer info moved into drawer menu panel',
         'Mobile: increased text editor vertical area (80vh)',
+        'Changed text overlay button icon to □字 (kanji in square)',
+        'Changed reading order button icon to ①② (circled numbers)',
       ],
     },
   },
@@ -708,6 +712,74 @@ export const Header = memo(function Header({
                 ))}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* ── Footer info inside drawer (mobile only) ── */}
+        <div className="drawer-footer-info">
+          <div className="drawer-footer-privacy">
+            <span className="privacy-icon">🔒</span>
+            {L(lang, {
+              ja: 'このシステムはWebブラウザで完結して動作します。選択した画像とOCR結果はPCの外部には送信されません。',
+              en: 'This system runs entirely in your browser. Images and OCR results are never sent to any external server.',
+              'zh-CN': '该系统完全在浏览器中运行。图像和OCR结果不会发送到外部。',
+              'zh-TW': '該系統完全在瀏覽器中運行。圖像和OCR結果不會傳送到外部。',
+              ko: '이 시스템은 브라우저에서 완전히 실행됩니다. 이미지와 OCR 결과는 외부로 전송되지 않습니다.',
+              la: 'Hoc systema in navigatro operatur. Imagines et eventus OCR extra non mittuntur.',
+              eo: 'Ĉi tiu sistemo funkcias tute en via retumilo. Bildoj kaj OCR-rezultoj neniam estas senditaj eksteren.',
+              es: 'Este sistema funciona completamente en su navegador. Las imágenes y resultados OCR nunca se envían a ningún servidor.',
+              de: 'Dieses System läuft vollständig in Ihrem Browser. Bilder und OCR-Ergebnisse werden nie an externe Server gesendet.',
+              ar: 'يعمل هذا النظام بالكامل في متصفحك. لا يتم إرسال الصور ونتائج OCR إلى أي خادم خارجي.',
+              hi: 'यह सिस्टम पूरी तरह आपके ब्राउज़र में चलता है। छवियाँ और OCR परिणाम कभी बाहर नहीं भेजे जाते।',
+              ru: 'Эта система работает полностью в вашем браузере. Изображения и результаты OCR никогда не отправляются на внешний сервер.',
+              el: 'Αυτό το σύστημα λειτουργεί εξ ολοκλήρου στο πρόγραμμα περιήγησής σας. Οι εικόνες και τα αποτελέσματα OCR δεν αποστέλλονται ποτέ.',
+              syc: 'ܗܢ ܫܘ̈ܠܛ̈ܢ ܟ̈ܠ̈ܗ ܒ̈ܡ̈ܕ̈ܒ̈ܪ̈ܢ̈ܐ ܦ̈ܥ̈ܠ. ܨ̈ܘ̈ܪ̈ܬ̈ܐ ܘ̈ܦ̈ܠ̈ܛ̈ OCR ܠ̈ܒ̈ܪ ܠ̈ܐ ܡ̈ܫ̈ܬ̈ܕ̈ܪ̈ܝ̈ܢ.',
+              cop: 'ⲡⲁⲓⲥⲩⲥⲧⲏⲙⲁ ⲉϥⲉⲣϩⲱⲃ ⲧⲏⲣϥ ϧⲉⲛ ⲡⲉⲕⲃⲣⲁⲩⲍⲉⲣ. ⲛⲓⲉⲓⲕⲱⲛ ⲛⲉⲙ ⲛⲓⲡⲟⲗⲏ ⲛⲧⲉ OCR ⲛⲁⲩⲟⲩⲟⲣⲡⲟⲩ ⲉⲃⲟⲗ ⲁⲛ.',
+              sa: 'एतत् प्रणालिका सम्पूर्णतया ब्राउज़रे चलति। चित्राणि OCR-फलानि च बाह्यसेवकाय न प्रेष्यन्ते।'
+            })}
+          </div>
+          <div className="drawer-footer-credits">
+            {L(lang, {
+              ja: 'OCRエンジン: 国立国会図書館 (NDL Lab) / Web版: 橋本雄太 / AI校正: 小形克宏 / Ultra Bluepond: 宮川創',
+              en: 'OCR engine: NDL Lab / Web port: Y. Hashimoto / AI proofread: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              'zh-CN': 'OCR引擎: NDL Lab / Web版: 桥本雄太 / AI校正: 小形克宏 / Ultra Bluepond: 宫川创',
+              'zh-TW': 'OCR引擎: NDL Lab / Web版: 橋本雄太 / AI校正: 小形克宏 / Ultra Bluepond: 宮川創',
+              ko: 'OCR 엔진: NDL Lab / Web판: 하시모토 유타 / AI교정: 오가타 카쓰히로 / Ultra Bluepond: 미야가와 소',
+              la: 'OCR: NDL Lab / Web: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              eo: 'OCR: NDL Lab / Retversio: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              es: 'OCR: NDL Lab / Web: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              de: 'OCR: NDL Lab / Web: Y. Hashimoto / KI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              ar: 'محرك OCR: NDL Lab / الويب: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              hi: 'OCR: NDL Lab / वेब: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              ru: 'OCR: NDL Lab / Веб: Ю. Хасимото / AI: К. Огата / Ultra Bluepond: С. Миягава',
+              el: 'OCR: NDL Lab / Web: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              syc: 'OCR: NDL Lab / ܓܘ: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              cop: 'OCR: NDL Lab / Web: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              sa: 'OCR: NDL Lab / Web: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa'
+            })}
+          </div>
+          <div className="drawer-footer-license">
+            NDLOCR-Lite: CC BY 4.0 (NDL) / Web: CC BY 4.0 (Hashimoto) / AI: MIT (Ogata) / Ultra Bluepond: CC BY 4.0 (Miyagawa)
+          </div>
+          <div className="drawer-footer-frog">
+            {L(lang, {
+              ja: '🐸 鳥獣戯画模様は NDLOCR 開発者・青池亨先生へのオマージュ',
+              en: '🐸 Choju-giga background is a tribute to Toru Aoike (NDL), developer of NDLOCR',
+              'zh-CN': '🐸 鸟兽戏画背景是向NDLOCR开发者青池亨致敬',
+              'zh-TW': '🐸 鳥獸戲畫背景是向NDLOCR開發者青池亨致敬',
+              ko: '🐸 조수희화 배경은 NDLOCR 개발자 아오이케 토오루에 대한 오마주',
+              la: '🐸 Choju-giga est honorarium Toru Aoike (NDL), creatori NDLOCR',
+              eo: '🐸 Choju-giga estas omaĝo al Toru Aoike (NDL), kreinto de NDLOCR',
+              es: '🐸 Choju-giga es un tributo a Toru Aoike (NDL), desarrollador de NDLOCR',
+              de: '🐸 Choju-giga ist eine Hommage an Toru Aoike (NDL), Entwickler von NDLOCR',
+              ar: '🐸 Choju-giga هو تكريم لـ Toru Aoike (NDL)، مطور NDLOCR',
+              hi: '🐸 Choju-giga पृष्ठभूमि Toru Aoike (NDL), NDLOCR के डेवलपर को श्रद्धांजलि',
+              ru: '🐸 Choju-giga — дань уважения Тору Аойке (NDL), разработчику NDLOCR',
+              el: '🐸 Choju-giga: φόρος τιμής στον Toru Aoike (NDL), δημιουργό του NDLOCR',
+              syc: '🐸 Choju-giga ܐ̈ܝ̈ܩ̈ܪ̈ ܠ Toru Aoike (NDL)، ܒ̈ܪ̈ܘ̈ܝ̈ NDLOCR',
+              cop: '🐸 Choju-giga ⲟⲩⲧⲁⲓⲟ ⲛ Toru Aoike (NDL), ⲫⲏ ⲉⲧⲁϥⲑⲁⲙⲓⲟ ⲙ NDLOCR',
+              sa: '🐸 Choju-giga Toru Aoike (NDL) NDLOCR विकासकस्य सम्मानार्थम्'
+            })}
           </div>
         </div>
       </div>

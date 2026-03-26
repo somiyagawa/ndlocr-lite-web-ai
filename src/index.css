@@ -5991,6 +5991,53 @@ button.ai-status-clickable .ai-status-text {
   margin: 0.75rem 0;
 }
 
+/* ── Drawer footer info (mobile only — replaces hidden footer) ── */
+.drawer-footer-info {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .drawer-footer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--color-border-light);
+    font-size: 0.7rem;
+    color: var(--color-text-secondary);
+    line-height: 1.45;
+  }
+
+  .drawer-footer-privacy {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.3rem;
+  }
+
+  .drawer-footer-privacy .privacy-icon {
+    flex-shrink: 0;
+    font-size: 0.85rem;
+    line-height: 1;
+  }
+
+  .drawer-footer-credits {
+    font-size: 0.65rem;
+    color: var(--color-text-tertiary);
+  }
+
+  .drawer-footer-license {
+    font-size: 0.6rem;
+    color: var(--color-text-tertiary);
+    word-break: break-word;
+  }
+
+  .drawer-footer-frog {
+    font-size: 0.65rem;
+    color: var(--color-text-tertiary);
+  }
+}
+
 /* ── Floating Action Button (FAB) ── */
 .fab {
   display: none;

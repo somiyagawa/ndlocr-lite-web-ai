@@ -815,10 +815,10 @@ export function ImageViewer({
               onClick={() => setShowTextOverlay(prev => !prev)}
               title={L(lang, { ja: 'OCRテキストを画像上に表示', en: 'Show OCR text on image', 'zh-CN': '在图像上显示OCR文字', 'zh-TW': '在影像上顯示OCR文字', ko: '이미지에 OCR 텍스트 표시', la: 'Textum OCR ostendere', eo: 'Montri OCR-tekston', es: 'Mostrar texto OCR', de: 'OCR-Text anzeigen', ar: 'عرض نص OCR', hi: 'OCR पाठ दिखाएँ', ru: 'Показать текст OCR', el: 'Εμφάνιση κειμένου OCR', syc: 'ܚܘܝ ܟܬܒ OCR' })}
             >
-              {/* 画像＋文字の重ね合わせアイコン */}
+              {/* □字 アイコン — テキストオーバーレイ */}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="2" y="2" width="14" height="14" rx="2" />
-                <text x="14" y="22" fontSize="14" fontWeight="700" fill="currentColor" stroke="none" fontFamily="sans-serif">T</text>
+                <rect x="1" y="1" width="22" height="22" rx="2" />
+                <text x="12" y="18" fontSize="15" fontWeight="700" fill="currentColor" stroke="none" fontFamily="serif" textAnchor="middle">字</text>
               </svg>
             </button>
             <button
@@ -838,12 +838,12 @@ export function ImageViewer({
               onClick={() => setShowReadingOrder(prev => !prev)}
               title={L(lang, { ja: '読み順表示', en: 'Show reading order', 'zh-CN': '显示阅读顺序', 'zh-TW': '顯示閱讀順序', ko: '읽기 순서 표시', la: 'Ordinem legendi ostendere', eo: 'Montri legordon', es: 'Mostrar orden', de: 'Lesereihenfolge', ar: 'عرض ترتيب القراءة', hi: 'पढ़ने का क्रम', ru: 'Порядок чтения', el: 'Σειρά ανάγνωσης', syc: 'ܚܘܝ ܣܕܪ ܩܪܝܢ' })}
             >
-              {/* 1→2→3 番号順アイコン */}
+              {/* ①② 読み順アイコン */}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <text x="1" y="9" fontSize="9" fontWeight="700" fill="currentColor" stroke="none" fontFamily="sans-serif">1</text>
-                <path d="M11 6h3" strokeWidth="2" />
-                <path d="M14 6l-2 2M14 6l-2-2" strokeWidth="1.5" />
-                <text x="14" y="21" fontSize="9" fontWeight="700" fill="currentColor" stroke="none" fontFamily="sans-serif">2</text>
+                <circle cx="8" cy="8" r="6.5" strokeWidth="1.5" />
+                <text x="8" y="11" fontSize="9" fontWeight="700" fill="currentColor" stroke="none" fontFamily="sans-serif" textAnchor="middle">1</text>
+                <circle cx="16" cy="16" r="6.5" strokeWidth="1.5" />
+                <text x="16" y="19" fontSize="9" fontWeight="700" fill="currentColor" stroke="none" fontFamily="sans-serif" textAnchor="middle">2</text>
               </svg>
             </button>
           </>
