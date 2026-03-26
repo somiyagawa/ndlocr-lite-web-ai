@@ -5,11 +5,11 @@
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
 </p>
 
-# NDLOCR-lite Web AI: Ultra BLUEPOND
+# NDLOCR-lite Web AI: Ultra Bluepond
 
 ### ブラウザ完結型 日本語OCR＋AI校正ツール
 
-> **旧称 NDLOCR-Lite Web AI Ultra** — v3.0 より **Ultra BLUEPOND** に改称しました。名称は北海道美瑛町の青い池（Blue Pond）に由来します。
+> **旧称 NDLOCR-Lite Web AI Ultra** — v3.0 より **Ultra Bluepond** に改称しました。名称は北海道美瑛町の青い池（Blue Pond）に由来します。
 
 画像やPDFをブラウザにドロップするだけで日本語OCRを実行し、AIが誤認識を自動校正します。
 **画像データはサーバーに送信されません。** すべての処理がブラウザ内で完結します。
@@ -202,13 +202,13 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 
 ## 更新記録
 
-### v3.6.0 — 2026-03-26 🔷 Ultra BLUEPOND
+### v3.6.0 — 2026-03-26 🔷 Ultra Bluepond
 
-**名称変更:** Model BLUEPOND → **Ultra BLUEPOND** に改称しました。
+**名称変更:** Model BLUEPOND → **Ultra Bluepond** に改称しました。
 
 **モバイル保存ボタン修正** — iOS Safari でファイルダウンロードが動作しない問題を修正。DOM に追加した `<a>` 要素経由でダウンロードをトリガーし、URL 解放を遅延させることで互換性を向上。
 
-**ローディング画面タイトル強化** — ローディング画面の「Ultra BLUEPOND」タイトルに複数レイヤーの白いハロー効果（text-shadow）を追加し、視認性を大幅に向上。
+**ローディング画面タイトル強化** — ローディング画面の「Ultra Bluepond」タイトルに複数レイヤーの白いハロー効果（text-shadow）を追加し、視認性を大幅に向上。
 
 **モバイルUI改善** — エクスポートドロップダウンメニューのタッチターゲットサイズを44pxに拡大し、タップフィードバックを追加。
 
@@ -274,15 +274,15 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 
 **一括保存** — 複数ページの結果をまとめてダウンロード。
 
-### v3.0.0 — 2026-03-24 🏞️ Ultra BLUEPOND
+### v3.0.0 — 2026-03-24 🏞️ Ultra Bluepond
 
-**名称変更:** NDLOCR-Lite Web AI Ultra → **NDLOCR-lite Web AI: Ultra BLUEPOND** に改称しました。北海道美瑛町の青い池（Blue Pond）に因む名称です。
+**名称変更:** NDLOCR-Lite Web AI Ultra → **NDLOCR-lite Web AI: Ultra Bluepond** に改称しました。北海道美瑛町の青い池（Blue Pond）に因む名称です。
 
 **パフォーマンス最適化** — React.lazy/Suspenseによるモーダル類の遅延ロード（メインバンドル65%削減: 812KB→283KB）。React.memoによるHeader/Footer/ProgressBar/BottomToolbarの再レンダリング抑制。Viteチャンク分割最適化。
 
 **行間調整スライダー** — テキストエディタのステータスバーに行間（line-height）調整スライダーを追加。
 
-**ローディング画面刷新** — 青い池の背景画像上に「Ultra BLUEPOND」タイトルをアニメーション表示。
+**ローディング画面刷新** — 青い池の背景画像上に「Ultra Bluepond」タイトルをアニメーション表示。
 
 **ヘルプ機能** — ユーザーガイドとAI接続ガイドを追加。
 
@@ -317,7 +317,7 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 | NDLOCR-Lite（OCRモデル・アルゴリズム） | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | 国立国会図書館 |
 | ndlocrlite-web（Web移植） | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | 橋本雄太氏（国立歴史民俗博物館） |
 | NDLOCR-Lite Web AI（AI校正機能） | [MIT](https://opensource.org/licenses/MIT) | 小形克宏氏（一般社団法人ビブリオスタイル） |
-| NDLOCR-lite Web AI: Ultra BLUEPOND（その他蛇足機能） | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | 宮川創（筑波大学） |
+| NDLOCR-lite Web AI: Ultra Bluepond（その他蛇足機能） | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | 宮川創（筑波大学） |
 
 ---
 

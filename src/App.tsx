@@ -66,7 +66,7 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
   return (
     <div className={`splash-screen splash-${phase}`}>
       <div className="splash-content">
-        <div className="splash-title">Ultra BLUEPOND</div>
+        <div className="splash-title">Ultra <span className="bluepond-blue-splash">Blue</span>pond</div>
         <div className="splash-subtitle">NDLOCR-lite Web AI</div>
         <div className="splash-description">国立国会図書館の縦書きに強い自動書き起こし日本語OCRソフト機能拡張版</div>
         <div className="splash-line" />
@@ -697,7 +697,7 @@ export default function App() {
         {!hasResults && !isWorking && !isModelLoading && !hasPendingImages && (
           <section className="upload-section">
             <div className="landing-title">
-              <h1 className="landing-title-main">Ultra BLUEPOND</h1>
+              <h1 className="landing-title-main">Ultra <span className="bluepond-blue">Blue</span>pond</h1>
               <p className="landing-title-sub">NDLOCR-lite Web AI</p>
               <p className="landing-title-desc">{L(lang, {
                 ja: '国立国会図書館の縦書きに強い自動書き起こし日本語OCRソフト機能拡張版',
@@ -841,7 +841,7 @@ export default function App() {
         {(isLoadingFiles || isModelLoading) && (
           <div className="processing-section">
             <div className="processing-bluepond-title">
-              <span className="processing-bluepond-main">Ultra BLUEPOND</span>
+              <span className="processing-bluepond-main">Ultra <span className="bluepond-blue">Blue</span>pond</span>
               <span className="processing-bluepond-sub">NDLOCR-lite Web AI</span>
               <span className="processing-bluepond-desc">国立国会図書館の縦書きに強い自動書き起こし日本語OCRソフト機能拡張版</span>
             </div>

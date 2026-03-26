@@ -171,7 +171,7 @@ export const Footer = memo(function Footer({ lang, onBugReport }: FooterProps) {
           const aiLabel = L(lang, { ja: 'AI校正', en: 'AI proofread', 'zh-CN': 'AI校正', 'zh-TW': 'AI校正', ko: 'AI교정', la: 'AI', eo: 'AI', es: 'AI', de: 'KI', ar: 'AI', hi: 'AI', ru: 'AI', el: 'AI', syc: 'AI', cop: 'AI', sa: 'AI' })
           return (
             <span>
-              NDLOCR-Lite: {ccby} ({ndl}) / {webLabel}: {ccby} ({hashi}) / {aiLabel}: {mit} ({ogata}) / Ultra BLUEPOND: {ccby} ({miya})
+              NDLOCR-Lite: {ccby} ({ndl}) / {webLabel}: {ccby} ({hashi}) / {aiLabel}: {mit} ({ogata}) / Ultra Bluepond: {ccby} ({miya})
             </span>
           )
         })()}

@@ -12,7 +12,7 @@ const content: Record<string, { title: string; sections: { heading: string; body
       {
         heading: '概要',
         body:
-          'NDLOCR-lite Web AI: Ultra BLUEPOND は、国立国会図書館の NDLOCR-Lite をベースにしたブラウザ完結型の OCR（光学文字認識）Web アプリです。画像内の文字をテキストに変換します。画像はサーバーに送信されず、すべてブラウザ内で処理されます。',
+          'NDLOCR-lite Web AI: Ultra Bluepond は、国立国会図書館の NDLOCR-Lite をベースにしたブラウザ完結型の OCR（光学文字認識）Web アプリです。画像内の文字をテキストに変換します。画像はサーバーに送信されず、すべてブラウザ内で処理されます。',
       },
       {
         heading: '画像の読み込み',
@@ -102,7 +102,7 @@ const content: Record<string, { title: string; sections: { heading: string; body
       {
         heading: 'Overview',
         body:
-          'NDLOCR-lite Web AI: Ultra BLUEPOND is a browser-based OCR (Optical Character Recognition) web application based on the National Diet Library\'s NDLOCR-Lite. It converts text within images into editable text. All processing happens in your browser — no images are sent to a server.',
+          'NDLOCR-lite Web AI: Ultra Bluepond is a browser-based OCR (Optical Character Recognition) web application based on the National Diet Library\'s NDLOCR-Lite. It converts text within images into editable text. All processing happens in your browser — no images are sent to a server.',
       },
       {
         heading: 'Loading Images',
@@ -192,7 +192,7 @@ const content: Record<string, { title: string; sections: { heading: string; body
       {
         heading: '概述',
         body:
-          'NDLOCR-lite Web AI: Ultra BLUEPOND 是基于日本国立国会图书馆 NDLOCR-Lite 开发的浏览器完整型 OCR（光学字符识别）网络应用。它可以将图像中的文字转换为可编辑的文本。所有处理都在浏览器中完成——图像不会被发送到任何服务器。',
+          'NDLOCR-lite Web AI: Ultra Bluepond 是基于日本国立国会图书馆 NDLOCR-Lite 开发的浏览器完整型 OCR（光学字符识别）网络应用。它可以将图像中的文字转换为可编辑的文本。所有处理都在浏览器中完成——图像不会被发送到任何服务器。',
       },
       {
         heading: '加载图像',
@@ -282,7 +282,7 @@ const content: Record<string, { title: string; sections: { heading: string; body
       {
         heading: '概述',
         body:
-          'NDLOCR-lite Web AI: Ultra BLUEPOND 是基於日本國立國會圖書館 NDLOCR-Lite 開發的瀏覽器完整型 OCR（光學字符識別）網路應用。它可以將圖像中的文字轉換為可編輯的文本。所有處理都在瀏覽器中完成——圖像不會被發送到任何伺服器。',
+          'NDLOCR-lite Web AI: Ultra Bluepond 是基於日本國立國會圖書館 NDLOCR-Lite 開發的瀏覽器完整型 OCR（光學字符識別）網路應用。它可以將圖像中的文字轉換為可編輯的文本。所有處理都在瀏覽器中完成——圖像不會被發送到任何伺服器。',
       },
       {
         heading: '加載圖像',
@@ -372,7 +372,7 @@ const content: Record<string, { title: string; sections: { heading: string; body
       {
         heading: '개요',
         body:
-          'NDLOCR-lite Web AI: Ultra BLUEPOND는 일본 국립국회도서관의 NDLOCR-Lite를 기반으로 개발된 브라우저 기반 OCR(광학 문자 인식) 웹 애플리케이션입니다. 이미지 내의 텍스트를 편집 가능한 텍스트로 변환합니다. 모든 처리는 브라우저에서 완료되며 이미지는 서버로 전송되지 않습니다.',
+          'NDLOCR-lite Web AI: Ultra Bluepond는 일본 국립국회도서관의 NDLOCR-Lite를 기반으로 개발된 브라우저 기반 OCR(광학 문자 인식) 웹 애플리케이션입니다. 이미지 내의 텍스트를 편집 가능한 텍스트로 변환합니다. 모든 처리는 브라우저에서 완료되며 이미지는 서버로 전송되지 않습니다.',
       },
       {
         heading: '이미지 로드',
@@ -462,7 +462,7 @@ const content: Record<string, { title: string; sections: { heading: string; body
       {
         heading: 'Sententia',
         body:
-          'NDLOCR-lite Web AI: Ultra BLUEPOND est applicationem retis (OCR - Cognitio Characterum Optica) in navigatore constructum, ex NDLOCR-Lite Bibliothecae Nationalis Iaponiae. Imagines in textum mutantur. Omnes processus in navigatore accidunt; imagines ad servatorem non mittuntur.',
+          'NDLOCR-lite Web AI: Ultra Bluepond est applicationem retis (OCR - Cognitio Characterum Optica) in navigatore constructum, ex NDLOCR-Lite Bibliothecae Nationalis Iaponiae. Imagines in textum mutantur. Omnes processus in navigatore accidunt; imagines ad servatorem non mittuntur.',
       },
       {
         heading: 'Imagines imponere',
@@ -497,7 +497,7 @@ const content: Record<string, { title: string; sections: { heading: string; body
       {
         heading: 'Superrigardo',
         body:
-          'NDLOCR-lite Web AI: Ultra BLUEPOND estas retumila OCR (Optika Karaktero Rekono) aplikaĵo bazita sur NDLOCR-Lite de la Nacia Biblioteko de Japanio. Ĝi konvertas tekstojn en bildoj al redaktebla teksto. Ĉiuj procezoj okazas en via retumilo—bildoj ne estas senditaj al servilo.',
+          'NDLOCR-lite Web AI: Ultra Bluepond estas retumila OCR (Optika Karaktero Rekono) aplikaĵo bazita sur NDLOCR-Lite de la Nacia Biblioteko de Japanio. Ĝi konvertas tekstojn en bildoj al redaktebla teksto. Ĉiuj procezoj okazas en via retumilo—bildoj ne estas senditaj al servilo.',
       },
       {
         heading: 'Ŝargi Bildojn',

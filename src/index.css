@@ -5,7 +5,7 @@
 }
 
 /* ══════════════════════════════════════
-   Splash Screen — Ultra BLUEPOND
+   Splash Screen — Ultra Bluepond
    ══════════════════════════════════════ */
 .splash-screen {
   position: fixed;
@@ -90,6 +90,15 @@
 @keyframes splash-line-in {
   from { width: 0; }
   to   { width: min(300px, 60vw); }
+}
+
+/* ── "Blue" accent color for Bluepond titles ── */
+.bluepond-blue {
+  color: var(--color-primary);
+}
+/* スプラッシュ画面（白文字ベース）では明るいブルー */
+.bluepond-blue-splash {
+  color: #60b5e8;
 }
 
 :root {

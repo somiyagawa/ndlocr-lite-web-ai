@@ -480,6 +480,41 @@ export function ImageViewer({
               onBlockSelect(block)
             }
           }}
+          /* モバイル対応: コンテナの touchstart preventDefault により click が
+             発火しないため、touchEnd でタップを検出して直接 onBlockSelect を呼ぶ */
+          onTouchStart={(e) => {
+            // タッチ開始位置を記録（パンとタップを区別するため）
+            const touch = e.touches[0]
+            ;(e.currentTarget as HTMLElement).dataset.touchX = String(touch.clientX)
+            ;(e.currentTarget as HTMLElement).dataset.touchY = String(touch.clientY)
+            ;(e.currentTarget as HTMLElement).dataset.touchTime = String(Date.now())
+            e.stopPropagation()  // コンテナのパン開始を防止
+          }}
+          onTouchEnd={(e) => {
+            const el = e.currentTarget as HTMLElement
+            const startX = parseFloat(el.dataset.touchX || '0')
+            const startY = parseFloat(el.dataset.touchY || '0')
+            const startTime = parseInt(el.dataset.touchTime || '0', 10)
+            const endTouch = e.changedTouches[0]
+            const dx = Math.abs(endTouch.clientX - startX)
+            const dy = Math.abs(endTouch.clientY - startY)
+            const dt = Date.now() - startTime
+            // 移動量が少なく短時間ならタップと判定
+            if (dx < 15 && dy < 15 && dt < 500) {
+              e.stopPropagation()
+              e.preventDefault()
+              if (readingOrderEditMode) {
+                setAssignedOrder(prev => {
+                  const next = new Map(prev)
+                  next.set(i, nextOrderNumber)
+                  return next
+                })
+                setNextOrderNumber(prev => prev + 1)
+              } else {
+                onBlockSelect(block)
+              }
+            }
+          }}
           title={`${block.text}${showConfidence ? ` (${Math.round(conf * 100)}%)` : ''}`}
         >
           {readingOrderEditMode && (

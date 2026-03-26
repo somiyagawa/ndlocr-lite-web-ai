@@ -262,9 +262,28 @@ export function TextEditor({
     // ハイライト範囲を設定
     setHighlightRange({ start, end })
 
-    // textarea にフォーカスして選択範囲を設定
-    ta.focus()
-    ta.setSelectionRange(start, end)
+    // モバイル判定（SplitView のモバイルモードと同じ閾値）
+    const isMobile = window.innerWidth <= 768
+
+    if (isMobile) {
+      // モバイル: readOnly を一時的に設定してキーボード表示を防ぐ
+      const wasReadOnly = ta.readOnly
+      ta.readOnly = true
+      ta.focus({ preventScroll: true })
+      ta.setSelectionRange(start, end)
+      // readOnly を元に戻す（次のユーザー入力に備えて）
+      setTimeout(() => { ta.readOnly = wasReadOnly }, 150)
+
+      // エディタペイン（モバイルでは上部）にスムーズスクロール
+      const editorPane = ta.closest('.split-pane-mobile-top')
+      if (editorPane) {
+        editorPane.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }
+    } else {
+      // デスクトップ: 通常通りフォーカス＆選択
+      ta.focus()
+      ta.setSelectionRange(start, end)
+    }
 
     // 対象箇所がビューポート中央に来るようスクロール
     // テキストの行番号を計算し、その行が中央に来るようにする

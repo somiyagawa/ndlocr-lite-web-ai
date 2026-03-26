@@ -67,7 +67,7 @@ export function generateHOCR(result: OCRResult): string {
 <head>
   <title>hOCR output: ${fileName}</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <meta name="ocr-system" content="NDLOCR-lite Web AI: Ultra BLUEPOND"/>
+  <meta name="ocr-system" content="NDLOCR-lite Web AI: Ultra Bluepond"/>
   <meta name="ocr-capabilities" content="ocr_page ocr_line"/>
   <meta name="dc.date" content="${now}"/>
   <meta name="dc.source" content="${fileName}"/>
@@ -134,7 +134,7 @@ ${lines}
 <head>
   <title>hOCR output: ${results.length} pages</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-  <meta name="ocr-system" content="NDLOCR-lite Web AI: Ultra BLUEPOND"/>
+  <meta name="ocr-system" content="NDLOCR-lite Web AI: Ultra Bluepond"/>
   <meta name="ocr-capabilities" content="ocr_page ocr_line"/>
   <meta name="dc.date" content="${now}"/>
 </head>

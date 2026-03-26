@@ -11,13 +11,13 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
     date: '2026-03-26',
     changes: {
       ja: [
-        '名称変更: Model BLUEPOND → Ultra BLUEPOND',
+        '名称変更: Model BLUEPOND → Ultra Bluepond',
         'モバイル保存ボタンの修正（iOS Safari ダウンロード互換性向上）',
         'ローディング画面タイトルの白いハロー効果を強化',
         'ドロップダウンメニューのモバイルタッチ操作を改善',
       ],
       en: [
-        'Renamed: Model BLUEPOND → Ultra BLUEPOND',
+        'Renamed: Model BLUEPOND → Ultra Bluepond',
         'Fixed mobile save button (iOS Safari download compatibility)',
         'Enhanced white halo effect on loading screen title',
         'Improved dropdown menu touch interaction on mobile',
@@ -254,7 +254,7 @@ export const Header = memo(function Header({
         </div>
         <div className="header-title-text">
           <span className="header-title-main">NDLOCR-lite Web AI</span>
-          <span className="header-title-accent">Ultra BLUEPOND</span>
+          <span className="header-title-accent">Ultra <span className="bluepond-blue">Blue</span>pond</span>
         </div>
         <span
           className="header-version header-version-pulse header-version-clickable"
