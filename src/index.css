@@ -998,13 +998,15 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
 }
 
 .sample-tile-badge-modern {
-  background: var(--primary-color);
-  color: white;
+  background: var(--color-primary);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .sample-tile-badge-koten {
   background: #8b5e3c;
-  color: white;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .sample-tile-title {
