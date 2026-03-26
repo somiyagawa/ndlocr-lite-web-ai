@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.3.1-teal?style=for-the-badge" alt="v4.3.1" />
+  <img src="https://img.shields.io/badge/version-4.3.2-teal?style=for-the-badge" alt="v4.3.2" />
   <img src="https://img.shields.io/badge/license-CC_BY_4.0-blue?style=for-the-badge" alt="CC BY 4.0" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
@@ -205,6 +205,10 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 ### v4.2.2 — 2026-03-26
 
 **くずし字バッジ色変更** — サンプルタイルセレクタのくずし字バッジ色をpondblue（プライマリカラー）に変更。
+
+### v4.3.2 — 2026-03-27
+
+**携帯版UI大幅リファクタリング** — ペイン順序修正（画像が上、テキストが下）。「ファイル名」「改行無視」をアイコンのみに統合し行間スライダー横に配置。ツールバーボタン（空行削除・行結合・元に戻す）のテキストラベルを非表示。バグ報告ボタンを虫アイコンのみに変更。画像補正パネルの縦スタック対応。領域選択ヒント非表示。フッター重なり修正。コンテナResizeObserverによる初回fitZoom再計算。
 
 ### v4.3.1 — 2026-03-27
 

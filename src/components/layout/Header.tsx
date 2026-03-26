@@ -8,6 +8,32 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '4.3.2',
+    date: '2026-03-27',
+    changes: {
+      ja: [
+        '携帯版: ペイン順序修正 — 画像ビューワを上、テキストエディタを下に正しく配置',
+        '携帯版: 「ファイル名」「改行無視」をアイコンのみのチェックボックスに統合し、行間スライダー横に配置',
+        '携帯版: ツールバーボタン（空行削除・行結合・元に戻す）のテキストラベルを非表示、アイコンのみに',
+        '携帯版: バグ報告ボタンを虫アイコンのみに変更',
+        '携帯版: 画像補正パネルを縦スタック表示に対応（幅100%、高さ制限40vh）',
+        '携帯版: 領域選択ヒントテキストを非表示にし表示面積を最大化',
+        '携帯版: フッターのビューワ重なりを修正',
+        '携帯版: 画像ビューワのコンテナにResizeObserverを追加し初回ロード時のfitZoom再計算を確実に',
+      ],
+      en: [
+        'Mobile: fixed pane order — image viewer on top, text editor on bottom',
+        'Mobile: merged filename/ignore-newline into icon-only checkboxes next to line-spacing slider',
+        'Mobile: hidden text labels on toolbar buttons (del blank, join, undo) — icons only',
+        'Mobile: bug report button now shows bug icon only',
+        'Mobile: image correction panel stacks vertically (100% width, 40vh max)',
+        'Mobile: hidden region-select hint to maximize display area',
+        'Mobile: fixed footer overlapping viewer',
+        'Mobile: added ResizeObserver on viewer container for reliable fitZoom on initial load',
+      ],
+    },
+  },
+  {
     version: '4.3.1',
     date: '2026-03-27',
     changes: {
@@ -441,7 +467,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.3.1</span>
+        >v4.3.2</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}
