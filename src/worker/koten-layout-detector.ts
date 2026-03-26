@@ -25,7 +25,7 @@ interface PreprocessResult {
 
 export class KotenLayoutDetector {
   private session: OrtType.InferenceSession | null = null
-  private inputSize = { width: 1280, height: 1280 }
+  private inputSize = { width: 1024, height: 1024 }
   private initialized = false
 
   async initialize(modelData: ArrayBuffer): Promise<void> {
@@ -34,7 +34,16 @@ export class KotenLayoutDetector {
     try {
       this.session = await createSession(modelData)
       this.initialized = true
-      console.log(`[KotenLayout] RTMDet initialized: input ${this.inputSize.width}×${this.inputSize.height}`)
+      // モデルの実際の入力サイズを取得して使用
+      const inputNames = this.session.inputNames
+      if (inputNames.length > 0) {
+        // ONNX セッションから実際の入力形状を取得
+        // onnxruntime-web のInputMetadataからdimensionsを読む方法は限定的なので、
+        // モデルファイル名とセッション情報からサイズを確認
+        console.log(`[KotenLayout] RTMDet initialized: input ${this.inputSize.width}×${this.inputSize.height}, inputNames: [${inputNames.join(', ')}]`)
+      } else {
+        console.log(`[KotenLayout] RTMDet initialized: input ${this.inputSize.width}×${this.inputSize.height}`)
+      }
     } catch (error) {
       console.error('[KotenLayout] Failed to initialize:', error)
       throw error

@@ -17,6 +17,7 @@ import { BottomToolbar } from './components/layout/BottomToolbar'
 import { FileDropZone } from './components/upload/FileDropZone'
 import { DirectoryPicker } from './components/upload/DirectoryPicker'
 import { CameraCapture } from './components/upload/CameraCapture'
+import { SampleTileSelector } from './components/SampleTileSelector'
 import { ProgressBar } from './components/progress/ProgressBar'
 import { ImageViewer } from './components/viewer/ImageViewer'
 import { TextEditor } from './components/editor/TextEditor'
@@ -282,11 +283,8 @@ export default function App() {
     return () => document.removeEventListener('paste', handleGlobalPaste)
   }, [sessionResults.length, isLoadingFiles, isProcessing, handleFilesSelected])
 
-  const handleSampleLoad = useCallback(async () => {
-    const res = await fetch('/kumonoito.png')
-    const blob = await res.blob()
-    const file = new File([blob], 'kumonoito.png', { type: 'image/png' })
-    await processFiles([file])
+  const handleSampleLoad = useCallback(async (files: File[]) => {
+    await processFiles(files)
   }, [processFiles])
 
   const handlePasteFromClipboard = useCallback(async () => {
@@ -731,10 +729,13 @@ export default function App() {
               <button className="btn btn-secondary" onClick={handlePasteFromClipboard} disabled={isWorking}>
                 {L(lang, { ja: 'クリップボードから貼り付け', en: 'Paste from Clipboard', 'zh-CN': '从剪贴板粘贴', 'zh-TW': '從剪貼簿貼上', ko: '클립보드에서 붙여넣기', la: 'Glutinare ex tabulā', eo: 'Alglui el tondujo', es: 'Pegar desde portapapeles', de: 'Aus Zwischenablage einfügen', ar: 'لصق من الحافظة', hi: 'क्लिपबोर्ड से पेस्ट करें', ru: 'Вставить из буфера обмена', el: 'Επικόλληση από πρόχειρο', syc: 'ܐܠܨܘܩ ܡܢ ܠܘ̈ܚܐ ܕܢܣ̈ܚܐ' })}
               </button>
-              <button className="btn btn-secondary" onClick={handleSampleLoad} disabled={isWorking}>
-                {L(lang, { ja: 'サンプルを試す', en: 'Try Sample', 'zh-CN': '试用示例', 'zh-TW': '試用範例', ko: '샘플 사용해보기', la: 'Exemplum temptare', eo: 'Provi ekzemplon', es: 'Probar ejemplo', de: 'Beispiel ausprobieren', ar: 'تجربة عينة', hi: 'नमूना आज़माएँ', ru: 'Попробовать пример', el: 'Δοκιμή δείγματος', syc: 'ܢܣܝ ܕܘ̈ܓܡܐ' })}
-              </button>
             </div>
+            <SampleTileSelector
+              ocrMode={ocrMode}
+              lang={lang}
+              disabled={isWorking}
+              onSampleSelected={handleSampleLoad}
+            />
             <span className="bluepond-credit">
               {L(lang, {
                 ja: '背景写真: 美瑛・青い池 — MaedaAkihiko, CC BY-SA 4.0',

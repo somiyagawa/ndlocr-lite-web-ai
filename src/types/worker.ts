@@ -35,6 +35,8 @@ export type WorkerOutMessage =
       progress: number
       message: string
       modelProgress?: ModelProgress
+      /** auto モード時に画像分析で検出されたモード */
+      detectedMode?: 'modern' | 'koten'
     }
   | {
       type: 'OCR_COMPLETE'
@@ -42,6 +44,8 @@ export type WorkerOutMessage =
       textBlocks: TextBlock[]
       txt: string
       processingTime: number
+      /** auto モード時に実際に使用されたモード */
+      detectedMode?: 'modern' | 'koten'
     }
   | {
       type: 'OCR_ERROR'

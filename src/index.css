@@ -923,6 +923,108 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   }
 }
 
+/* ===== SAMPLE TILE SELECTOR ===== */
+.sample-tile-container {
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.sample-tile-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.sample-tile-grid {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.sample-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem;
+  border: 2px solid var(--border-color);
+  border-radius: 0.75rem;
+  background: var(--surface-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  max-width: 200px;
+  width: 180px;
+}
+
+.sample-tile:hover:not(:disabled) {
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.sample-tile:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.sample-tile-image-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.sample-tile-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.sample-tile-badge {
+  position: absolute;
+  top: 0.3rem;
+  right: 0.3rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.3rem;
+  line-height: 1;
+}
+
+.sample-tile-badge-modern {
+  background: var(--primary-color);
+  color: white;
+}
+
+.sample-tile-badge-koten {
+  background: #8b5e3c;
+  color: white;
+}
+
+.sample-tile-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.sample-tile-modern {
+  border-color: color-mix(in srgb, var(--primary-color) 30%, var(--border-color));
+}
+
+.sample-tile-koten {
+  border-color: color-mix(in srgb, #8b5e3c 30%, var(--border-color));
+}
+
+@media (max-width: 768px) {
+  .sample-tile {
+    width: 140px;
+    max-width: 140px;
+  }
+}
+
 /* ===== PROGRESS ===== */
 .processing-section {
   padding: 2rem 0;

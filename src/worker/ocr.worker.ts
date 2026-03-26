@@ -21,6 +21,7 @@ import { TextRecognizer } from './text-recognizer'
 import { KotenLayoutDetector } from './koten-layout-detector'
 import { KotenTextRecognizer } from './koten-text-recognizer'
 import { ReadingOrderProcessor } from './reading-order'
+import { classifyImage } from './image-classifier'
 import type { TextBlock, OCRMode } from '../types/ocr'
 import type { WorkerInMessage, WorkerOutMessage } from '../types/worker'
 
@@ -51,14 +52,90 @@ class OCRWorker {
     this.ocrMode = ocrMode
 
     try {
+      const modeLabel = ocrMode === 'koten' ? 'classical' : ocrMode === 'auto' ? 'auto (all models)' : 'modern'
       this.post({
         type: 'OCR_PROGRESS',
         stage: 'initializing',
         progress: 0.02,
-        message: ocrMode === 'koten' ? 'Initializing classical OCR...' : 'Initializing...',
+        message: `Initializing ${modeLabel} OCR...`,
       })
 
-      if (ocrMode === 'koten') {
+      if (ocrMode === 'auto') {
+        // === オートモード: 現代 + 古典籍の全モデルをロード ===
+        // 画像分析で自動判定し、即座に適切なパイプラインを使用可能にする
+        const progresses = { layout: 0, rec30: 0, rec50: 0, rec100: 0, koten_layout: 0, koten_rec: 0 }
+        const reportProgress = () => {
+          const vals = Object.values(progresses)
+          const avg = vals.reduce((a, b) => a + b, 0) / vals.length
+          this.post({
+            type: 'OCR_PROGRESS',
+            stage: 'loading_models',
+            progress: 0.02 + avg * 0.68,
+            message: `Loading all models (auto)... ${Math.round(avg * 100)}%`,
+            modelProgress: { layout: progresses.layout, rec30: progresses.rec30, rec50: progresses.rec50, rec100: progresses.rec100 },
+          })
+        }
+
+        if (layoutOnly) {
+          // モバイル auto: レイアウト2モデル + koten認識のみ
+          const [layoutData, kotenLayoutData, rec100Data, kotenRecData] = await Promise.all([
+            loadModel('layout',            (p) => { progresses.layout = p; reportProgress() }),
+            loadModel('koten_layout',      (p) => { progresses.koten_layout = p; reportProgress() }),
+            loadModel('recognition100',    (p) => { progresses.rec100 = p; reportProgress() }),
+            loadModel('koten_recognition', (p) => { progresses.koten_rec = p; reportProgress() }),
+          ])
+
+          this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.72, message: 'Preparing modern layout model...' })
+          this.layoutDetector = new LayoutDetector()
+          await this.layoutDetector.initialize(layoutData)
+
+          this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.80, message: 'Preparing classical layout model...' })
+          this.kotenLayoutDetector = new KotenLayoutDetector()
+          await this.kotenLayoutDetector.initialize(kotenLayoutData)
+
+          this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.88, message: 'Preparing recognition model...' })
+          this.recognizer100 = new TextRecognizer([1, 3, 16, 768])
+          await this.recognizer100.initialize(rec100Data)
+
+          this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.96, message: 'Preparing classical recognition model...' })
+          this.kotenRecognizer = new KotenTextRecognizer()
+          await this.kotenRecognizer.initialize(kotenRecData)
+        } else {
+          // デスクトップ auto: 全6モデル
+          const [layoutData, rec30Data, rec50Data, rec100Data, kotenLayoutData, kotenRecData] = await Promise.all([
+            loadModel('layout',            (p) => { progresses.layout = p; reportProgress() }),
+            loadModel('recognition30',     (p) => { progresses.rec30 = p; reportProgress() }),
+            loadModel('recognition50',     (p) => { progresses.rec50 = p; reportProgress() }),
+            loadModel('recognition100',    (p) => { progresses.rec100 = p; reportProgress() }),
+            loadModel('koten_layout',      (p) => { progresses.koten_layout = p; reportProgress() }),
+            loadModel('koten_recognition', (p) => { progresses.koten_rec = p; reportProgress() }),
+          ])
+
+          this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.72, message: 'Preparing modern layout model...' })
+          this.layoutDetector = new LayoutDetector()
+          await this.layoutDetector.initialize(layoutData)
+
+          this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.78, message: 'Preparing recognition model (30)...' })
+          this.recognizer30 = new TextRecognizer([1, 3, 16, 256])
+          await this.recognizer30.initialize(rec30Data)
+
+          this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.82, message: 'Preparing recognition model (50)...' })
+          this.recognizer50 = new TextRecognizer([1, 3, 16, 384])
+          await this.recognizer50.initialize(rec50Data)
+
+          this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.86, message: 'Preparing recognition model (100)...' })
+          this.recognizer100 = new TextRecognizer([1, 3, 16, 768])
+          await this.recognizer100.initialize(rec100Data)
+
+          this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.92, message: 'Preparing classical layout model (RTMDet)...' })
+          this.kotenLayoutDetector = new KotenLayoutDetector()
+          await this.kotenLayoutDetector.initialize(kotenLayoutData)
+
+          this.post({ type: 'OCR_PROGRESS', stage: 'initializing_models', progress: 0.97, message: 'Preparing classical recognition model (PARSeq)...' })
+          this.kotenRecognizer = new KotenTextRecognizer()
+          await this.kotenRecognizer.initialize(kotenRecData)
+        }
+      } else if (ocrMode === 'koten') {
         // === 古典籍モード: RTMDet + PARSeq(32×384) の2モデル ===
         const progresses = { koten_layout: 0, koten_rec: 0 }
         const reportProgress = () => {
@@ -157,6 +234,27 @@ class OCRWorker {
 
   /** 認識モデルを遅延ロード（layoutOnly モードで processOCR が呼ばれた場合） */
   private async ensureRecognizers(): Promise<void> {
+    if (this.ocrMode === 'auto') {
+      // auto モード: 両方の認識モデルが必要
+      const promises: Promise<void>[] = []
+      if (!this.kotenRecognizer) {
+        promises.push((async () => {
+          const recData = await loadModel('koten_recognition')
+          this.kotenRecognizer = new KotenTextRecognizer()
+          await this.kotenRecognizer.initialize(recData)
+        })())
+      }
+      if (!this.recognizer100) {
+        promises.push((async () => {
+          const rec100Data = await loadModel('recognition100')
+          this.recognizer100 = new TextRecognizer([1, 3, 16, 768])
+          await this.recognizer100.initialize(rec100Data)
+        })())
+      }
+      if (promises.length > 0) await Promise.all(promises)
+      return
+    }
+
     if (this.ocrMode === 'koten') {
       if (this.kotenRecognizer) return
       const recData = await loadModel('koten_recognition')
@@ -196,16 +294,39 @@ class OCRWorker {
     return this.recognizer100!  // モバイルは常に rec100
   }
 
+  /**
+   * auto モードの場合、画像を分析して最適なパイプラインを決定する
+   * modern/koten が明示指定されている場合はそのまま返す
+   */
+  private resolveMode(requestedMode: OCRMode, imageData: ImageData): 'modern' | 'koten' {
+    if (requestedMode !== 'auto') return requestedMode as 'modern' | 'koten'
+    const classification = classifyImage(imageData)
+    return classification.detectedMode
+  }
+
   /** 領域OCR用: レイアウト検出 + 逐次認識 + 読み順処理 (processRegion から使用) */
   async processOCR(id: string, imageData: ImageData, startTime: number, mode?: OCRMode): Promise<void> {
     try {
-      const effectiveMode = mode ?? this.ocrMode
-      if (!this.isInitialized || this.initializedMode !== effectiveMode) {
-        await this.initialize(this.layoutOnly, effectiveMode)
+      const requestedMode = mode ?? this.ocrMode
+      if (!this.isInitialized || this.initializedMode !== requestedMode) {
+        await this.initialize(this.layoutOnly, requestedMode)
       }
       await this.ensureRecognizers()
 
+      // auto モード: 画像分析で最適パイプラインを決定
+      const effectiveMode = this.resolveMode(requestedMode, imageData)
       const isKoten = effectiveMode === 'koten'
+
+      if (requestedMode === 'auto') {
+        this.post({
+          type: 'OCR_PROGRESS',
+          id,
+          stage: 'auto_detection',
+          progress: 0.05,
+          message: isKoten ? 'Auto-detected: classical/kuzushiji text' : 'Auto-detected: modern text',
+          detectedMode: effectiveMode,
+        })
+      }
 
       // Stage 1: レイアウト検出
       this.post({
@@ -214,6 +335,7 @@ class OCRWorker {
         stage: 'layout_detection',
         progress: 0.1,
         message: isKoten ? 'Detecting text regions (classical)...' : 'Detecting text regions...',
+        detectedMode: requestedMode === 'auto' ? effectiveMode : undefined,
       })
 
       const detector = isKoten ? this.kotenLayoutDetector! : this.layoutDetector!
@@ -299,6 +421,7 @@ class OCRWorker {
         textBlocks: orderedResults,
         txt,
         processingTime: Date.now() - startTime,
+        detectedMode: requestedMode === 'auto' ? effectiveMode : undefined,
       })
     } catch (error) {
       this.post({
@@ -312,12 +435,25 @@ class OCRWorker {
   /** バッチOCR用: レイアウト検出のみ実行し LAYOUT_DONE を返す (processImage から使用) */
   async detectLayout(id: string, imageData: ImageData, startTime: number, mode?: OCRMode): Promise<void> {
     try {
-      const effectiveMode = mode ?? this.ocrMode
-      if (!this.isInitialized || this.initializedMode !== effectiveMode) {
-        await this.initialize(this.layoutOnly, effectiveMode)
+      const requestedMode = mode ?? this.ocrMode
+      if (!this.isInitialized || this.initializedMode !== requestedMode) {
+        await this.initialize(this.layoutOnly, requestedMode)
       }
 
+      // auto モード: 画像分析で最適パイプラインを決定
+      const effectiveMode = this.resolveMode(requestedMode, imageData)
       const isKoten = effectiveMode === 'koten'
+
+      if (requestedMode === 'auto') {
+        this.post({
+          type: 'OCR_PROGRESS',
+          id,
+          stage: 'auto_detection',
+          progress: 0.05,
+          message: isKoten ? 'Auto-detected: classical/kuzushiji text' : 'Auto-detected: modern text',
+          detectedMode: effectiveMode,
+        })
+      }
 
       this.post({
         type: 'OCR_PROGRESS',
@@ -325,6 +461,7 @@ class OCRWorker {
         stage: 'layout_detection',
         progress: 0.1,
         message: isKoten ? 'Detecting text regions (classical)...' : 'Detecting text regions...',
+        detectedMode: requestedMode === 'auto' ? effectiveMode : undefined,
       })
 
       const detector = isKoten ? this.kotenLayoutDetector! : this.layoutDetector!
