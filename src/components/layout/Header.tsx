@@ -356,6 +356,24 @@ export const Header = memo(function Header({
         <div className="header-title-text">
           <span className="header-title-main">NDL(Kotenseki)OCR-lite Web AI</span>
           <span className="header-title-accent">Ultra <span className="bluepond-blue">Blue</span>pond</span>
+          <span className="header-subtitle">{L(lang, {
+            ja: '現代の活字からくずし字まで',
+            en: 'Modern print to kuzushiji',
+            'zh-CN': '现代印刷体到古典草书',
+            'zh-TW': '現代印刷體到古典草書',
+            ko: '현대 인쇄체에서 흘림체까지',
+            la: 'A typis modernis ad kuzushiji',
+            eo: 'De moderna presaĵo ĝis kuzushiji',
+            es: 'Del texto moderno al kuzushiji',
+            de: 'Vom Druck bis Kuzushiji',
+            ar: 'من الطباعة الحديثة إلى الكوزوشيجي',
+            hi: 'आधुनिक मुद्रण से कुज़ुशिजी तक',
+            ru: 'От печати до кудзусидзи',
+            el: 'Από τυπωμένα κείμενα έως κουζουσίτζι',
+            syc: 'ܡܢ ܐܬܘ̈ܬ ܛܒ̈ܥܐ ܥܕܡܐ ܠܟ̈ܘ̈ܙ̈ܘ̈ܫ̈ܝ̈ܓ̈ܝ',
+            cop: 'Ⲓⲥϫⲉⲛ ⲛⲓⲧⲩⲡⲟⲥ ϣⲁ ⲛⲓⲕⲟⲩⲍⲟⲩϣⲓϫⲓ',
+            sa: 'आधुनिक-मुद्रणात् कुज़ुशिजी-पर्यन्तम्',
+          })}</span>
         </div>
         <span
           className="header-version header-version-pulse header-version-clickable"

@@ -701,22 +701,22 @@ export default function App() {
               <h1 className="landing-title-main">Ultra <span className="bluepond-blue">Blue</span>pond</h1>
               <p className="landing-title-sub">NDL(Kotenseki)OCR-lite Web AI</p>
               <p className="landing-title-desc">{L(lang, {
-                ja: '国立国会図書館の縦書きに強い自動書き起こし日本語OCRソフト機能拡張版',
-                en: 'A user-friendly adaptation of the National Diet Library\'s Japanese automatic transcription software',
-                'zh-CN': '基于日本国立国会图书馆日语自动转录软件的易用版本',
-                'zh-TW': '基於日本國立國會圖書館日語自動轉錄軟體的易用版本',
-                ko: '일본 국립국회도서관의 일본어 자동 전사 소프트웨어를 사용하기 쉽게 개선한 것',
-                la: 'Instrumentum transcriptionis Iaponicae automaticae Bibliothecae Diaetae Nationalis facilius redditum',
-                eo: 'Pli facile uzebla versio de la aŭtomata japana transskriba programo de la Nacia Dieta Biblioteko',
-                es: 'Una versión más accesible del software de transcripción automática japonesa de la Biblioteca Nacional de la Dieta',
-                de: 'Eine benutzerfreundliche Anpassung der automatischen japanischen Transkriptionssoftware der Nationalen Parlamentsbibliothek',
-                ar: 'نسخة سهلة الاستخدام من برنامج النسخ التلقائي الياباني لمكتبة البرلمان الوطني',
-                hi: 'राष्ट्रीय डाइट पुस्तकालय के जापानी स्वचालित प्रतिलेखन सॉफ़्टवेयर का उपयोग में आसान संस्करण',
-                ru: 'Удобная версия ПО автоматической транскрипции японского языка Национальной парламентской библиотеки',
-                el: 'Μια εύχρηστη έκδοση του λογισμικού αυτόματης μεταγραφής ιαπωνικών της Εθνικής Κοινοβουλευτικής Βιβλιοθήκης',
-                syc: 'ܛܘܦܣ ܦܫܝܩ ܕܬܘܩܢ ܟܬܒ̈ܬ ܝܦܘ̈ܢܝܬܐ ܐܘ̈ܛܘ̈ܡܛܝܬܐ ܕܒܝܬ ܟ̈ܬܒܐ ܕܟܢܘܫܬ ܐܘ̈ܡܬܐ',
-                cop: 'ⲟⲩⲙⲉⲧⲣⲉϥⲭⲣⲱ ⲉⲥⲙⲟⲧⲛ ⲛⲧⲉ ⲡⲓⲥⲟϥⲧⲱⲉⲣ ⲛⲧⲉ ⲡⲓⲥϧⲁⲓ ⲁⲩⲧⲟⲙⲁⲧⲟⲛ ⲙⲡⲓⲁⲥⲡⲓ ⲛ ⲓⲁⲡⲁⲛ ⲛⲧⲉ NDL',
-                sa: 'राष्ट्रीय-संसद्-पुस्तकालयस्य जापानीय-स्वचालित-लिप्यन्तरण-तन्त्रांशस्य सुलभ-संस्करणम्'
+                ja: '現代の活字から古典籍のくずし字まで — 国立国会図書館OCRエンジンによるブラウザ完結型日本語自動書き起こし',
+                en: 'From modern print to classical kuzushiji — browser-based Japanese OCR powered by the National Diet Library',
+                'zh-CN': '从现代印刷体到古典草书 — 基于日本国立国会图书馆OCR引擎的浏览器端日语自动转录',
+                'zh-TW': '從現代印刷體到古典草書 — 基於日本國立國會圖書館OCR引擎的瀏覽器端日語自動轉錄',
+                ko: '현대 인쇄체에서 고전 흘림체까지 — 일본 국립국회도서관 OCR 엔진 기반 브라우저 완결형 일본어 자동 전사',
+                la: 'A typis modernis ad kuzushiji classica — transcriptio Iaponica automatica in navigatro, motore OCR Bibliothecae Diaetae Nationalis',
+                eo: 'De moderna presaĵo ĝis klasika kuzushiji — aŭtomata japana transskribo en retumilo per OCR-motoro de la Nacia Dieta Biblioteko',
+                es: 'Del texto impreso moderno al kuzushiji clásico — transcripción japonesa automática en el navegador con el motor OCR de la Biblioteca Nacional de la Dieta',
+                de: 'Vom modernen Druck bis zum klassischen Kuzushiji — browserbasierte japanische OCR mit der Engine der Nationalen Parlamentsbibliothek',
+                ar: 'من الطباعة الحديثة إلى الكوزوشيجي الكلاسيكي — نسخ ياباني تلقائي في المتصفح بمحرك OCR لمكتبة البرلمان الوطني',
+                hi: 'आधुनिक मुद्रित पाठ से शास्त्रीय कुज़ुशिजी तक — राष्ट्रीय डाइट पुस्तकालय OCR इंजन द्वारा ब्राउज़र-आधारित जापानी स्वचालित प्रतिलेखन',
+                ru: 'От современной печати до классического кудзусидзи — автоматическая транскрипция японского языка в браузере на базе OCR-движка Национальной парламентской библиотеки',
+                el: 'Από σύγχρονα τυπωμένα κείμενα έως κλασικά κουζουσίτζι — αυτόματη μεταγραφή ιαπωνικών στο πρόγραμμα περιήγησης με τη μηχανή OCR της Εθνικής Κοινοβουλευτικής Βιβλιοθήκης',
+                syc: 'ܡܢ ܐܬܘ̈ܬܐ ܚ̈ܕܬܬܐ ܕܛܒ̈ܥܐ ܥܕܡܐ ܠܟܘ̈ܙ̈ܘ̈ܫ̈ܝ̈ܓ̈ܝ ܥ̈ܬ̈ܝ̈ܩ̈ܬ̈ܐ — ܟ̈ܬ̈ܒ̈ܬ̈ ܝ̈ܦ̈ܘ̈ܢ̈ܝ̈ܬ̈ܐ ܐ̈ܘ̈ܛ̈ܘ̈ܡ̈ܛ̈ܝ̈ܬ̈ܐ ܒ̈ܡ̈ܕ̈ܢ̈ܚ̈ܢ̈ ܕ̈ NDL',
+                cop: 'Ⲓⲥϫⲉⲛ ⲛⲓⲧⲩⲡⲟⲥ ⲛⲓⲙⲃⲉⲣⲓ ϣⲁ ⲛⲓⲕⲟⲩⲍⲟⲩϣⲓϫⲓ ⲛⲓⲁⲣⲭⲉⲟⲥ — ⲡⲓⲥϧⲁⲓ ⲁⲩⲧⲟⲙⲁⲧⲟⲛ ⲙⲡⲓⲁⲥⲡⲓ ⲛ ⲓⲁⲡⲁⲛ ϧⲉⲛ ⲡⲓⲃⲣⲁⲩⲍⲉⲣ ⲛⲧⲉ NDL',
+                sa: 'आधुनिक-मुद्रण-लिपेः प्राचीन-कुज़ुशिजी-पर्यन्तम् — राष्ट्रीय-संसद्-पुस्तकालय-OCR-यन्त्रेण ब्राउज़र-आधारितं जापानीय-स्वचालित-लिप्यन्तरणम्'
               })}</p>
             </div>
             <FileDropZone onFilesSelected={handleFilesSelected} lang={lang} disabled={isWorking} />
