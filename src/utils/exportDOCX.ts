@@ -116,7 +116,7 @@ export async function downloadDOCX(
               new Paragraph({
                 children: [
                   new TextRun({
-                    text: `${baseName} — NDLOCR-lite Web AI`,
+                    text: `${baseName} — NDL(Kotenseki)OCR-lite Web AI`,
                     size: 16, // 8pt
                     color: '999999',
                     font: 'Yu Gothic',

@@ -35,13 +35,14 @@ export const Footer = memo(function Footer({ lang, onBugReport }: FooterProps) {
       <div className="footer-attribution">
         {(() => {
           const ndlocrLink = <a href="https://github.com/ndl-lab/ndlocr-lite" target="_blank" rel="noopener noreferrer">NDLOCR-Lite</a>
+          const ndlkotenLink = <a href="https://github.com/ndl-lab/ndlkotenocr-lite" target="_blank" rel="noopener noreferrer">NDL古典籍OCR-Lite</a>
           const hashimotoLink = <a href="https://github.com/yuta1984/ndlocrlite-web" target="_blank" rel="noopener noreferrer">{L(lang, { ja: '橋本雄太', en: 'Yuta Hashimoto', 'zh-CN': '桥本雄太', 'zh-TW': '橋本雄太', ko: '하시모토 유타', la: 'Yuta Hashimoto', eo: 'Yuta Hashimoto', es: 'Yuta Hashimoto', de: 'Yuta Hashimoto', ar: 'يوتا هاشيموتو', hi: 'युता हाशिमोतो', ru: 'Юта Хашимото', el: 'Yuta Hashimoto', syc: 'Yuta Hashimoto', cop: 'Yuta Hashimoto', sa: 'Yuta Hashimoto' })}</a>
           const ogataLink = <a href="https://github.com/ogwata/ndlocr-lite-web-ai" target="_blank" rel="noopener noreferrer">{L(lang, { ja: '小形克宏', en: 'Katsuhiro Ogata', 'zh-CN': '小形克宏', 'zh-TW': '小形克宏', ko: '오가타 가쓰히로', la: 'Katsuhiro Ogata', eo: 'Katsuhiro Ogata', es: 'Katsuhiro Ogata', de: 'Katsuhiro Ogata', ar: 'كاتسوهيرو أوغاتا', hi: 'कात्सुहिरो ओगाटा', ru: 'Кацухиро Огата', el: 'Katsuhiro Ogata', syc: 'Katsuhiro Ogata', cop: 'Katsuhiro Ogata', sa: 'Katsuhiro Ogata' })}</a>
           const miyagawaLink = <a href="https://researchmap.jp/SoMiyagawa" target="_blank" rel="noopener noreferrer">{L(lang, { ja: '宮川創', en: 'So Miyagawa', 'zh-CN': '宫川创', 'zh-TW': '宮川創', ko: '미야가와 소', la: 'So Miyagawa', eo: 'So Miyagawa', es: 'So Miyagawa', de: 'So Miyagawa', ar: 'سو مياغاوا', hi: 'सो मियागावा', ru: 'Со Миягава', el: 'So Miyagawa', syc: 'So Miyagawa', cop: 'So Miyagawa', sa: 'So Miyagawa' })}</a>
 
           if (lang === 'ja') return (
             <span className="footer-attribution-text">
-              本ツールは、国立国会図書館（NDL Lab）が開発した {ndlocrLink} を{hashimotoLink}氏（国立歴史民俗博物館）がWebブラウザ版にし、{ogataLink}氏（一般社団法人ビブリオスタイル）がAI校正機能を付け、{miyagawaLink}（筑波大学）がカメラ撮影・ドキュメントスキャナー・画像前処理（明度・コントラスト・二値化・ノイズ除去・傾き補正等）・ダークモード・多言語UI（16言語対応）・縦書き表示・検索置換・TEI XML / hOCR / テキスト付きPDF / DOCXエクスポート・一括保存・処理履歴・差分表示・領域選択OCR・見開きページ分割・鳥獣戯画の背景など様々な蛇足な機能を施したものです。
+              本ツールは、国立国会図書館（NDL Lab）が開発した {ndlocrLink} および {ndlkotenLink} を{hashimotoLink}氏（国立歴史民俗博物館）がWebブラウザ版にし、{ogataLink}氏（一般社団法人ビブリオスタイル）がAI校正機能を付け、{miyagawaLink}（筑波大学）がカメラ撮影・ドキュメントスキャナー・画像前処理（明度・コントラスト・二値化・ノイズ除去・傾き補正等）・ダークモード・多言語UI（16言語対応）・縦書き表示・検索置換・TEI XML / hOCR / テキスト付きPDF / DOCXエクスポート・一括保存・処理履歴・差分表示・領域選択OCR・見開きページ分割・IIIF画像読み込み・鳥獣戯画の背景など様々な蛇足な機能を施したものです。
             </span>
           )
           if (lang === 'zh-CN') return (
@@ -116,7 +117,7 @@ export const Footer = memo(function Footer({ lang, onBugReport }: FooterProps) {
           )
           return (
             <span className="footer-attribution-text">
-              This tool is based on {ndlocrLink} developed by the National Diet Library of Japan (NDL Lab). {hashimotoLink} (National Museum of Japanese History) created the web browser version, {ogataLink} (Bibliostyle) added AI proofreading, and {miyagawaLink} (University of Tsukuba) added various superfluous features including camera capture, document scanner, image preprocessing (brightness, contrast, binarization, denoising, deskew, etc.), dark mode, multilingual UI (16 languages), vertical text display, search &amp; replace, TEI XML / hOCR / text-embedded PDF / DOCX export, batch download, processing history, diff view, region-select OCR, double-page splitting, and the Choju-giga background.
+              This tool is based on {ndlocrLink} and {ndlkotenLink} developed by the National Diet Library of Japan (NDL Lab). {hashimotoLink} (National Museum of Japanese History) created the web browser version, {ogataLink} (Bibliostyle) added AI proofreading, and {miyagawaLink} (University of Tsukuba) added various superfluous features including camera capture, document scanner, image preprocessing (brightness, contrast, binarization, denoising, deskew, etc.), dark mode, multilingual UI (16 languages), vertical text display, search &amp; replace, TEI XML / hOCR / text-embedded PDF / DOCX export, batch download, processing history, diff view, region-select OCR, double-page splitting, IIIF image loading, and the Choju-giga background.
             </span>
           )
         })()}
@@ -171,7 +172,7 @@ export const Footer = memo(function Footer({ lang, onBugReport }: FooterProps) {
           const aiLabel = L(lang, { ja: 'AI校正', en: 'AI proofread', 'zh-CN': 'AI校正', 'zh-TW': 'AI校正', ko: 'AI교정', la: 'AI', eo: 'AI', es: 'AI', de: 'KI', ar: 'AI', hi: 'AI', ru: 'AI', el: 'AI', syc: 'AI', cop: 'AI', sa: 'AI' })
           return (
             <span>
-              NDLOCR-Lite: {ccby} ({ndl}) / {webLabel}: {ccby} ({hashi}) / {aiLabel}: {mit} ({ogata}) / Ultra Bluepond: {ccby} ({miya})
+              NDLOCR-Lite: {ccby} ({ndl}) / {webLabel}: {ccby} ({hashi}) / {aiLabel}: {mit} ({ogata}) / Ultra Bluepond: {ccby} ({miya}) / NDL古典籍OCR-Lite: {ccby} ({ndl})
             </span>
           )
         })()}

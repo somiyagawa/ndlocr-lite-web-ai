@@ -1,8 +1,8 @@
-# NDLOCR-lite Web AI: Ultra Bluepond
+# NDL(Kotenseki)OCR-lite Web AI Ultra Bluepond
 
 ## プロジェクト概要
 
-NDLOCR-lite Web AI: Ultra Bluepond（旧称 NDLOCR-Lite Web AI Ultra）は、国立国会図書館の NDLOCR-Lite をベースにした、ブラウザ完結型OCR Webアプリケーションである。yuta1984/ndlocrlite-web をフォークし、AI校正機能とその他蛇足機能を追加している。
+NDL(Kotenseki)OCR-lite Web AI Ultra Bluepond（旧称 NDLOCR-lite Web AI: Ultra Bluepond）は、国立国会図書館の NDLOCR-Lite および NDL古典籍OCR-lite をベースにした、ブラウザ完結型OCR Webアプリケーションである。yuta1984/ndlocrlite-web をフォークし、AI校正機能とその他蛇足機能を追加している。
 
 - ブラウザ内でONNX Runtime Web（WASM）によるOCR推論を実行
 - サーバーに画像を送信しない完全クライアントサイド処理
@@ -122,4 +122,5 @@ Cross-Origin-Embedder-Policy: require-corp
 
 - **upstream:** yuta1984/ndlocrlite-web（フォーク元）
 - **中間:** ogwata/ndlocr-lite-web-ai（AI校正機能追加）
-- **元のOCRエンジン:** ndl-lab/ndlocr-lite
+- **元のOCRエンジン（現代）:** ndl-lab/ndlocr-lite
+- **元のOCRエンジン（古典籍）:** ndl-lab/ndlkotenocr-lite

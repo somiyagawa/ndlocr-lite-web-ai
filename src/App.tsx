@@ -18,6 +18,7 @@ import { FileDropZone } from './components/upload/FileDropZone'
 import { DirectoryPicker } from './components/upload/DirectoryPicker'
 import { CameraCapture } from './components/upload/CameraCapture'
 import { SampleTileSelector } from './components/SampleTileSelector'
+import { IIIFLoader } from './components/IIIFLoader'
 import { ProgressBar } from './components/progress/ProgressBar'
 import { ImageViewer } from './components/viewer/ImageViewer'
 import { TextEditor } from './components/editor/TextEditor'
@@ -68,7 +69,7 @@ function SplashScreen({ onDone }: { onDone: () => void }) {
     <div className={`splash-screen splash-${phase}`}>
       <div className="splash-content">
         <div className="splash-title">Ultra <span className="bluepond-blue-splash">Blue</span>pond</div>
-        <div className="splash-subtitle">NDLOCR-lite Web AI</div>
+        <div className="splash-subtitle">NDL(Kotenseki)OCR-lite Web AI</div>
         <div className="splash-description">国立国会図書館の縦書きに強い自動書き起こし日本語OCRソフト機能拡張版</div>
         <div className="splash-line" />
       </div>
@@ -698,7 +699,7 @@ export default function App() {
           <section className="upload-section">
             <div className="landing-title">
               <h1 className="landing-title-main">Ultra <span className="bluepond-blue">Blue</span>pond</h1>
-              <p className="landing-title-sub">NDLOCR-lite Web AI</p>
+              <p className="landing-title-sub">NDL(Kotenseki)OCR-lite Web AI</p>
               <p className="landing-title-desc">{L(lang, {
                 ja: '国立国会図書館の縦書きに強い自動書き起こし日本語OCRソフト機能拡張版',
                 en: 'A user-friendly adaptation of the National Diet Library\'s Japanese automatic transcription software',
@@ -729,6 +730,11 @@ export default function App() {
               <button className="btn btn-secondary" onClick={handlePasteFromClipboard} disabled={isWorking}>
                 {L(lang, { ja: 'クリップボードから貼り付け', en: 'Paste from Clipboard', 'zh-CN': '从剪贴板粘贴', 'zh-TW': '從剪貼簿貼上', ko: '클립보드에서 붙여넣기', la: 'Glutinare ex tabulā', eo: 'Alglui el tondujo', es: 'Pegar desde portapapeles', de: 'Aus Zwischenablage einfügen', ar: 'لصق من الحافظة', hi: 'क्लिपबोर्ड से पेस्ट करें', ru: 'Вставить из буфера обмена', el: 'Επικόλληση από πρόχειρο', syc: 'ܐܠܨܘܩ ܡܢ ܠܘ̈ܚܐ ܕܢܣ̈ܚܐ' })}
               </button>
+              <IIIFLoader
+                onImagesLoaded={handleFilesSelected}
+                lang={lang}
+                disabled={isWorking}
+              />
             </div>
             <SampleTileSelector
               ocrMode={ocrMode}
@@ -845,7 +851,7 @@ export default function App() {
           <div className="processing-section">
             <div className="processing-bluepond-title">
               <span className="processing-bluepond-main">Ultra <span className="bluepond-blue">Blue</span>pond</span>
-              <span className="processing-bluepond-sub">NDLOCR-lite Web AI</span>
+              <span className="processing-bluepond-sub">NDL(Kotenseki)OCR-lite Web AI</span>
               <span className="processing-bluepond-desc">国立国会図書館の縦書きに強い自動書き起こし日本語OCRソフト機能拡張版</span>
             </div>
             {isLoadingFiles && fileLoadingState && (

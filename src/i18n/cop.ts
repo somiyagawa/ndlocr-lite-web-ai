@@ -2,7 +2,7 @@ import type { Translations } from './ja'
 
 export const cop: Translations = {
   app: {
-    title: 'NDLOCR-Lite Web',
+    title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: 'ⲡⲓⲉⲣⲅⲁⲗⲓⲟⲛ ⲛⲧⲉ OCR ⲛⲓⲁⲡⲟⲛⲓⲕⲟⲛ ϧⲉⲛ ⲡⲓ browser',
   },
   upload: {

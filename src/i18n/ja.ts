@@ -1,7 +1,7 @@
 // as const を使わずに string型にすることでen.tsとの互換性を持たせる
 export const ja: Record<string, Record<string, string>> = {
   app: {
-    title: 'NDLOCR-Lite Web',
+    title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: 'ブラウザで動く日本語OCRツール',
   },
   upload: {

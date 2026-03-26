@@ -1,5 +1,5 @@
 /**
- * Document Scanner Module for NDLOCR-lite Web AI: Ultra Bluepond
+ * Document Scanner Module for NDL(Kotenseki)OCR-lite Web AI Ultra Bluepond
  *
  * Provides browser-based document detection, perspective correction,
  * and curved page dewarping using Canvas API.

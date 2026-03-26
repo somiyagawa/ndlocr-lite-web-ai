@@ -2,7 +2,7 @@ import type { Translations } from './ja'
 
 export const syc: Translations = {
   app: {
-    title: 'NDLOCR-Lite Web',
+    title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: 'ܡܐܢܐ ܕ OCR ܝܦܘܢܝܐ ܒܡܨܦܝܢܐ',
   },
   upload: {

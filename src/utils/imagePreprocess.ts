@@ -1,5 +1,5 @@
 /**
- * Image Preprocessing Module for NDLOCR-lite Web AI: Ultra Bluepond
+ * Image Preprocessing Module for NDL(Kotenseki)OCR-lite Web AI Ultra Bluepond
  * Provides comprehensive image manipulation using Canvas API
  * Optimized for historical Japanese document OCR
  */

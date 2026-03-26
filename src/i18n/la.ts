@@ -2,7 +2,7 @@ import type { Translations } from './ja'
 
 export const la: Translations = {
   app: {
-    title: 'NDLOCR-Lite Web',
+    title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: 'Instrumentum OCR Linguae Iaponiensis Navigatore Computatorum Perficiendum',
   },
   upload: {

@@ -1,15 +1,15 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.1.0-teal?style=for-the-badge" alt="v4.1.0" />
+  <img src="https://img.shields.io/badge/version-4.2.0-teal?style=for-the-badge" alt="v4.2.0" />
   <img src="https://img.shields.io/badge/license-CC_BY_4.0-blue?style=for-the-badge" alt="CC BY 4.0" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
 </p>
 
-# NDLOCR-lite Web AI: Ultra Bluepond
+# NDL(Kotenseki)OCR-lite Web AI Ultra Bluepond
 
 ### ブラウザ完結型 日本語OCR＋AI校正ツール
 
-> **旧称 NDLOCR-Lite Web AI Ultra** — v3.0 より **Ultra Bluepond** に改称しました。名称は北海道美瑛町の青い池（Blue Pond）に由来します。
+> **旧称 NDLOCR-Lite Web AI Ultra / NDLOCR-lite Web AI: Ultra Bluepond** — v4.2 より **NDL(Kotenseki)OCR-lite Web AI Ultra Bluepond** に改称しました。名称は北海道美瑛町の青い池（Blue Pond）に由来します。
 
 画像やPDFをブラウザにドロップするだけで日本語OCRを実行し、AIが誤認識を自動校正します。
 **画像データはサーバーに送信されません。** すべての処理がブラウザ内で完結します。
@@ -202,6 +202,16 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 
 ## 更新記録
 
+### v4.2.0 — 2026-03-26
+
+**名称変更:** NDLOCR-lite Web AI: Ultra Bluepond → **NDL(Kotenseki)OCR-lite Web AI Ultra Bluepond** に改称しました。
+
+**IIIF画像読み込み** — IIIFマニフェストURLを入力して画像を選択・読み込む機能を追加。IIIF Presentation API v2/v3に対応。国立国会図書館デジタルコレクション、国文学研究資料館等のIIIF対応機関の画像を直接OCRできます。
+
+**NDL古典籍OCR-Liteクレジット追加** — フッター・ライセンス・READMEにNDL古典籍OCR-Liteのクレジットを追加。
+
+**バグ修正** — コードレビューで発見された問題を修正（selectRecognizer null安全性、switchOcrModeハンドラ競合、ensureRecognizers不完全パス、メッセージIDフィルタリング厳格化）。
+
 ### v4.1.0 — 2026-03-26
 
 **オート自動判定・サンプルタイル選択** — オートモードに画像特徴分析（色温度・セピア度・紙の白さ）による現代/古典籍自動判定機能を実装。サンプル画像をビジュアルタイルで選択可能に（現代: 蜘蛛の糸、くずし字: 源氏物語絵巻）。RTMDetの入力サイズバグ（1280→1024）を修正。オートモード時に全モデルを並列プリロードし切替遅延を解消。
@@ -335,16 +345,20 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 | 対象 | ライセンス | 権利者 |
 |:---|:---:|:---|
 | NDLOCR-Lite（OCRモデル・アルゴリズム） | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | 国立国会図書館 |
+| NDL古典籍OCR-Lite（古典籍OCRモデル） | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | 国立国会図書館 |
 | ndlocrlite-web（Web移植） | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | 橋本雄太氏（国立歴史民俗博物館） |
 | NDLOCR-Lite Web AI（AI校正機能） | [MIT](https://opensource.org/licenses/MIT) | 小形克宏氏（一般社団法人ビブリオスタイル） |
-| NDLOCR-lite Web AI: Ultra Bluepond（その他蛇足機能） | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | 宮川創（筑波大学） |
+| NDL(Kotenseki)OCR-lite Web AI Ultra Bluepond（その他蛇足機能） | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) | 宮川創（筑波大学） |
 
 ---
 
 ## クレジット
 
-**OCRエンジン**
+**OCRエンジン（現代日本語）**
 [NDLOCR-Lite](https://github.com/ndl-lab/ndlocr-lite) — 国立国会図書館
+
+**OCRエンジン（古典籍・くずし字）**
+[NDL古典籍OCR-Lite](https://github.com/ndl-lab/ndlkotenocr-lite) — 国立国会図書館
 
 **Web移植**
 [ndlocrlite-web](https://github.com/yuta1984/ndlocrlite-web) — 橋本雄太氏（国立歴史民俗博物館）

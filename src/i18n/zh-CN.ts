@@ -2,7 +2,7 @@ import type { Translations } from './ja'
 
 export const zhCN: Translations = {
   app: {
-    title: 'NDLOCR-Lite Web',
+    title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: '浏览器端日语OCR工具',
   },
   upload: {

@@ -8,6 +8,24 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '4.2.0',
+    date: '2026-03-26',
+    changes: {
+      ja: [
+        '名称変更: NDLOCR-lite Web AI: Ultra Bluepond → NDL(Kotenseki)OCR-lite Web AI Ultra Bluepond',
+        'IIIF画像読み込み機能を追加（Presentation API v2/v3対応、マニフェストURLから画像を選択・読み込み）',
+        'NDL古典籍OCR-Liteのクレジットをフッター・ライセンス・READMEに追加',
+        'コードレビューで発見されたバグ修正（null安全性、ハンドラ競合、メッセージIDフィルタリング）',
+      ],
+      en: [
+        'Renamed: NDLOCR-lite Web AI: Ultra Bluepond → NDL(Kotenseki)OCR-lite Web AI Ultra Bluepond',
+        'Added IIIF image loading (Presentation API v2/v3, select and load images from manifest URL)',
+        'Added NDL Kotenseki OCR-Lite credit to footer, license, and README',
+        'Fixed bugs from code review (null safety, handler race conditions, message ID filtering)',
+      ],
+    },
+  },
+  {
     version: '4.1.0',
     date: '2026-03-26',
     changes: {
@@ -322,7 +340,7 @@ export const Header = memo(function Header({
           </svg>
         </div>
         <div className="header-title-text">
-          <span className="header-title-main">NDLOCR-lite Web AI</span>
+          <span className="header-title-main">NDL(Kotenseki)OCR-lite Web AI</span>
           <span className="header-title-accent">Ultra <span className="bluepond-blue">Blue</span>pond</span>
         </div>
         <span
@@ -331,7 +349,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.1</span>
+        >v4.2</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}
