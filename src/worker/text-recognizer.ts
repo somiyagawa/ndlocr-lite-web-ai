@@ -180,10 +180,7 @@ export class TextRecognizer {
       const dims = outputs[outputName].dims
       const [, seqLength, vocabSize] = dims
 
-      // PARSeq vocab layout: [<eos>=0, <s>=1, </s>=2, <pad>=3, charset[0], charset[1], ...]
-      // 特殊トークンは4つ（ID 0–3）、実際の文字は ID 4 以降
-      const SPECIAL_TOKEN_COUNT = 4
-      const resultChars: string[] = []
+      const resultClassIds: number[] = []
 
       for (let i = 0; i < seqLength; i++) {
         const scores = logits.slice(i * vocabSize, (i + 1) * vocabSize)
@@ -193,17 +190,20 @@ export class TextRecognizer {
         // <eos> (ID=0) で終了
         if (maxIndex === 0) break
         // 特殊トークン (<s>=1, </s>=2, <pad>=3) をスキップ
-        if (maxIndex > 0 && maxIndex < SPECIAL_TOKEN_COUNT) continue
+        if (maxIndex < 4) continue
 
-        // ID 4 → charset[0] (スペース), ID 5 → charset[1] ('!'), ...
-        const charIndex = maxIndex - SPECIAL_TOKEN_COUNT
-        if (charIndex >= 0 && charIndex < this.config.charList.length) {
-          resultChars.push(this.config.charList[charIndex])
-        }
+        resultClassIds.push(maxIndex - 1)
       }
 
-      // PARSeq はオートリグレッシブモデルなので、連続重複は正当
-      // （CTC方式の重複除去は不要）
+      // 連続重複を除去してテキスト生成
+      const resultChars: string[] = []
+      let prevId = -1
+      for (const id of resultClassIds) {
+        if (id !== prevId && id < this.config.charList.length) {
+          resultChars.push(this.config.charList[id])
+          prevId = id
+        }
+      }
 
       return {
         text: resultChars.join('').trim(),

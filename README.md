@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-3.8.0-teal?style=for-the-badge" alt="v3.8.0" />
+  <img src="https://img.shields.io/badge/version-3.9.0-teal?style=for-the-badge" alt="v3.9.0" />
   <img src="https://img.shields.io/badge/license-CC_BY_4.0-blue?style=for-the-badge" alt="CC BY 4.0" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
@@ -201,6 +201,10 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 ---
 
 ## 更新記録
+
+### v3.9.0 — 2026-03-26
+
+**言語セレクタのコンパクト化** — 現代語・古典語の言語選択を、選択中の国旗のみ表示するコンパクトなドロップダウン方式に統一。クリックで全言語リストが展開される。ヘッダーの省スペース化とモバイルでの操作性を向上。
 
 ### v3.8.0 — 2026-03-26
 

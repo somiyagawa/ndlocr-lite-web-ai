@@ -7,6 +7,18 @@ import type { Theme } from '../../hooks/useTheme'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '3.9.0',
+    date: '2026-03-26',
+    changes: {
+      ja: [
+        '言語セレクタをコンパクトなドロップダウン方式に変更（現代語・古典語とも選択中の国旗のみ表示）',
+      ],
+      en: [
+        'Compact dropdown language selector (shows only selected flag; click to expand full list)',
+      ],
+    },
+  },
+  {
     version: '3.8.0',
     date: '2026-03-26',
     changes: {
@@ -222,6 +234,7 @@ export const Header = memo(function Header({
 
   const [menuOpen, setMenuOpen] = useState(false)
   const [showChangelog, setShowChangelog] = useState(false)
+  const [modernOpen, setModernOpen] = useState(false)
   const [classicalOpen, setClassicalOpen] = useState(false)
 
   const CLASSICAL_LANGS = ['la', 'sa', 'syc', 'cop'] as const
@@ -280,7 +293,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v3.8</span>
+        >v3.9</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}
@@ -397,65 +410,78 @@ export const Header = memo(function Header({
             <span className="drawer-label">{THEME_LABELS.history[lang] ?? 'History'}</span>
           </button>
 
-          {/* Language section label */}
-          <div className="drawer-lang-label">{L(lang, {
-            ja: '言語', en: 'Language', 'zh-CN': '语言', 'zh-TW': '語言', ko: '언어',
-            la: 'Lingua', eo: 'Lingvo', es: 'Idioma', de: 'Sprache', ar: 'اللغة', hi: 'भाषा',
-            ru: 'Язык', el: 'Γλώσσα', syc: 'ܠܫܢܐ', cop: 'ⲁⲥⲡⲓ', sa: 'भाषा'
-          })}</div>
-
-          <div className="lang-flags" role="radiogroup" aria-label="Language">
-            {MODERN_LANGS.map(code => (
+          {/* Language selectors — compact dropdowns */}
+          <div className="lang-selector-row">
+            {/* Modern languages dropdown */}
+            <div className="lang-dropdown-wrap">
               <button
-                key={code}
-                className={`lang-flag-btn${lang === code ? ' lang-flag-active' : ''}`}
-                onClick={() => {
-                  onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)
-                  setMenuOpen(false)
-                }}
-                title={LANGUAGE_LABELS[code]}
-                aria-label={LANGUAGE_LABELS[code]}
-                role="radio"
-                aria-checked={lang === code}
+                className="lang-dropdown-toggle"
+                onClick={() => { setModernOpen(!modernOpen); setClassicalOpen(false) }}
+                type="button"
+                title={LANGUAGE_LABELS[lang] ?? 'Language'}
               >
-                {FLAG_EMOJI[code]}
+                <span className="lang-dropdown-flag">{FLAG_EMOJI[lang] ?? FLAG_EMOJI['ja']}</span>
+                <span className="lang-dropdown-label">{LANGUAGE_LABELS[lang] ?? 'Language'}</span>
+                <svg className="lang-dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: modernOpen ? 'rotate(180deg)' : 'none' }}>
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
               </button>
-            ))}
-          </div>
+              {modernOpen && (
+                <div className="lang-dropdown-menu">
+                  {MODERN_LANGS.map(code => (
+                    <button
+                      key={code}
+                      className={`lang-dropdown-item${lang === code ? ' lang-dropdown-item-active' : ''}`}
+                      onClick={() => {
+                        onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)
+                        setModernOpen(false)
+                        setMenuOpen(false)
+                      }}
+                    >
+                      <span className="lang-dropdown-item-flag">{FLAG_EMOJI[code]}</span>
+                      <span className="lang-dropdown-item-name">{LANGUAGE_LABELS[code]}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
 
-          {/* Classical languages dropdown */}
-          <div className="classical-lang-wrap">
-            <button
-              className={`classical-lang-toggle${CLASSICAL_LANGS.some(c => c === lang) ? ' lang-flag-active' : ''}`}
-              onClick={() => setClassicalOpen(!classicalOpen)}
-              type="button"
-            >
-              <span className="classical-lang-label">{L(lang, {
-                ja: '古典語', en: 'Classical', 'zh-CN': '古典语', 'zh-TW': '古典語', ko: '고전어',
-                la: 'Linguae classicae', eo: 'Klasikaj', es: 'Clásicas', de: 'Klassisch', ar: 'كلاسيكية', hi: 'शास्त्रीय',
-                ru: 'Классические', el: 'Κλασικές', syc: 'ܩܠܣܝ̈ܩܝ̈ܬ̈ܐ', cop: 'ⲛⲓⲕⲗⲁⲥⲓⲕⲟⲛ', sa: 'शास्त्रीयाः'
-              })}</span>
-              <svg className="classical-lang-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: classicalOpen ? 'rotate(180deg)' : 'none' }}>
-                <polyline points="6 9 12 15 18 9" />
-              </svg>
-            </button>
-            {classicalOpen && (
-              <div className="classical-lang-dropdown">
-                {CLASSICAL_LANGS.map(code => (
-                  <button
-                    key={code}
-                    className={`classical-lang-item${lang === code ? ' classical-lang-item-active' : ''}`}
-                    onClick={() => {
-                      onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)
-                      setClassicalOpen(false)
-                      setMenuOpen(false)
-                    }}
-                  >
-                    {CLASSICAL_LABELS[code]?.[lang] ?? CLASSICAL_LABELS[code]?.en ?? code}
-                  </button>
-                ))}
-              </div>
-            )}
+            {/* Classical languages dropdown */}
+            <div className="lang-dropdown-wrap">
+              <button
+                className={`lang-dropdown-toggle lang-dropdown-toggle-classical${CLASSICAL_LANGS.some(c => c === lang) ? ' lang-dropdown-toggle-active' : ''}`}
+                onClick={() => { setClassicalOpen(!classicalOpen); setModernOpen(false) }}
+                type="button"
+              >
+                <span className="lang-dropdown-flag">{CLASSICAL_LANGS.some(c => c === lang) ? (FLAG_EMOJI[lang] ?? '') : ''}</span>
+                <span className="lang-dropdown-label">{L(lang, {
+                  ja: '古典語', en: 'Classical', 'zh-CN': '古典语', 'zh-TW': '古典語', ko: '고전어',
+                  la: 'Linguae classicae', eo: 'Klasikaj', es: 'Clásicas', de: 'Klassisch', ar: 'كلاسيكية', hi: 'शास्त्रीय',
+                  ru: 'Классические', el: 'Κλασικές', syc: 'ܩܠܣܝ̈ܩܝ̈ܬ̈ܐ', cop: 'ⲛⲓⲕⲗⲁⲥⲓⲕⲟⲛ', sa: 'शास्त्रीयाः'
+                })}</span>
+                <svg className="lang-dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: classicalOpen ? 'rotate(180deg)' : 'none' }}>
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+              {classicalOpen && (
+                <div className="lang-dropdown-menu">
+                  {CLASSICAL_LANGS.map(code => (
+                    <button
+                      key={code}
+                      className={`lang-dropdown-item${lang === code ? ' lang-dropdown-item-active' : ''}`}
+                      onClick={() => {
+                        onToggleLanguage({ target: { value: code } } as React.ChangeEvent<HTMLSelectElement>)
+                        setClassicalOpen(false)
+                        setMenuOpen(false)
+                      }}
+                    >
+                      <span className="lang-dropdown-item-flag">{FLAG_EMOJI[code]}</span>
+                      <span className="lang-dropdown-item-name">{CLASSICAL_LABELS[code]?.[lang] ?? CLASSICAL_LABELS[code]?.en ?? code}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
