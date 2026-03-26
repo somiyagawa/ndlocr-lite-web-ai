@@ -60,13 +60,16 @@ export function useOCRWorker() {
       // OCR Worker 初期化（auto モードはワーカー側で全モデルロード）
       worker.postMessage({ type: 'INITIALIZE', layoutOnly: isMobile, ocrMode: ocrModeRef.current } satisfies WorkerInMessage)
 
-      worker.onmessage = (event: MessageEvent<WorkerOutMessage>) => {
+      // addEventListener を使い、processImage / switchOcrMode の handler と共存可能にする
+      const initHandler = (event: MessageEvent<WorkerOutMessage>) => {
         const msg = event.data
         if (msg.type === 'OCR_PROGRESS') {
           if (msg.stage === 'initialized') {
             ocrWorkerReady = true
             checkBothReady()
-          } else {
+            worker.removeEventListener('message', initHandler)
+          } else if (!msg.id) {
+            // id なし = 初期化進捗（ジョブ進捗ではない）
             setJobState((prev) => ({
               ...prev,
               status: 'loading_model',
@@ -78,6 +81,7 @@ export function useOCRWorker() {
           }
         }
       }
+      worker.addEventListener('message', initHandler)
 
       // 認識 Worker 初期化
       recWorkers.forEach((w) => {
@@ -381,14 +385,21 @@ export function useOCRWorker() {
       setJobState(initialJobState)
       workerRef.current.postMessage({ type: 'INITIALIZE', layoutOnly: isMobile, ocrMode: mode } satisfies WorkerInMessage)
       // addEventListener を使い、既存の processImage ハンドラを壊さない
+      // タイムアウトでリーク防止（60秒以内に初期化完了しなければクリーンアップ）
+      const cleanup = () => workerRef.current?.removeEventListener('message', initHandler)
+      const timeout = setTimeout(() => {
+        cleanup()
+        console.warn('OCR mode switch initialization timeout')
+      }, 60000)
       const initHandler = (event: MessageEvent<WorkerOutMessage>) => {
         const msg = event.data
         if (msg.type === 'OCR_PROGRESS') {
           if (msg.stage === 'initialized') {
+            clearTimeout(timeout)
             setIsReady(true)
             setJobState(initialJobState)
-            workerRef.current?.removeEventListener('message', initHandler)
-          } else {
+            cleanup()
+          } else if (!msg.id) {
             setJobState((prev) => ({
               ...prev,
               status: 'loading_model',
@@ -398,6 +409,11 @@ export function useOCRWorker() {
               modelProgress: msg.modelProgress,
             }))
           }
+        } else if (msg.type === 'OCR_ERROR' && !msg.id) {
+          // 初期化エラー
+          clearTimeout(timeout)
+          cleanup()
+          setJobState((prev) => ({ ...prev, status: 'error', errorMessage: msg.error }))
         }
       }
       workerRef.current.addEventListener('message', initHandler)

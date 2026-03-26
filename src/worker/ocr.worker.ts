@@ -318,13 +318,14 @@ class OCRWorker {
     }
   }
 
-  /** charCountCategory に応じたモデルを選択（null-safe: フォールバック付き） */
-  private selectRecognizer(charCountCategory?: number): TextRecognizer | null {
+  /** charCountCategory に応じたモデルを選択（null の場合はエラー） */
+  private selectRecognizer(charCountCategory?: number): TextRecognizer {
     if (!this.layoutOnly) {
       if (charCountCategory === 3 && this.recognizer30) return this.recognizer30
       if (charCountCategory === 2 && this.recognizer50) return this.recognizer50
     }
-    return this.recognizer100  // モバイルは常に rec100（null の場合もあり得る）
+    if (!this.recognizer100) throw new Error('Text recognizer (rec100) not initialized')
+    return this.recognizer100
   }
 
   /**
@@ -407,7 +408,6 @@ class OCRWorker {
           result = await this.kotenRecognizer.recognizeCropped(croppedImages[i])
         } else {
           const recognizer = this.selectRecognizer(region.charCountCategory)
-          if (!recognizer) throw new Error('Text recognizer not initialized')
           result = await recognizer.recognizeCropped(croppedImages[i])
         }
 
