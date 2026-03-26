@@ -802,8 +802,10 @@ export function ImageViewer({
               onClick={() => setShowTextOverlay(prev => !prev)}
               title={L(lang, { ja: 'OCRテキストを画像上に表示', en: 'Show OCR text on image', 'zh-CN': '在图像上显示OCR文字', 'zh-TW': '在影像上顯示OCR文字', ko: '이미지에 OCR 텍스트 표시', la: 'Textum OCR ostendere', eo: 'Montri OCR-tekston', es: 'Mostrar texto OCR', de: 'OCR-Text anzeigen', ar: 'عرض نص OCR', hi: 'OCR पाठ दिखाएँ', ru: 'Показать текст OCR', el: 'Εμφάνιση κειμένου OCR', syc: 'ܚܘܝ ܟܬܒ OCR' })}
             >
+              {/* 画像＋文字の重ね合わせアイコン */}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 7V4h16v3" /><path d="M9 20h6" /><path d="M12 4v16" />
+                <rect x="2" y="2" width="14" height="14" rx="2" />
+                <text x="14" y="22" fontSize="14" fontWeight="700" fill="currentColor" stroke="none" fontFamily="sans-serif">T</text>
               </svg>
             </button>
             <button
@@ -811,9 +813,11 @@ export function ImageViewer({
               onClick={() => setShowConfidence(prev => !prev)}
               title={L(lang, { ja: '信頼度ヒートマップ表示', en: 'Show confidence heatmap', 'zh-CN': '显示置信度热图', 'zh-TW': '顯示信賴度熱圖', ko: '신뢰도 히트맵 표시', la: 'Fiduciam ostendere', eo: 'Montri fidmapon', es: 'Mostrar confianza', de: 'Konfidenz-Heatmap', ar: 'عرض خريطة الثقة', hi: 'विश्वसनीयता हीटमैप', ru: 'Тепловая карта', el: 'Χάρτης εμπιστοσύνης', syc: 'ܚܘܝ ܬܘܟܠܢ' })}
             >
+              {/* 温度計・棒グラフ風の信頼度アイコン */}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
-                <path d="M12 6v6l4 2" />
+                <rect x="3" y="12" width="4" height="8" rx="1" fill="currentColor" opacity="0.3" />
+                <rect x="10" y="7" width="4" height="13" rx="1" fill="currentColor" opacity="0.55" />
+                <rect x="17" y="3" width="4" height="17" rx="1" fill="currentColor" opacity="0.85" />
               </svg>
             </button>
             <button
@@ -821,8 +825,12 @@ export function ImageViewer({
               onClick={() => setShowReadingOrder(prev => !prev)}
               title={L(lang, { ja: '読み順表示', en: 'Show reading order', 'zh-CN': '显示阅读顺序', 'zh-TW': '顯示閱讀順序', ko: '읽기 순서 표시', la: 'Ordinem legendi ostendere', eo: 'Montri legordon', es: 'Mostrar orden', de: 'Lesereihenfolge', ar: 'عرض ترتيب القراءة', hi: 'पढ़ने का क्रम', ru: 'Порядок чтения', el: 'Σειρά ανάγνωσης', syc: 'ܚܘܝ ܣܕܪ ܩܪܝܢ' })}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" />
+              {/* 1→2→3 番号順アイコン */}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <text x="1" y="9" fontSize="9" fontWeight="700" fill="currentColor" stroke="none" fontFamily="sans-serif">1</text>
+                <path d="M11 6h3" strokeWidth="2" />
+                <path d="M14 6l-2 2M14 6l-2-2" strokeWidth="1.5" />
+                <text x="14" y="21" fontSize="9" fontWeight="700" fill="currentColor" stroke="none" fontFamily="sans-serif">2</text>
               </svg>
             </button>
           </>

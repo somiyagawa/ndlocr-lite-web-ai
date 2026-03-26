@@ -932,10 +932,12 @@ export function TextEditor({
             aria-label="Toggle line numbers"
           >
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <text x="1" y="6" fontSize="7" fill="currentColor" stroke="none" fontWeight="600">1</text>
-              <line x1="7" y1="4" x2="15" y2="4" />
-              <text x="1" y="13" fontSize="7" fill="currentColor" stroke="none" fontWeight="600">2</text>
-              <line x1="7" y1="11" x2="15" y2="11" />
+              <text x="0" y="5.5" fontSize="6" fill="currentColor" stroke="none" fontWeight="700" fontFamily="sans-serif">1</text>
+              <line x1="5" y1="3.5" x2="15" y2="3.5" />
+              <text x="0" y="10.5" fontSize="6" fill="currentColor" stroke="none" fontWeight="700" fontFamily="sans-serif">2</text>
+              <line x1="5" y1="8.5" x2="15" y2="8.5" />
+              <text x="0" y="15.5" fontSize="6" fill="currentColor" stroke="none" fontWeight="700" fontFamily="sans-serif">3</text>
+              <line x1="5" y1="13.5" x2="15" y2="13.5" />
             </svg>
           </button>
 
@@ -1300,6 +1302,7 @@ export function TextEditor({
                 lineHeight: `${lineSpacing}`,
                 writingMode: isVertical ? 'vertical-rl' : 'horizontal-tb',
                 textOrientation: isVertical ? 'mixed' : 'initial',
+                fontFeatureSettings: isVertical ? '"vert" 1' : 'normal',
               }}
             />
           </div>
@@ -1390,26 +1393,42 @@ export function TextEditor({
               <option value="ud-kyokasho">教科書体 (Klee One)</option>
               <option value="biz-ud">BIZ UDゴシック</option>
             </select>
-            <span className="text-editor-font-value-compact">{fontSize}px</span>
-            <input
-              type="range"
-              className="text-editor-font-slider-compact"
-              min="10"
-              max="48"
-              value={fontSize}
-              onChange={(e) => setFontSize(Number(e.target.value))}
-              title={`${fontSize}px`}
-            />
-            <button
-              className="text-editor-icon-btn"
-              onClick={handleAutoFitFont}
-              title={L(lang, { ja: '行幅に合わせて文字を拡大', en: 'Auto-fit font to line width', 'zh-CN': '自动适应行宽', 'zh-TW': '自動適應行寬', ko: '줄 너비에 맞춤' })}
-            >
-              <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M2 4h12M2 12h12" />
-                <path d="M4 2l-2 2 2 2M12 10l2 2-2 2" />
+            <span className="text-editor-font-size-group">
+              <svg className="text-editor-font-size-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor" stroke="none">
+                <text x="0" y="14" fontSize="11" fontWeight="700" fontFamily="sans-serif">A</text>
+                <text x="10" y="18" fontSize="8" fontWeight="600" fontFamily="sans-serif">A</text>
               </svg>
-            </button>
+              <button
+                className="text-editor-font-size-btn"
+                onClick={() => setFontSize(s => Math.max(10, s - 2))}
+                title={L(lang, { ja: '文字を小さく', en: 'Decrease font size', 'zh-CN': '缩小字体', 'zh-TW': '縮小字體', ko: '글자 축소' })}
+              >−</button>
+              <span className="text-editor-font-value-compact">{fontSize}px</span>
+              <button
+                className="text-editor-font-size-btn"
+                onClick={() => setFontSize(s => Math.min(48, s + 2))}
+                title={L(lang, { ja: '文字を大きく', en: 'Increase font size', 'zh-CN': '放大字体', 'zh-TW': '放大字體', ko: '글자 확대' })}
+              >+</button>
+              <input
+                type="range"
+                className="text-editor-font-slider-compact"
+                min="10"
+                max="48"
+                value={fontSize}
+                onChange={(e) => setFontSize(Number(e.target.value))}
+                title={L(lang, { ja: `文字サイズ: ${fontSize}px`, en: `Font size: ${fontSize}px`, 'zh-CN': `字号: ${fontSize}px`, 'zh-TW': `字級: ${fontSize}px`, ko: `글자 크기: ${fontSize}px` })}
+              />
+              <button
+                className="text-editor-icon-btn"
+                onClick={handleAutoFitFont}
+                title={L(lang, { ja: '行幅に合わせて文字を自動拡大', en: 'Auto-fit font to line width', 'zh-CN': '自动适应行宽', 'zh-TW': '自動適應行寬', ko: '줄 너비에 맞춤' })}
+              >
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 4h12M2 12h12" />
+                  <path d="M4 2l-2 2 2 2M12 10l2 2-2 2" />
+                </svg>
+              </button>
+            </span>
             <span className="text-editor-font-sep-compact">|</span>
             <span className="text-editor-font-label-compact">{L(lang, { ja: '行間', en: 'Spacing', 'zh-CN': '行距', 'zh-TW': '行距', ko: '행간', la: 'Interl.', eo: 'Interlinio', es: 'Espacio', de: 'Abstand', ar: 'التباعد', hi: 'अंतराल', ru: 'Интервал', el: 'Απόσταση', syc: 'ܦܚܘܩܐ' })}</span>
             <span className="text-editor-font-value-compact">{lineSpacing.toFixed(1)}</span>
