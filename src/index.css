@@ -6309,9 +6309,9 @@ button.ai-status-clickable .ai-status-text {
 }
 
 .iiif-modal {
-  background: var(--bg-primary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   width: 100%;
   max-width: 640px;
@@ -6326,7 +6326,7 @@ button.ai-status-clickable .ai-status-text {
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
 }
 
 .iiif-modal-header h3 {
@@ -6339,7 +6339,7 @@ button.ai-status-clickable .ai-status-text {
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
-  color: var(--text-secondary);
+  color: var(--color-text-secondary);
   padding: 0 4px;
   line-height: 1;
 }
@@ -6352,7 +6352,7 @@ button.ai-status-clickable .ai-status-text {
 
 .iiif-description {
   font-size: 0.9rem;
-  color: var(--text-secondary);
+  color: var(--color-text-secondary);
   margin-bottom: 16px;
 }
 
@@ -6365,22 +6365,22 @@ button.ai-status-clickable .ai-status-text {
 .iiif-url-input {
   flex: 1;
   padding: 10px 14px;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 0.9rem;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
+  background: var(--color-surface-elevated);
+  color: var(--color-text);
   outline: none;
   transition: border-color 0.2s;
 }
 
 .iiif-url-input:focus {
-  border-color: var(--accent);
+  border-color: var(--color-primary);
 }
 
 .iiif-hint {
   font-size: 0.8rem;
-  color: var(--text-tertiary);
+  color: var(--color-text-tertiary);
   line-height: 1.4;
 }
 
@@ -6400,7 +6400,7 @@ button.ai-status-clickable .ai-status-text {
 .iiif-canvas-list {
   max-height: 40vh;
   overflow-y: auto;
-  border: 1px solid var(--border-color);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   margin-bottom: 16px;
 }
@@ -6411,7 +6411,7 @@ button.ai-status-clickable .ai-status-text {
   gap: 10px;
   padding: 8px 12px;
   cursor: pointer;
-  border-bottom: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--color-border);
   transition: background 0.15s;
   font-size: 0.85rem;
 }
@@ -6421,11 +6421,11 @@ button.ai-status-clickable .ai-status-text {
 }
 
 .iiif-canvas-item:hover {
-  background: var(--bg-secondary);
+  background: var(--color-surface-elevated);
 }
 
 .iiif-canvas-item.selected {
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  background: var(--color-primary-light);
 }
 
 .iiif-canvas-label {
@@ -6437,7 +6437,7 @@ button.ai-status-clickable .ai-status-text {
 
 .iiif-canvas-size {
   font-size: 0.75rem;
-  color: var(--text-tertiary);
+  color: var(--color-text-tertiary);
   white-space: nowrap;
 }
 
@@ -6449,9 +6449,9 @@ button.ai-status-clickable .ai-status-text {
 
 .iiif-error {
   padding: 12px 20px;
-  background: color-mix(in srgb, #ef4444 15%, var(--bg-primary));
-  color: #ef4444;
+  background: var(--color-danger-light);
+  color: var(--color-danger);
   font-size: 0.85rem;
-  border-top: 1px solid var(--border-color);
+  border-top: 1px solid var(--color-border);
   border-radius: 0 0 12px 12px;
 }

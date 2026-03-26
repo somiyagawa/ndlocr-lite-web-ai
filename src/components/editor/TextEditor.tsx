@@ -68,7 +68,7 @@ export function TextEditor({
   const [batchProofreadState, setBatchProofreadState] = useState<BatchProofreadState>({ status: 'idle' })
   const [fontSize, setFontSize] = useState(14)
   const [lineSpacing, setLineSpacing] = useState(1.9)
-  const [fontFamily, setFontFamily] = useState<string>('mono')
+  const [fontFamily, setFontFamily] = useState<string>('ud-kyokasho')
   const [showLineNumbers, setShowLineNumbers] = useState(false)
   const [showSearchBar, setShowSearchBar] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
