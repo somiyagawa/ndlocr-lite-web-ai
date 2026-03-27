@@ -839,6 +839,7 @@ export default function App() {
                         onPerspectiveToggle={handlePerspectiveToggle}
                         perspectiveCorners={perspectiveCorners}
                         onPerspectiveCornersChange={setPerspectiveCorners}
+                        onClose={() => setShowPreprocessPanel(false)}
                       />
                     </Suspense>
                   )}
@@ -1098,6 +1099,7 @@ export default function App() {
                                 onPerspectiveToggle={handlePerspectiveToggle}
                                 perspectiveCorners={perspectiveCorners}
                                 onPerspectiveCornersChange={setPerspectiveCorners}
+                                onClose={() => setShowPreprocessPanel(false)}
                               />
                             </Suspense>
                           )}

@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.4.0-teal?style=for-the-badge" alt="v4.4.0" />
+  <img src="https://img.shields.io/badge/version-4.4.1-teal?style=for-the-badge" alt="v4.4.1" />
   <img src="https://img.shields.io/badge/license-CC_BY_4.0-blue?style=for-the-badge" alt="CC BY 4.0" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
@@ -201,6 +201,10 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 ---
 
 ## 更新記録
+
+### v4.4.1 — 2026-03-27
+
+**画像補正パネル閉じるボタン・バグ報告修正** — 携帯版の画像補正ボトムシート右上に✕閉じるボタンを追加。バグ報告のmailto送信方式を `window.location.href` に変更し、COOPヘッダー環境・モバイルでの送信失敗を修正。送信メール本文のバージョン表記を更新。
 
 ### v4.4.0 — 2026-03-27
 

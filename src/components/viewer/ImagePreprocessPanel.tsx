@@ -50,6 +50,8 @@ interface ImagePreprocessPanelProps {
   onPerspectiveToggle?: () => void
   perspectiveCorners?: PerspectiveCorners | null
   onPerspectiveCornersChange?: (corners: PerspectiveCorners) => void
+  /** Close the panel (mobile bottom sheet) */
+  onClose?: () => void
 }
 
 type TranslationStrings = {
@@ -575,6 +577,7 @@ export function ImagePreprocessPanel({
   onPerspectiveToggle,
   perspectiveCorners,
   onPerspectiveCornersChange,
+  onClose,
 }: ImagePreprocessPanelProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [options, setOptions] = useState<PreprocessOptions>(DEFAULT_PREPROCESS_OPTIONS)
@@ -785,6 +788,19 @@ export function ImagePreprocessPanel({
             <polygon points="14.5 2 18 6 7.5 16.5 4 17 4.5 13.5 14.5 2" />
           </svg>
           <span>{strings.imagePreprocessing}</span>
+          {onClose && (
+            <button
+              className="preprocess-panel-close-btn"
+              onClick={onClose}
+              type="button"
+              aria-label="Close"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+              </svg>
+            </button>
+          )}
         </div>
       )}
 

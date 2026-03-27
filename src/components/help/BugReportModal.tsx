@@ -178,21 +178,17 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
       '',
       '--- Environment ---',
       `Browser: ${browserInfo}`,
-      `App Version: v3.5`,
+      `App Version: v4.4.1`,
       `URL: ${window.location.href}`,
       `Timestamp: ${new Date().toISOString()}`,
     ].filter(Boolean).join('\n')
 
     const mailto = `mailto:miyagawa.so.36u@kyoto-u.jp?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
-    // window.open は COOP ヘッダー環境でブロックされる場合があるため、
-    // <a> 要素を生成してクリックする方式にフォールバック
-    const a = document.createElement('a')
-    a.href = mailto
-    a.target = '_blank'
-    a.rel = 'noopener noreferrer'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
+    // COOP (Cross-Origin-Opener-Policy: same-origin) 環境では
+    // window.open() や <a target="_blank"> がブロックされるため、
+    // window.location.href に直接代入する方式を使用。
+    // モバイルブラウザでも mailto: の直接遷移が最も確実。
+    window.location.href = mailto
     setSent(true)
   }, [name, email, category, categoryLabel, description, steps])
 

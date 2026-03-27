@@ -4623,7 +4623,26 @@ button.ai-status-clickable .ai-status-text {
 
   /* ── Ultra-compact preprocess panel on mobile ── */
   .preprocess-panel-side .preprocess-panel-side-header {
-    display: none;  /* Hide header entirely to save space */
+    padding: 0.15rem 0.5rem;
+    font-size: 0;       /* Hide text but keep close button */
+    gap: 0;
+    border-bottom: none;
+    background: transparent;
+    justify-content: flex-end;
+    min-height: 0;
+  }
+
+  .preprocess-panel-side .preprocess-panel-side-header > svg,
+  .preprocess-panel-side .preprocess-panel-side-header > span {
+    display: none;  /* Hide icon + title text, keep close button */
+  }
+
+  .preprocess-panel-side .preprocess-panel-close-btn {
+    min-width: 32px;
+    min-height: 32px;
+    padding: 0.25rem;
+    border-radius: 50%;
+    background: rgba(var(--color-surface-rgb), 0.8);
   }
 
   .preprocess-panel-side .preprocess-panel-body {
@@ -5591,6 +5610,27 @@ button.ai-status-clickable .ai-status-text {
   color: var(--color-text);
   border-bottom: 1px solid var(--color-border);
   background: var(--color-bg);
+}
+
+.preprocess-panel-close-btn {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm, 6px);
+  padding: 0.2rem;
+  cursor: pointer;
+  color: var(--color-text-secondary);
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.preprocess-panel-close-btn:hover {
+  background: var(--color-danger, #dc3545);
+  color: white;
+  border-color: var(--color-danger, #dc3545);
 }
 
 .preprocess-panel-side-header svg {

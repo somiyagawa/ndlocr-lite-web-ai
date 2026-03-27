@@ -8,6 +8,22 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '4.4.1',
+    date: '2026-03-27',
+    changes: {
+      ja: [
+        '携帯版: 画像補正パネルに✕閉じるボタンを追加（ボトムシート右上に丸形ボタン）',
+        'バグ報告: mailto送信方式をwindow.location.hrefに変更 — COOPヘッダー環境・モバイルでの送信失敗を修正',
+        'バグ報告: 送信メール本文のバージョン表記を v4.4.1 に更新',
+      ],
+      en: [
+        'Mobile: added close button to image correction panel (circular button at top-right of bottom sheet)',
+        'Bug report: changed mailto method to window.location.href — fixes submission failure under COOP headers and on mobile',
+        'Bug report: updated app version in email body to v4.4.1',
+      ],
+    },
+  },
+  {
     version: '4.4.0',
     date: '2026-03-27',
     changes: {
@@ -539,7 +555,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.4.0</span>
+        >v4.4.1</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}
