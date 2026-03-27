@@ -146,6 +146,51 @@ export function TextEditor({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [result?.id])
 
+  // Auto-fit: テキストの最長行に合わせてフォントサイズを自動拡大
+  const handleAutoFitFont = useCallback(() => {
+    const ta = textareaRef.current
+    if (!ta || !displayText) return
+    const lines = displayText.split('\n').filter(l => l.length > 0)
+    if (lines.length === 0) return
+
+    const style = window.getComputedStyle(ta)
+    const canvas = document.createElement('canvas')
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    const refSize = fontSize
+    const families = style.fontFamily
+    ctx.font = `${refSize}px ${families}`
+
+    if (isVertical) {
+      // 縦書き: コンテナの高さに対して最長行（文字数）をフィット
+      const padding = parseFloat(style.paddingTop) + parseFloat(style.paddingBottom)
+      const availableHeight = ta.clientHeight - padding
+      if (availableHeight <= 0) return
+      // 縦書きの1行の高さ ≈ 文字数 × fontSize（lineSpacing含む）
+      const maxChars = Math.max(...lines.map(l => l.length))
+      const currentLineH = maxChars * refSize * lineSpacing
+      if (currentLineH <= 0) return
+      const scale = availableHeight / currentLineH
+      const newSize = Math.min(48, Math.max(10, Math.floor(refSize * scale)))
+      setFontSize(newSize)
+    } else {
+      // 横書き: コンテナの幅に対して最長行の文字幅をフィット
+      const padding = parseFloat(style.paddingLeft) + parseFloat(style.paddingRight)
+      const availableWidth = ta.clientWidth - padding
+      if (availableWidth <= 0) return
+      let maxWidth = 0
+      for (const line of lines) {
+        const w = ctx.measureText(line).width
+        if (w > maxWidth) maxWidth = w
+      }
+      if (maxWidth <= 0) return
+      const scale = availableWidth / maxWidth
+      const newSize = Math.min(48, Math.max(10, Math.floor(refSize * scale)))
+      setFontSize(newSize)
+    }
+  }, [displayText, fontSize, lineSpacing, isVertical])
+
   // Search matches calculation
   const searchMatches = useMemo<SearchMatch[]>(() => {
     if (!searchQuery || shouldShowDiff) return []
@@ -904,10 +949,12 @@ export function TextEditor({
             aria-label="Toggle line numbers"
           >
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <text x="1" y="6" fontSize="7" fill="currentColor" stroke="none" fontWeight="600">1</text>
-              <line x1="7" y1="4" x2="15" y2="4" />
-              <text x="1" y="13" fontSize="7" fill="currentColor" stroke="none" fontWeight="600">2</text>
-              <line x1="7" y1="11" x2="15" y2="11" />
+              <text x="0" y="5.5" fontSize="6" fill="currentColor" stroke="none" fontWeight="700" fontFamily="sans-serif">1</text>
+              <line x1="5" y1="3.5" x2="15" y2="3.5" />
+              <text x="0" y="10.5" fontSize="6" fill="currentColor" stroke="none" fontWeight="700" fontFamily="sans-serif">2</text>
+              <line x1="5" y1="8.5" x2="15" y2="8.5" />
+              <text x="0" y="15.5" fontSize="6" fill="currentColor" stroke="none" fontWeight="700" fontFamily="sans-serif">3</text>
+              <line x1="5" y1="13.5" x2="15" y2="13.5" />
             </svg>
           </button>
 
@@ -938,7 +985,7 @@ export function TextEditor({
               <path d="M7 7l2 2M9 7l-2 2" strokeWidth="1.2" />
               <line x1="2" y1="13" x2="14" y2="13" />
             </svg>
-            {L(lang, { ja: '空行削除', en: 'Del blank', 'zh-CN': '删空行', 'zh-TW': '刪空行', ko: '빈줄삭제', la: 'Del. vac.', eo: 'For. malplen.', es: 'Borrar vacías', de: 'Leer lösch.', ar: 'حذف فارغ', hi: 'खाली हटाएँ', ru: 'Уд. пусто', el: 'Διαγр. κενό', syc: 'ܚܕ ܠܐ ܗܘܕ' })}
+            <span className="toolbar-btn-label">{L(lang, { ja: '空行削除', en: 'Del blank', 'zh-CN': '删空行', 'zh-TW': '刪空行', ko: '빈줄삭제', la: 'Del. vac.', eo: 'For. malplen.', es: 'Borrar vacías', de: 'Leer lösch.', ar: 'حذف فارغ', hi: 'खाली हटाएँ', ru: 'Уд. пусто', el: 'Διαγр. κενό', syc: 'ܚܕ ܠܐ ܗܘܕ' })}</span>
           </button>
 
           <button
@@ -952,7 +999,7 @@ export function TextEditor({
               <polyline points="5 5 2 8 5 11" fill="none" />
               <polyline points="11 5 14 8 11 11" fill="none" />
             </svg>
-            {L(lang, { ja: '行結合', en: 'Join', 'zh-CN': '合并', 'zh-TW': '合併', ko: '합치기', la: 'Coniung.', eo: 'Kunigi', es: 'Unir', de: 'Verb.', ar: 'دمج', hi: 'जोड़ें', ru: 'Объедн.', el: 'Συγχώ.', syc: 'ܚܒܪ' })}
+            <span className="toolbar-btn-label">{L(lang, { ja: '行結合', en: 'Join', 'zh-CN': '合并', 'zh-TW': '合併', ko: '합치기', la: 'Coniung.', eo: 'Kunigi', es: 'Unir', de: 'Verb.', ar: 'دمج', hi: 'जोड़ें', ru: 'Объедн.', el: 'Συγχώ.', syc: 'ܚܒܪ' })}</span>
           </button>
 
           <button
@@ -966,7 +1013,7 @@ export function TextEditor({
               <path d="M4 7h6a3 3 0 0 1 0 6H8" />
               <polyline points="7 4 4 7 7 10" fill="none" />
             </svg>
-            {L(lang, { ja: '元に戻す', en: 'Undo', 'zh-CN': '撤销', 'zh-TW': '復原', ko: '실행 취소', la: 'Revocare', eo: 'Malfari', es: 'Deshacer', de: 'Rückgängig', ar: 'تراجع', hi: 'पूर्ववत', ru: 'Отменить', el: 'Αναίρεση', syc: 'ܐܗܦܟ' })}
+            <span className="toolbar-btn-label">{L(lang, { ja: '元に戻す', en: 'Undo', 'zh-CN': '撤销', 'zh-TW': '復原', ko: '실행 취소', la: 'Revocare', eo: 'Malfari', es: 'Deshacer', de: 'Rückgängig', ar: 'تراجع', hi: 'पूर्ववत', ru: 'Отменить', el: 'Αναίρεση', syc: 'ܐܗܦܟ' })}</span>
           </button>
         </div>
 
@@ -1263,6 +1310,7 @@ export function TextEditor({
                 lineHeight: `${lineSpacing}`,
                 writingMode: isVertical ? 'vertical-rl' : 'horizontal-tb',
                 textOrientation: isVertical ? 'mixed' : 'initial',
+                fontFeatureSettings: isVertical ? '"vert" 1' : 'normal',
               }}
             />
           </div>
@@ -1287,8 +1335,9 @@ export function TextEditor({
           )}
         </div>
         <div className="text-editor-statusbar-right">
+          {/* Desktop: separate labels; Mobile: hidden here, shown inline after line spacing */}
           <label
-            className="text-editor-option-compact"
+            className="text-editor-option-compact text-editor-option-desktop-only"
             title={L(lang, {
               ja: 'コピー・保存時にファイル名をヘッダーとして付加します',
               en: 'Prepend the filename as a header when copying or saving',
@@ -1314,7 +1363,7 @@ export function TextEditor({
             {L(lang, { ja: 'ファイル名', en: 'Filename', 'zh-CN': '文件名', 'zh-TW': '檔案名', ko: '파일명', la: 'Nomen', eo: 'Dosiernomo', es: 'Nombre', de: 'Dateiname', ar: 'اسم الملف', hi: 'फ़ाइल नाम', ru: 'Включить имя файла', el: 'Συμπερίληψη ονόματος αρχείου', syc: 'ܐܥܠ ܫܡ ܩܛܝܡܐ' })}
           </label>
           <label
-            className="text-editor-option-compact"
+            className="text-editor-option-compact text-editor-option-desktop-only"
             title={L(lang, {
               ja: 'コピー・保存時に改行を除去して1行にまとめます',
               en: 'Remove all line breaks when copying or saving',
@@ -1339,7 +1388,7 @@ export function TextEditor({
             />
             {L(lang, { ja: '改行無視', en: 'No newlines', 'zh-CN': '忽略换行', 'zh-TW': '忽略換行', ko: '줄바꿈 무시', la: 'Sine fractis', eo: 'Sen linirompoj', es: 'Sin saltos', de: 'Ohne Umbrüche', ar: 'بدون أسطر', hi: 'बिना लाइन ब्रेक', ru: 'Игнорировать переносы строк', el: 'Χωρίς αλλαγές γραμμής', syc: 'ܠܐ ܫ̈ܘܚܠܦ̈ܐ ܣܛܪܐ' })}
           </label>
-          <span className="text-editor-stat-sep" />
+          <span className="text-editor-stat-sep text-editor-option-desktop-only" />
           <div className="text-editor-font-controls-compact">
             <select
               className="text-editor-font-select"
@@ -1353,16 +1402,42 @@ export function TextEditor({
               <option value="ud-kyokasho">教科書体 (Klee One)</option>
               <option value="biz-ud">BIZ UDゴシック</option>
             </select>
-            <span className="text-editor-font-value-compact">{fontSize}px</span>
-            <input
-              type="range"
-              className="text-editor-font-slider-compact"
-              min="10"
-              max="28"
-              value={fontSize}
-              onChange={(e) => setFontSize(Number(e.target.value))}
-              title={`${fontSize}px`}
-            />
+            <span className="text-editor-font-size-group">
+              <svg className="text-editor-font-size-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor" stroke="none">
+                <text x="0" y="14" fontSize="11" fontWeight="700" fontFamily="sans-serif">A</text>
+                <text x="10" y="18" fontSize="8" fontWeight="600" fontFamily="sans-serif">A</text>
+              </svg>
+              <button
+                className="text-editor-font-size-btn"
+                onClick={() => setFontSize(s => Math.max(10, s - 2))}
+                title={L(lang, { ja: '文字を小さく', en: 'Decrease font size', 'zh-CN': '缩小字体', 'zh-TW': '縮小字體', ko: '글자 축소' })}
+              >−</button>
+              <span className="text-editor-font-value-compact">{fontSize}px</span>
+              <button
+                className="text-editor-font-size-btn"
+                onClick={() => setFontSize(s => Math.min(48, s + 2))}
+                title={L(lang, { ja: '文字を大きく', en: 'Increase font size', 'zh-CN': '放大字体', 'zh-TW': '放大字體', ko: '글자 확대' })}
+              >+</button>
+              <input
+                type="range"
+                className="text-editor-font-slider-compact"
+                min="10"
+                max="48"
+                value={fontSize}
+                onChange={(e) => setFontSize(Number(e.target.value))}
+                title={L(lang, { ja: `文字サイズ: ${fontSize}px`, en: `Font size: ${fontSize}px`, 'zh-CN': `字号: ${fontSize}px`, 'zh-TW': `字級: ${fontSize}px`, ko: `글자 크기: ${fontSize}px` })}
+              />
+              <button
+                className="text-editor-icon-btn"
+                onClick={handleAutoFitFont}
+                title={L(lang, { ja: '行幅に合わせて文字を自動拡大', en: 'Auto-fit font to line width', 'zh-CN': '自动适应行宽', 'zh-TW': '自動適應行寬', ko: '줄 너비에 맞춤' })}
+              >
+                <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 4h12M2 12h12" />
+                  <path d="M4 2l-2 2 2 2M12 10l2 2-2 2" />
+                </svg>
+              </button>
+            </span>
             <span className="text-editor-font-sep-compact">|</span>
             <span className="text-editor-font-label-compact">{L(lang, { ja: '行間', en: 'Spacing', 'zh-CN': '行距', 'zh-TW': '行距', ko: '행간', la: 'Interl.', eo: 'Interlinio', es: 'Espacio', de: 'Abstand', ar: 'التباعد', hi: 'अंतराल', ru: 'Интервал', el: 'Απόσταση', syc: 'ܦܚܘܩܐ' })}</span>
             <span className="text-editor-font-value-compact">{lineSpacing.toFixed(1)}</span>
@@ -1376,6 +1451,24 @@ export function TextEditor({
               onChange={(e) => setLineSpacing(Number(e.target.value))}
               title={`${L(lang, { ja: '行間', en: 'Line spacing', 'zh-CN': '行距', 'zh-TW': '行距', ko: '행간', la: 'Interlineum', eo: 'Interlinio', es: 'Interlineado', de: 'Zeilenabstand', ar: 'تباعد الأسطر', hi: 'पंक्ति अंतराल', ru: 'Интервал строк', el: 'Απόσταση γραμμών', syc: 'ܦܚܘܩܐ ܕ̈ܣܛܪܐ' })}: ${lineSpacing.toFixed(1)}`}
             />
+            {/* Mobile-only: merged copy options (filename + ignore newlines) */}
+            <span className="text-editor-copy-opts-mobile">
+              <span className="text-editor-font-sep-compact">|</span>
+              <label
+                className="text-editor-option-icon"
+                title={L(lang, { ja: 'ファイル名付加', en: 'Include filename', 'zh-CN': '含文件名', 'zh-TW': '含檔名', ko: '파일명 포함' })}
+              >
+                <input type="checkbox" checked={includeFileName} onChange={(e) => setIncludeFileName(e.target.checked)} />
+                <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M2 2h8l4 4v8H2V2zm8 1v3h3L10 3zM4 9h8v1H4V9zm0 2h6v1H4v-1z"/></svg>
+              </label>
+              <label
+                className="text-editor-option-icon"
+                title={L(lang, { ja: '改行無視', en: 'Ignore newlines', 'zh-CN': '忽略换行', 'zh-TW': '忽略換行', ko: '줄바꿈 무시' })}
+              >
+                <input type="checkbox" checked={ignoreNewlines} onChange={(e) => setIgnoreNewlines(e.target.checked)} />
+                <svg width="10" height="10" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2 4h12M2 8h8M10 8v4H4" strokeLinecap="round" strokeLinejoin="round"/><path d="M6 10l-2 2 2 2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+              </label>
+            </span>
           </div>
         </div>
       </div>

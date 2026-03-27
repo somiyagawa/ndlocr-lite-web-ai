@@ -8,6 +8,144 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '4.3.5',
+    date: '2026-03-27',
+    changes: {
+      ja: [
+        '携帯版: 画像補正パネルを超コンパクト化（max-height 28vh、ヘッダー・セクションラベル非表示）',
+        '携帯版: スライダーを横一行レイアウトに変更（ラベル＋スライダー＋数値が一行）',
+        '携帯版: スライダーにtouch-action: none＋stopPropagationを追加 — パネルスクロールとの干渉を解消',
+        '携帯版: パネル半透明化（backdrop-filter: blur）— 背面の画像を透かして確認可能',
+        '携帯版: ボタン・チェックボックス・つまみをタッチサイズに最適化',
+      ],
+      en: [
+        'Mobile: ultra-compact preprocess panel (max-height 28vh, header and section labels hidden)',
+        'Mobile: sliders in horizontal inline layout (label + slider + value on one row)',
+        'Mobile: touch-action: none + stopPropagation on sliders — fixes scroll conflict during drag',
+        'Mobile: panel semi-transparent with backdrop blur — image visible behind',
+        'Mobile: buttons, checkboxes, slider thumbs optimized for touch targets',
+      ],
+    },
+  },
+  {
+    version: '4.3.3',
+    date: '2026-03-27',
+    changes: {
+      ja: [
+        '携帯版: ズームコントロール・オーバーレイ文字・信頼度・読み順ボタンがタッチ操作で反応しなかった問題を修正（touchイベント伝播制御）',
+        '携帯版: 画像補正パネルをボトムシート方式に変更 — 画面下部からスライドアップし、画像を確認しながら補正可能に',
+        '携帯版: 保存メニューをボトムシート方式に変更 — ツールバーのオーバーフローでクリップされていた問題を修正',
+        '携帯版: メニューを左からスライドするように変更（ハンバーガーボタン位置に合わせて）',
+        '携帯版: メニュー内の言語選択・OCRモード切替のレイアウトを改善',
+        '携帯版: ドロップゾーンを超コンパクト化（フォーマット表記非表示）',
+        '携帯版: 冗長なUpload image/PDFボタン（BottomToolbar）を削除',
+        '携帯版: フッターを非表示にし、フッター情報をメニューパネル下部に移動',
+        '携帯版: テキストエディタの縦方向領域を拡大（80vh）',
+        '文字オーバーレイボタンを「□字」アイコンに変更',
+        '読み順ボタンを「①②」丸囲み数字アイコンに変更',
+      ],
+      en: [
+        'Mobile: fixed zoom controls, overlay text, confidence, and reading order buttons not responding to touch (touch event propagation fix)',
+        'Mobile: image correction panel now slides up as bottom sheet — image stays visible while adjusting',
+        'Mobile: save/export menu now slides up as bottom sheet — fixes clipping by toolbar overflow',
+        'Mobile: menu now slides from LEFT to match hamburger button position',
+        'Mobile: improved language selector and OCR mode toggle layout in drawer menu',
+        'Mobile: ultra-compact dropzone (format text hidden)',
+        'Mobile: removed redundant Upload image/PDF button (BottomToolbar)',
+        'Mobile: footer info moved into drawer menu panel',
+        'Mobile: increased text editor vertical area (80vh)',
+        'Changed text overlay button icon to □字 (kanji in square)',
+        'Changed reading order button icon to ①② (circled numbers)',
+      ],
+    },
+  },
+  {
+    version: '4.3.2',
+    date: '2026-03-27',
+    changes: {
+      ja: [
+        '携帯版: ペイン順序修正 — 画像ビューワを上、テキストエディタを下に正しく配置',
+        '携帯版: 「ファイル名」「改行無視」をアイコンのみのチェックボックスに統合し、行間スライダー横に配置',
+        '携帯版: ツールバーボタン（空行削除・行結合・元に戻す）のテキストラベルを非表示、アイコンのみに',
+        '携帯版: バグ報告ボタンを虫アイコンのみに変更',
+        '携帯版: 画像補正パネルを縦スタック表示に対応（幅100%、高さ制限40vh）',
+        '携帯版: 領域選択ヒントテキストを非表示にし表示面積を最大化',
+        '携帯版: フッターのビューワ重なりを修正',
+        '携帯版: 画像ビューワのコンテナにResizeObserverを追加し初回ロード時のfitZoom再計算を確実に',
+      ],
+      en: [
+        'Mobile: fixed pane order — image viewer on top, text editor on bottom',
+        'Mobile: merged filename/ignore-newline into icon-only checkboxes next to line-spacing slider',
+        'Mobile: hidden text labels on toolbar buttons (del blank, join, undo) — icons only',
+        'Mobile: bug report button now shows bug icon only',
+        'Mobile: image correction panel stacks vertically (100% width, 40vh max)',
+        'Mobile: hidden region-select hint to maximize display area',
+        'Mobile: fixed footer overlapping viewer',
+        'Mobile: added ResizeObserver on viewer container for reliable fitZoom on initial load',
+      ],
+    },
+  },
+  {
+    version: '4.3.1',
+    date: '2026-03-27',
+    changes: {
+      ja: [
+        '携帯版: 画像ビューワ・テキストエディタの分割ペインを大幅に拡大（各70vh、従来の2倍以上）',
+        '携帯版: ステータスバー（ファイル名・改行無視等）を超コンパクト化し、テキスト編集面積を最大化',
+        '携帯版: 画像読み込み時にビューワ全体に画像がフィットするよう修正（fitZoomの上限キャップ撤廃）',
+        '携帯版: テキストエディタのtextareaがペイン全体を埋めるようflex伸長を追加',
+        'モーダルのモバイルCSS重複定義を統合',
+      ],
+      en: [
+        'Mobile: greatly enlarged image viewer and text editor split panes (70vh each, 2x+ previous)',
+        'Mobile: ultra-compact statusbar (filename, ignore-newline, etc.) to maximize text editing area',
+        'Mobile: fixed image filling viewer on load by removing fitZoom cap',
+        'Mobile: textarea now fills entire pane via flex growth',
+        'Merged duplicate mobile modal CSS definitions',
+      ],
+    },
+  },
+  {
+    version: '4.3.0',
+    date: '2026-03-27',
+    changes: {
+      ja: [
+        'IIIFサンプル追加: 玉水物語（京都大学附属図書館蔵）をサンプルタイルから直接読み込み可能に',
+        'IIIFLoaderに外部URL指定による自動フェッチ機能を追加（forwardRef + useImperativeHandle）',
+        'テキストエディタに文字サイズ自動フィット機能を追加（行幅に合わせてフォントサイズを自動拡大）',
+        '縦書きモードで「ー」等の縦書き字形が正しく表示されるようfont-feature-settings: "vert"を追加',
+        'くずし字サンプルを竹取物語に修正、バッジ色をpondblueに変更',
+        'ヘッダーサブタイトル「現代の活字からくずし字まで」をバッジ風の目立つデザインに変更',
+        'サンプルラベル「サンプル画像で試す:」の視認性を向上',
+        '携帯版: 結果ツールバー・AI校正・読み順編集・バグ報告ボタンをコンパクト化',
+        '携帯版: テキストエディタのヘッダー・ステータスバー・フォントコントロールを画面内に収まるよう最適化',
+      ],
+      en: [
+        'Added IIIF sample: Tamamizu Monogatari (Kyoto Univ. Library) loadable from sample tile',
+        'Added auto-fetch via external URL to IIIFLoader (forwardRef + useImperativeHandle)',
+        'Added auto-fit font size feature to text editor (scales font to fill line width)',
+        'Fixed vertical glyph rendering for "ー" etc. with font-feature-settings: "vert"',
+        'Corrected kuzushiji sample to Taketori Monogatari, changed badge color to pondblue',
+        'Made header subtitle more prominent with badge-style design',
+        'Improved visibility of sample tile label',
+        'Mobile: compacted result toolbar, AI proofread, reading order, and bug report buttons',
+        'Mobile: optimized text editor header, statusbar, and font controls to fit screen',
+      ],
+    },
+  },
+  {
+    version: '4.2.2',
+    date: '2026-03-26',
+    changes: {
+      ja: [
+        'くずし字サンプルタイルのバッジ色をpondblue（プライマリカラー）に変更',
+      ],
+      en: [
+        'Changed kuzushiji sample tile badge color to pondblue (primary color)',
+      ],
+    },
+  },
+  {
     version: '4.2.1',
     date: '2026-03-26',
     changes: {
@@ -45,7 +183,7 @@ const CHANGELOG: { version: string; date: string; changes: Record<string, string
     changes: {
       ja: [
         'オートモードで画像の色分布・紙質を自動分析し、現代/古典籍OCRを自動選択する機能を実装',
-        'サンプル画像をビジュアルタイル形式で選択可能に（現代: 蜘蛛の糸、くずし字: 源氏物語絵巻）',
+        'サンプル画像をビジュアルタイル形式で選択可能に（現代: 蜘蛛の糸、くずし字: 竹取物語）',
         'くずし字/古典籍ボタンのラベルを「くずし字/古典籍」に変更し、対応範囲を明確化',
         'RTMDetレイアウト検出モデルの入力サイズバグを修正（1280→1024、モデル実寸に合致）',
         'オートモード初期化時に全モデル（現代+古典籍）を並列ロードし、切替遅延を解消',
@@ -381,7 +519,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.2.1</span>
+        >v4.3.5</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}
@@ -594,6 +732,74 @@ export const Header = memo(function Header({
                 ))}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* ── Footer info inside drawer (mobile only) ── */}
+        <div className="drawer-footer-info">
+          <div className="drawer-footer-privacy">
+            <span className="privacy-icon">🔒</span>
+            {L(lang, {
+              ja: 'このシステムはWebブラウザで完結して動作します。選択した画像とOCR結果はPCの外部には送信されません。',
+              en: 'This system runs entirely in your browser. Images and OCR results are never sent to any external server.',
+              'zh-CN': '该系统完全在浏览器中运行。图像和OCR结果不会发送到外部。',
+              'zh-TW': '該系統完全在瀏覽器中運行。圖像和OCR結果不會傳送到外部。',
+              ko: '이 시스템은 브라우저에서 완전히 실행됩니다. 이미지와 OCR 결과는 외부로 전송되지 않습니다.',
+              la: 'Hoc systema in navigatro operatur. Imagines et eventus OCR extra non mittuntur.',
+              eo: 'Ĉi tiu sistemo funkcias tute en via retumilo. Bildoj kaj OCR-rezultoj neniam estas senditaj eksteren.',
+              es: 'Este sistema funciona completamente en su navegador. Las imágenes y resultados OCR nunca se envían a ningún servidor.',
+              de: 'Dieses System läuft vollständig in Ihrem Browser. Bilder und OCR-Ergebnisse werden nie an externe Server gesendet.',
+              ar: 'يعمل هذا النظام بالكامل في متصفحك. لا يتم إرسال الصور ونتائج OCR إلى أي خادم خارجي.',
+              hi: 'यह सिस्टम पूरी तरह आपके ब्राउज़र में चलता है। छवियाँ और OCR परिणाम कभी बाहर नहीं भेजे जाते।',
+              ru: 'Эта система работает полностью в вашем браузере. Изображения и результаты OCR никогда не отправляются на внешний сервер.',
+              el: 'Αυτό το σύστημα λειτουργεί εξ ολοκλήρου στο πρόγραμμα περιήγησής σας. Οι εικόνες και τα αποτελέσματα OCR δεν αποστέλλονται ποτέ.',
+              syc: 'ܗܢ ܫܘ̈ܠܛ̈ܢ ܟ̈ܠ̈ܗ ܒ̈ܡ̈ܕ̈ܒ̈ܪ̈ܢ̈ܐ ܦ̈ܥ̈ܠ. ܨ̈ܘ̈ܪ̈ܬ̈ܐ ܘ̈ܦ̈ܠ̈ܛ̈ OCR ܠ̈ܒ̈ܪ ܠ̈ܐ ܡ̈ܫ̈ܬ̈ܕ̈ܪ̈ܝ̈ܢ.',
+              cop: 'ⲡⲁⲓⲥⲩⲥⲧⲏⲙⲁ ⲉϥⲉⲣϩⲱⲃ ⲧⲏⲣϥ ϧⲉⲛ ⲡⲉⲕⲃⲣⲁⲩⲍⲉⲣ. ⲛⲓⲉⲓⲕⲱⲛ ⲛⲉⲙ ⲛⲓⲡⲟⲗⲏ ⲛⲧⲉ OCR ⲛⲁⲩⲟⲩⲟⲣⲡⲟⲩ ⲉⲃⲟⲗ ⲁⲛ.',
+              sa: 'एतत् प्रणालिका सम्पूर्णतया ब्राउज़रे चलति। चित्राणि OCR-फलानि च बाह्यसेवकाय न प्रेष्यन्ते।'
+            })}
+          </div>
+          <div className="drawer-footer-credits">
+            {L(lang, {
+              ja: 'OCRエンジン: 国立国会図書館 (NDL Lab) / Web版: 橋本雄太 / AI校正: 小形克宏 / Ultra Bluepond: 宮川創',
+              en: 'OCR engine: NDL Lab / Web port: Y. Hashimoto / AI proofread: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              'zh-CN': 'OCR引擎: NDL Lab / Web版: 桥本雄太 / AI校正: 小形克宏 / Ultra Bluepond: 宫川创',
+              'zh-TW': 'OCR引擎: NDL Lab / Web版: 橋本雄太 / AI校正: 小形克宏 / Ultra Bluepond: 宮川創',
+              ko: 'OCR 엔진: NDL Lab / Web판: 하시모토 유타 / AI교정: 오가타 카쓰히로 / Ultra Bluepond: 미야가와 소',
+              la: 'OCR: NDL Lab / Web: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              eo: 'OCR: NDL Lab / Retversio: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              es: 'OCR: NDL Lab / Web: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              de: 'OCR: NDL Lab / Web: Y. Hashimoto / KI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              ar: 'محرك OCR: NDL Lab / الويب: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              hi: 'OCR: NDL Lab / वेब: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              ru: 'OCR: NDL Lab / Веб: Ю. Хасимото / AI: К. Огата / Ultra Bluepond: С. Миягава',
+              el: 'OCR: NDL Lab / Web: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              syc: 'OCR: NDL Lab / ܓܘ: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              cop: 'OCR: NDL Lab / Web: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa',
+              sa: 'OCR: NDL Lab / Web: Y. Hashimoto / AI: K. Ogata / Ultra Bluepond: S. Miyagawa'
+            })}
+          </div>
+          <div className="drawer-footer-license">
+            NDLOCR-Lite: CC BY 4.0 (NDL) / Web: CC BY 4.0 (Hashimoto) / AI: MIT (Ogata) / Ultra Bluepond: CC BY 4.0 (Miyagawa)
+          </div>
+          <div className="drawer-footer-frog">
+            {L(lang, {
+              ja: '🐸 鳥獣戯画模様は NDLOCR 開発者・青池亨先生へのオマージュ',
+              en: '🐸 Choju-giga background is a tribute to Toru Aoike (NDL), developer of NDLOCR',
+              'zh-CN': '🐸 鸟兽戏画背景是向NDLOCR开发者青池亨致敬',
+              'zh-TW': '🐸 鳥獸戲畫背景是向NDLOCR開發者青池亨致敬',
+              ko: '🐸 조수희화 배경은 NDLOCR 개발자 아오이케 토오루에 대한 오마주',
+              la: '🐸 Choju-giga est honorarium Toru Aoike (NDL), creatori NDLOCR',
+              eo: '🐸 Choju-giga estas omaĝo al Toru Aoike (NDL), kreinto de NDLOCR',
+              es: '🐸 Choju-giga es un tributo a Toru Aoike (NDL), desarrollador de NDLOCR',
+              de: '🐸 Choju-giga ist eine Hommage an Toru Aoike (NDL), Entwickler von NDLOCR',
+              ar: '🐸 Choju-giga هو تكريم لـ Toru Aoike (NDL)، مطور NDLOCR',
+              hi: '🐸 Choju-giga पृष्ठभूमि Toru Aoike (NDL), NDLOCR के डेवलपर को श्रद्धांजलि',
+              ru: '🐸 Choju-giga — дань уважения Тору Аойке (NDL), разработчику NDLOCR',
+              el: '🐸 Choju-giga: φόρος τιμής στον Toru Aoike (NDL), δημιουργό του NDLOCR',
+              syc: '🐸 Choju-giga ܐ̈ܝ̈ܩ̈ܪ̈ ܠ Toru Aoike (NDL)، ܒ̈ܪ̈ܘ̈ܝ̈ NDLOCR',
+              cop: '🐸 Choju-giga ⲟⲩⲧⲁⲓⲟ ⲛ Toru Aoike (NDL), ⲫⲏ ⲉⲧⲁϥⲑⲁⲙⲓⲟ ⲙ NDLOCR',
+              sa: '🐸 Choju-giga Toru Aoike (NDL) NDLOCR विकासकस्य सम्मानार्थम्'
+            })}
           </div>
         </div>
       </div>

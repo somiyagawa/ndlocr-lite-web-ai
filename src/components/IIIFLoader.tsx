@@ -10,8 +10,14 @@
  * - AbortController によるキャンセル
  * - ダウンロード進捗表示
  */
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useImperativeHandle, forwardRef } from 'react'
 import { L, type Language } from '../i18n'
+
+/** 外部から IIIFLoader を制御するためのハンドル */
+export interface IIIFLoaderHandle {
+  /** モーダルを開き、指定URLでマニフェストを自動取得する */
+  openWithUrl: (url: string) => void
+}
 
 interface IIIFLoaderProps {
   onImagesLoaded: (files: File[]) => void
@@ -239,7 +245,7 @@ async function parallelMap<T, R>(
 }
 
 
-export function IIIFLoader({ onImagesLoaded, lang, disabled }: IIIFLoaderProps) {
+export const IIIFLoader = forwardRef<IIIFLoaderHandle, IIIFLoaderProps>(function IIIFLoader({ onImagesLoaded, lang, disabled }, ref) {
   const [showModal, setShowModal] = useState(false)
   const [manifestUrl, setManifestUrl] = useState('')
   const [loading, setLoading] = useState(false)
@@ -250,8 +256,8 @@ export function IIIFLoader({ onImagesLoaded, lang, disabled }: IIIFLoaderProps) 
   const [downloadProgress, setDownloadProgress] = useState({ done: 0, total: 0 })
   const abortRef = useRef<AbortController | null>(null)
 
-  const handleFetchManifest = useCallback(async () => {
-    const url = manifestUrl.trim()
+  const fetchManifestByUrl = useCallback(async (urlToFetch: string) => {
+    const url = urlToFetch.trim()
     if (!url) return
     setLoading(true)
     setError('')
@@ -297,7 +303,23 @@ export function IIIFLoader({ onImagesLoaded, lang, disabled }: IIIFLoaderProps) 
       setLoading(false)
       abortRef.current = null
     }
-  }, [manifestUrl, lang])
+  }, [lang])
+
+  const handleFetchManifest = useCallback(async () => {
+    await fetchManifestByUrl(manifestUrl)
+  }, [manifestUrl, fetchManifestByUrl])
+
+  // 外部から URL 指定でモーダルを開くハンドル
+  useImperativeHandle(ref, () => ({
+    openWithUrl: (url: string) => {
+      setManifestUrl(url)
+      setShowModal(true)
+      setStep('input')
+      setError('')
+      // 次のレンダー後に自動フェッチ
+      setTimeout(() => { fetchManifestByUrl(url) }, 50)
+    },
+  }), [fetchManifestByUrl])
 
   const handleToggle = useCallback((index: number) => {
     setSelectedIndices(prev => {
@@ -525,4 +547,4 @@ export function IIIFLoader({ onImagesLoaded, lang, disabled }: IIIFLoaderProps) 
       )}
     </>
   )
-}
+})

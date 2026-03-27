@@ -97,11 +97,12 @@ export function ImageViewer({
   const touchStartRef = useRef<{ x: number; y: number; dist: number; zoom: number }>({ x: 0, y: 0, dist: 0, zoom: 1 })
   const lastTouchRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 })
 
-  // Compute fit-to-container zoom
+  // Compute fit-to-container zoom (scale image to fill visible area)
   const computeFitZoom = useCallback(() => {
     if (!containerRef.current || naturalSize.width === 0) return 1
     const c = containerRef.current
-    return Math.min(c.clientWidth / naturalSize.width, c.clientHeight / naturalSize.height, 1)
+    // Allow scaling up so image fills the container on small screens
+    return Math.min(c.clientWidth / naturalSize.width, c.clientHeight / naturalSize.height)
   }, [naturalSize])
 
   const effectiveZoom = zoom === FIT_ZOOM ? computeFitZoom() : zoom
@@ -134,7 +135,18 @@ export function ImageViewer({
     window.addEventListener('resize', updateSize)
     let obs: ResizeObserver | null = null
     if (img) { obs = new ResizeObserver(updateSize); obs.observe(img) }
-    return () => { img?.removeEventListener('load', updateSize); window.removeEventListener('resize', updateSize); obs?.disconnect() }
+    // Also observe the container so fit-zoom recalculates when it gets a real size
+    let containerObs: ResizeObserver | null = null
+    if (containerRef.current) {
+      containerObs = new ResizeObserver(() => {
+        // Force re-render so computeFitZoom uses the new container size
+        if (imgRef.current) {
+          setImgSize({ width: imgRef.current.clientWidth, height: imgRef.current.clientHeight })
+        }
+      })
+      containerObs.observe(containerRef.current)
+    }
+    return () => { img?.removeEventListener('load', updateSize); window.removeEventListener('resize', updateSize); obs?.disconnect(); containerObs?.disconnect() }
   }, [imageDataUrl])
 
   // Spacebar held = temporary pan mode
@@ -754,7 +766,8 @@ export function ImageViewer({
         style={{ cursor: cursorStyle, overflow: 'hidden', touchAction: 'none' }}
       >
       {/* Zoom + mode controls — placed inside .image-viewer so absolute positioning is relative to image area */}
-      <div className="zoom-controls">
+      {/* onTouchStart stopPropagation prevents parent pan/zoom handlers from stealing button taps on mobile */}
+      <div className="zoom-controls" onTouchStart={(e) => e.stopPropagation()} onTouchEnd={(e) => e.stopPropagation()}>
         {/* Reset / Fit */}
         <button
           className="btn-zoom btn-zoom-reset"
@@ -802,8 +815,10 @@ export function ImageViewer({
               onClick={() => setShowTextOverlay(prev => !prev)}
               title={L(lang, { ja: 'OCRテキストを画像上に表示', en: 'Show OCR text on image', 'zh-CN': '在图像上显示OCR文字', 'zh-TW': '在影像上顯示OCR文字', ko: '이미지에 OCR 텍스트 표시', la: 'Textum OCR ostendere', eo: 'Montri OCR-tekston', es: 'Mostrar texto OCR', de: 'OCR-Text anzeigen', ar: 'عرض نص OCR', hi: 'OCR पाठ दिखाएँ', ru: 'Показать текст OCR', el: 'Εμφάνιση κειμένου OCR', syc: 'ܚܘܝ ܟܬܒ OCR' })}
             >
+              {/* □字 アイコン — テキストオーバーレイ */}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M4 7V4h16v3" /><path d="M9 20h6" /><path d="M12 4v16" />
+                <rect x="1" y="1" width="22" height="22" rx="2" />
+                <text x="12" y="18" fontSize="15" fontWeight="700" fill="currentColor" stroke="none" fontFamily="serif" textAnchor="middle">字</text>
               </svg>
             </button>
             <button
@@ -811,9 +826,11 @@ export function ImageViewer({
               onClick={() => setShowConfidence(prev => !prev)}
               title={L(lang, { ja: '信頼度ヒートマップ表示', en: 'Show confidence heatmap', 'zh-CN': '显示置信度热图', 'zh-TW': '顯示信賴度熱圖', ko: '신뢰도 히트맵 표시', la: 'Fiduciam ostendere', eo: 'Montri fidmapon', es: 'Mostrar confianza', de: 'Konfidenz-Heatmap', ar: 'عرض خريطة الثقة', hi: 'विश्वसनीयता हीटमैप', ru: 'Тепловая карта', el: 'Χάρτης εμπιστοσύνης', syc: 'ܚܘܝ ܬܘܟܠܢ' })}
             >
+              {/* 温度計・棒グラフ風の信頼度アイコン */}
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z" />
-                <path d="M12 6v6l4 2" />
+                <rect x="3" y="12" width="4" height="8" rx="1" fill="currentColor" opacity="0.3" />
+                <rect x="10" y="7" width="4" height="13" rx="1" fill="currentColor" opacity="0.55" />
+                <rect x="17" y="3" width="4" height="17" rx="1" fill="currentColor" opacity="0.85" />
               </svg>
             </button>
             <button
@@ -821,8 +838,12 @@ export function ImageViewer({
               onClick={() => setShowReadingOrder(prev => !prev)}
               title={L(lang, { ja: '読み順表示', en: 'Show reading order', 'zh-CN': '显示阅读顺序', 'zh-TW': '顯示閱讀順序', ko: '읽기 순서 표시', la: 'Ordinem legendi ostendere', eo: 'Montri legordon', es: 'Mostrar orden', de: 'Lesereihenfolge', ar: 'عرض ترتيب القراءة', hi: 'पढ़ने का क्रम', ru: 'Порядок чтения', el: 'Σειρά ανάγνωσης', syc: 'ܚܘܝ ܣܕܪ ܩܪܝܢ' })}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M10 3H6a2 2 0 0 0-2 2v14c0 1.1.9 2 2 2h4" /><path d="M16 17l5-5-5-5" /><path d="M21 12H9" />
+              {/* ①② 読み順アイコン */}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="8" cy="8" r="6.5" strokeWidth="1.5" />
+                <text x="8" y="11" fontSize="9" fontWeight="700" fill="currentColor" stroke="none" fontFamily="sans-serif" textAnchor="middle">1</text>
+                <circle cx="16" cy="16" r="6.5" strokeWidth="1.5" />
+                <text x="16" y="19" fontSize="9" fontWeight="700" fill="currentColor" stroke="none" fontFamily="sans-serif" textAnchor="middle">2</text>
               </svg>
             </button>
           </>

@@ -117,15 +117,15 @@ export function SplitView({
     }
   }, [viewMode, minLeftPx, minRightPx])
 
-  // Mobile layout: stacked vertically (editor on top, image below)
+  // Mobile layout: stacked vertically (image on top, editor below)
   if (viewMode === 'mobile') {
     return (
       <div className="split-view split-view-mobile" ref={containerRef}>
-        <div className="split-pane split-pane-right split-pane-active split-pane-mobile-top">
-          {right}
-        </div>
-        <div className="split-pane split-pane-left split-pane-active split-pane-mobile-bottom">
+        <div className="split-pane split-pane-left split-pane-active split-pane-mobile-top">
           {left}
+        </div>
+        <div className="split-pane split-pane-right split-pane-active split-pane-mobile-bottom">
+          {right}
         </div>
       </div>
     )

@@ -13,12 +13,11 @@ import { useTheme } from './hooks/useTheme'
 import { Header } from './components/layout/Header'
 import { Footer } from './components/layout/Footer'
 import { SplitView } from './components/layout/SplitView'
-import { BottomToolbar } from './components/layout/BottomToolbar'
 import { FileDropZone } from './components/upload/FileDropZone'
 import { DirectoryPicker } from './components/upload/DirectoryPicker'
 import { CameraCapture } from './components/upload/CameraCapture'
 import { SampleTileSelector } from './components/SampleTileSelector'
-import { IIIFLoader } from './components/IIIFLoader'
+import { IIIFLoader, type IIIFLoaderHandle } from './components/IIIFLoader'
 import { ProgressBar } from './components/progress/ProgressBar'
 import { ImageViewer } from './components/viewer/ImageViewer'
 import { TextEditor } from './components/editor/TextEditor'
@@ -107,6 +106,7 @@ export default function App() {
   const [isProcessing, setIsProcessing] = useState(false)
   const [isReadyToProcess, setIsReadyToProcess] = useState(false)
   const cancelRef = useRef(false)
+  const iiifLoaderRef = useRef<IIIFLoaderHandle>(null)
   const [pendingImageIndex, setPendingImageIndex] = useState(0)
 
   // 領域選択状態
@@ -731,6 +731,7 @@ export default function App() {
                 {L(lang, { ja: 'クリップボードから貼り付け', en: 'Paste from Clipboard', 'zh-CN': '从剪贴板粘贴', 'zh-TW': '從剪貼簿貼上', ko: '클립보드에서 붙여넣기', la: 'Glutinare ex tabulā', eo: 'Alglui el tondujo', es: 'Pegar desde portapapeles', de: 'Aus Zwischenablage einfügen', ar: 'لصق من الحافظة', hi: 'क्लिपबोर्ड से पेस्ट करें', ru: 'Вставить из буфера обмена', el: 'Επικόλληση από πρόχειρο', syc: 'ܐܠܨܘܩ ܡܢ ܠܘ̈ܚܐ ܕܢܣ̈ܚܐ' })}
               </button>
               <IIIFLoader
+                ref={iiifLoaderRef}
                 onImagesLoaded={handleFilesSelected}
                 lang={lang}
                 disabled={isWorking}
@@ -741,6 +742,7 @@ export default function App() {
               lang={lang}
               disabled={isWorking}
               onSampleSelected={handleSampleLoad}
+              onIIIFSampleSelected={(url) => iiifLoaderRef.current?.openWithUrl(url)}
             />
             <span className="bluepond-credit">
               {L(lang, {
@@ -981,8 +983,18 @@ export default function App() {
                     <button className="btn btn-secondary btn-new-file" onClick={handleClear}>
                       {L(lang, { ja: '新しいファイルを処理', en: 'Process New Files', 'zh-CN': '处理新文件', 'zh-TW': '處理新檔案', ko: '새 파일 처리', la: 'Fasciculos novos tractare', eo: 'Prilabori novajn dosierojn', es: 'Procesar nuevos archivos', de: 'Neue Dateien verarbeiten', ar: 'معالجة ملفات جديدة', hi: 'नई फ़ाइलें प्रोसेस करें', ru: 'Обработать новые файлы', el: 'Επεξεργασία νέων αρχείων', syc: 'ܦܠܘܚ ܩ̈ܛܝܡܐ ܚܕ̈ܬܐ' })}
                     </button>
-                    <button className="btn btn-secondary btn-bug-report-inline" onClick={() => setShowBugReport(true)}>
-                      {L(lang, { ja: 'バグ報告・要望', en: 'Bug Report', 'zh-CN': '反馈', 'zh-TW': '回饋', ko: '버그 보고', la: 'Nuntia', eo: 'Raporti', es: 'Reportar', de: 'Melden', ar: 'إبلاغ', hi: 'रिपोर्ट', ru: 'Отчёт', el: 'Αναφορά', syc: 'ܡܘܕܥܢܘܬ', cop: 'ⲙⲉⲧⲙⲉⲑⲣⲉ', sa: 'निवेदनम्' })}
+                    <button className="btn btn-secondary btn-bug-report-inline" onClick={() => setShowBugReport(true)} title={L(lang, { ja: 'バグ報告・要望', en: 'Bug Report' })}>
+                      <svg className="bug-report-icon-mobile" width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round">
+                        <ellipse cx="8" cy="10" rx="4" ry="4.5" />
+                        <path d="M6 6.5C6 5 7 4 8 4s2 1 2 2.5" />
+                        <line x1="1" y1="8" x2="4" y2="9" />
+                        <line x1="15" y1="8" x2="12" y2="9" />
+                        <line x1="2" y1="13" x2="4.5" y2="12" />
+                        <line x1="14" y1="13" x2="11.5" y2="12" />
+                        <line x1="6" y1="2" x2="6.5" y2="4" />
+                        <line x1="10" y1="2" x2="9.5" y2="4" />
+                      </svg>
+                      <span className="bug-report-label-desktop">{L(lang, { ja: 'バグ報告・要望', en: 'Bug Report', 'zh-CN': '反馈', 'zh-TW': '回饋', ko: '버그 보고', la: 'Nuntia', eo: 'Raporti', es: 'Reportar', de: 'Melden', ar: 'إبلاغ', hi: 'रिपोर्ट', ru: 'Отчёт', el: 'Αναφορά', syc: 'ܡܘܕܥܢܘܬ', cop: 'ⲙⲉⲧⲙⲉⲑⲣⲉ', sa: 'निवेदनम्' })}</span>
                     </button>
                   </>
                 )}
@@ -1148,13 +1160,6 @@ export default function App() {
           </button>
         )}
       </main>
-
-      <BottomToolbar
-        lang={lang}
-        onUpload={handleClear}
-        ocrTimeMs={currentResult?.processingTimeMs}
-        hasResults={hasResults}
-      />
 
       <Footer lang={lang} />
 

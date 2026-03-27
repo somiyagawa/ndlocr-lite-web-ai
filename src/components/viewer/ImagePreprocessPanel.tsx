@@ -797,10 +797,7 @@ export function ImagePreprocessPanel({
             </label>
             {sliderControlData.map(({ key, label, min, max, step }) => (
               <div key={key} className="preprocess-slider">
-                <label htmlFor={`slider-${key}`}>
-                  <span>{label}</span>
-                  <span className="preprocess-slider-value">{options[key]}{key === 'rotation' ? strings.degrees : ''}</span>
-                </label>
+                <label htmlFor={`slider-${key}`} className="preprocess-slider-label">{label}</label>
                 <input
                   id={`slider-${key}`}
                   type="range"
@@ -809,8 +806,11 @@ export function ImagePreprocessPanel({
                   step={step}
                   value={options[key]}
                   onChange={(e) => handleSliderChange(key, parseFloat(e.target.value))}
+                  onTouchStart={(e) => e.stopPropagation()}
+                  onTouchMove={(e) => e.stopPropagation()}
                   disabled={isProcessing}
                 />
+                <span className="preprocess-slider-value">{options[key]}{key === 'rotation' ? strings.degrees : ''}</span>
               </div>
             ))}
           </div>
