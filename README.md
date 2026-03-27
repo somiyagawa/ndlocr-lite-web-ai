@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.3.5-teal?style=for-the-badge" alt="v4.3.5" />
+  <img src="https://img.shields.io/badge/version-4.4.0-teal?style=for-the-badge" alt="v4.4.0" />
   <img src="https://img.shields.io/badge/license-CC_BY_4.0-blue?style=for-the-badge" alt="CC BY 4.0" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
@@ -201,6 +201,10 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 ---
 
 ## 更新記録
+
+### v4.4.0 — 2026-03-27
+
+**携帯版デバイス互換性・UX大幅強化** — ノッチ付き端末（iPhone等）対応として `env(safe-area-inset-*)` をヘッダー・ドロワー・ボトムシート・FABに適用。`viewport-fit=cover` メタタグ追加。仮想キーボード表示時のレイアウト崩れを防止するため `vh` → `dvh`（dynamic viewport height）に変更。OCR処理中の進捗表示にスピナーアニメーションとパーセンテージ表示を追加。ダークモード自動検出（OS設定連動）は既存機能として確認済み。
 
 ### v4.3.5 — 2026-03-27
 

@@ -172,37 +172,63 @@ export const ProgressBar = memo(function ProgressBar({ jobState, lang }: Progres
 
   return (
     <div className={`progress-container ${isError ? 'error' : ''}`}>
-      {totalFiles > 1 && (
-        <div className="progress-files">
-          {L(lang, {
-            ja: `${currentFileIndex} / ${totalFiles} ファイル`,
-            en: `${currentFileIndex} / ${totalFiles} files`,
-            'zh-CN': `${currentFileIndex} / ${totalFiles} 个文件`,
-            'zh-TW': `${currentFileIndex} / ${totalFiles} 個檔案`,
-            ko: `${currentFileIndex} / ${totalFiles} 파일`,
-            la: `${currentFileIndex} / ${totalFiles} fasciculi`,
-            eo: `${currentFileIndex} / ${totalFiles} dosieroj`,
-            es: `${currentFileIndex} / ${totalFiles} archivos`,
-            de: `${currentFileIndex} / ${totalFiles} Dateien`,
-            ar: `${currentFileIndex} / ${totalFiles} ملفات`,
-            hi: `${currentFileIndex} / ${totalFiles} फ़ाइलें`,
-            ru: `${currentFileIndex} / ${totalFiles} файлов`,
-            el: `${currentFileIndex} / ${totalFiles} αρχεία`,
-            syc: `${currentFileIndex} / ${totalFiles} ܩ̈ܛܝܡܐ`,
-            cop: `${currentFileIndex} / ${totalFiles} ϫⲱⲙⲉ`,
-            sa: `${currentFileIndex} / ${totalFiles} फलकानि`,
-          })}
-        </div>
-      )}
+      <div className="progress-files">
+        {!isDone && !isError && <span className="progress-spinner" />}
+        <span>
+          {totalFiles > 1
+            ? L(lang, {
+                ja: `${currentFileIndex} / ${totalFiles} ファイル処理中`,
+                en: `Processing ${currentFileIndex} / ${totalFiles} files`,
+                'zh-CN': `处理中 ${currentFileIndex} / ${totalFiles} 个文件`,
+                'zh-TW': `處理中 ${currentFileIndex} / ${totalFiles} 個檔案`,
+                ko: `${currentFileIndex} / ${totalFiles} 파일 처리 중`,
+                la: `Processus ${currentFileIndex} / ${totalFiles}`,
+                eo: `Prilaboras ${currentFileIndex} / ${totalFiles} dosierojn`,
+                es: `Procesando ${currentFileIndex} / ${totalFiles} archivos`,
+                de: `Verarbeite ${currentFileIndex} / ${totalFiles} Dateien`,
+                ar: `معالجة ${currentFileIndex} / ${totalFiles} ملفات`,
+                hi: `${currentFileIndex} / ${totalFiles} फ़ाइलें संसाधित हो रही हैं`,
+                ru: `Обработка ${currentFileIndex} / ${totalFiles} файлов`,
+                el: `Επεξεργασία ${currentFileIndex} / ${totalFiles} αρχείων`,
+                syc: `ܡܥܒܕ ${currentFileIndex} / ${totalFiles} ܩ̈ܛܝܡܐ`,
+                cop: `ⲉϥⲉⲣϩⲱⲃ ${currentFileIndex} / ${totalFiles} ϫⲱⲙⲉ`,
+                sa: `${currentFileIndex} / ${totalFiles} फलकानि संसाध्यन्ते`,
+              })
+            : L(lang, {
+                ja: 'OCR処理中…',
+                en: 'Processing OCR…',
+                'zh-CN': 'OCR处理中…',
+                'zh-TW': 'OCR處理中…',
+                ko: 'OCR 처리 중…',
+                la: 'OCR processus…',
+                eo: 'OCR prilaboras…',
+                es: 'Procesando OCR…',
+                de: 'OCR-Verarbeitung…',
+                ar: 'معالجة OCR…',
+                hi: 'OCR प्रसंस्करण…',
+                ru: 'Обработка OCR…',
+                el: 'Επεξεργασία OCR…',
+                syc: 'ܡܥܒܕ OCR…',
+                cop: 'ⲉϥⲉⲣϩⲱⲃ OCR…',
+                sa: 'OCR संसाध्यते…',
+              })
+          }
+        </span>
+        {totalFiles > 0 && !isDone && !isError && (
+          <span className="progress-pct">{Math.round(overallProgress)}%</span>
+        )}
+      </div>
       <div className="progress-bar-track">
         <div
           className={`progress-bar-fill ${isDone ? 'done' : ''}`}
           style={{ width: `${Math.min(100, overallProgress)}%` }}
         />
       </div>
-      <div className="progress-message">
-        {isError ? jobState.errorMessage : message}
-      </div>
+      {message && (
+        <div className="progress-message">
+          {isError ? jobState.errorMessage : message}
+        </div>
+      )}
     </div>
   )
 })
