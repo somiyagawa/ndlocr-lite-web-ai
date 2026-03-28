@@ -25,8 +25,7 @@ import fontkit from '@pdf-lib/fontkit'
 import type { OCRResult } from '../types/ocr'
 import { loadCJKFontBytes } from './pdfFont'
 
-// デバッグ: 0.3 にしてテキスト配置を目視確認 → 本番では 0.01 に戻す
-const TEXT_OPACITY = 0.3
+const TEXT_OPACITY = 0.01
 
 // CJK全角文字の幅は概ね fontSize の 0.5〜0.6 倍（フォント依存）
 const CJK_WIDTH_RATIO = 0.55
@@ -194,12 +193,6 @@ async function addPageToPdf(
     }
   }
 
-  console.log(
-    `[exportPDF] image: ${imgW}x${imgH}, coordBasis: ${coordW}x${coordH}, ` +
-    `originalW/H: ${blockCoordWidth ?? 'none'}x${blockCoordHeight ?? 'none'}, ` +
-    `blocks: ${blocks.length}`
-  )
-
   // PDF ページサイズは座標基準サイズで計算
   const DPI = 150
   const pdfW = (coordW / DPI) * 72
@@ -227,14 +220,6 @@ async function addPageToPdf(
     const bh = block.height * scaleY
 
     const isVertical = block.height / block.width >= VERTICAL_ASPECT_RATIO
-
-    // デバッグ: 全ブロックの座標を出力
-    console.log(
-      `[exportPDF] block[${sortedBlocks.indexOf(block)}]: ` +
-      `orig(${block.x.toFixed(0)},${block.y.toFixed(0)},${block.width.toFixed(0)}x${block.height.toFixed(0)}) → ` +
-      `pdf(x=${bx.toFixed(1)},y=${(byTop - bh).toFixed(1)}..${byTop.toFixed(1)},${bw.toFixed(1)}x${bh.toFixed(1)}) ` +
-      `${isVertical ? 'VERT' : 'HORIZ'} "${block.text.slice(0, 15)}"`
-    )
 
     if (isVertical) {
       // ---- 縦書きブロック: 1文字ずつ正しいY座標に配置 ----
