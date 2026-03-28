@@ -218,52 +218,63 @@ export function getStoredLang(): Language {
 }
 
 /**
- * Reverse-lookup cache: English text → translation file key (e.g. "upload.startButton")
+ * Reverse-lookup cache: text value → translation file dot-key (e.g. "upload.startButton")
+ * Indexes both English and Japanese values for maximum coverage.
  * Built lazily on first L() miss to avoid startup cost.
  */
-let _enReverseMap: Map<string, string> | null = null
-function getEnReverseMap(): Map<string, string> {
-  if (_enReverseMap) return _enReverseMap
-  _enReverseMap = new Map()
-  const enTrans = translations.en
-  for (const section of Object.keys(enTrans)) {
-    const sectionObj = enTrans[section]
-    if (!sectionObj || typeof sectionObj !== 'object') continue
-    for (const key of Object.keys(sectionObj)) {
-      _enReverseMap.set(sectionObj[key], `${section}.${key}`)
+let _reverseMap: Map<string, string> | null = null
+function getReverseMap(): Map<string, string> {
+  if (_reverseMap) return _reverseMap
+  _reverseMap = new Map()
+  // Index both en and ja for broader matching
+  for (const srcLang of ['en', 'ja'] as const) {
+    const trans = translations[srcLang]
+    for (const section of Object.keys(trans)) {
+      const sectionObj = trans[section]
+      if (!sectionObj || typeof sectionObj !== 'object') continue
+      for (const key of Object.keys(sectionObj)) {
+        const dotKey = `${section}.${key}`
+        // Don't overwrite — en takes priority
+        if (!_reverseMap.has(sectionObj[key])) {
+          _reverseMap.set(sectionObj[key], dotKey)
+        }
+      }
     }
   }
-  return _enReverseMap
+  return _reverseMap
 }
 
 /**
  * Helper for inline multi-language text in components that receive `lang` prop.
  *
  * Fallback chain:
- *   1. texts[lang]           — インライン定義にその言語がある場合
- *   2. translation file match — texts.en の値を翻訳ファイルから逆引きし、
- *                               対象言語の対応する値を返す
- *   3. texts.en              — 英語テキスト
- *   4. texts.ja              — 日本語テキスト
+ *   1. texts[lang]              — インライン定義にその言語がある場合
+ *   2. reverse-lookup (en text) — texts.en を翻訳ファイルのキーに逆引き
+ *   3. reverse-lookup (ja text) — texts.ja を翻訳ファイルのキーに逆引き
+ *   4. texts.en                 — 英語テキスト
+ *   5. texts.ja                 — 日本語テキスト
  */
 export function L(lang: Language, texts: Partial<Record<Language, string>>): string {
   // 1. Direct match in inline texts
   if (texts[lang] != null) return texts[lang]!
 
-  // 2. Try reverse lookup: find the translation file key from the English text
-  const enText = texts.en ?? texts.ja
-  if (enText && lang !== 'en' && lang !== 'ja') {
-    const reverseMap = getEnReverseMap()
-    const dotKey = reverseMap.get(enText)
-    if (dotKey) {
-      const resolved = getNestedValue(
-        translations[lang] as unknown as Record<string, unknown>,
-        dotKey
-      )
-      if (resolved !== dotKey) return resolved
+  // 2. Try reverse lookup from en text, then ja text
+  if (lang !== 'en' && lang !== 'ja') {
+    const reverseMap = getReverseMap()
+    // Try English first, then Japanese
+    for (const probe of [texts.en, texts.ja]) {
+      if (!probe) continue
+      const dotKey = reverseMap.get(probe)
+      if (dotKey) {
+        const resolved = getNestedValue(
+          translations[lang] as unknown as Record<string, unknown>,
+          dotKey
+        )
+        if (resolved !== dotKey) return resolved
+      }
     }
   }
 
-  // 3/4. Fallback to English or Japanese
-  return enText ?? ''
+  // 3. Fallback to English or Japanese
+  return texts.en ?? texts.ja ?? ''
 }
