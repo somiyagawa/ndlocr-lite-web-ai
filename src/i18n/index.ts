@@ -225,6 +225,7 @@ let _enReverseMap: Map<string, string> | null = null
 function getEnReverseMap(): Map<string, string> {
   if (_enReverseMap) return _enReverseMap
   _enReverseMap = new Map()
+  const enTrans = translations.en
   for (const section of Object.keys(enTrans)) {
     const sectionObj = enTrans[section]
     if (!sectionObj || typeof sectionObj !== 'object') continue
