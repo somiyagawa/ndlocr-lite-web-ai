@@ -64,20 +64,32 @@ async function embedImage(pdfDoc: PDFDocument, dataUrl: string) {
 }
 
 /**
- * フォントでエンコード可能な文字かどうかを判定する。
- * pdf-lib の embedFont で得たフォントオブジェクトを使い、
- * encodeText が例外を投げないか試す。
+ * テキストからフォントでエンコードできない文字を除去する。
+ * 1文字ずつ encodeText を試すのではなく、
+ * 文字列全体を一度に試し、失敗した場合のみ文字単位でフィルタする。
  */
-function canEncode(
+function filterEncodableText(
   font: Awaited<ReturnType<PDFDocument['embedFont']>>,
-  ch: string,
-): boolean {
+  text: string,
+): string {
+  // まず文字列全体を試す（大半のケースでこれが成功 → 高速）
   try {
-    font.encodeText(ch)
-    return true
+    font.encodeText(text)
+    return text
   } catch {
-    return false
+    // 失敗した場合のみ文字単位でフィルタ
   }
+
+  let result = ''
+  for (const ch of text) {
+    try {
+      font.encodeText(ch)
+      result += ch
+    } catch {
+      // エンコード不可の文字をスキップ
+    }
+  }
+  return result
 }
 
 /**
@@ -203,123 +215,50 @@ async function addPageToPdf(
       fontSize = Math.max(4, Math.min(bh * 0.75, 48))
     }
 
-    if (isVerticalBlock) {
-      // 縦書き: 1文字ずつ上から下へ配置
-      drawVerticalText(page, font, block.text, bx, by, bw, bh, fontSize)
-    } else {
-      // 横書き: 1文字ずつ左から右へ配置
-      // pdf-lib の maxWidth はスペースで折り返すため、
-      // スペースを含まない日本語テキストでは機能しない。
-      // CJK 互換のため文字単位で配置する。
-      drawHorizontalText(page, font, block.text, bx, by, bw, bh, fontSize)
-    }
-  }
-}
-
-/**
- * 縦書きテキストを1文字ずつ上から下へ配置
- */
-function drawVerticalText(
-  page: ReturnType<PDFDocument['addPage']>,
-  font: Awaited<ReturnType<PDFDocument['embedFont']>>,
-  text: string,
-  bx: number,
-  by: number,
-  bw: number,
-  bh: number,
-  fontSize: number,
-): void {
-  const chars = text.replace(/\n/g, '')
-  const charHeight = fontSize * 1.2
-  let cy = by - fontSize  // 上端からスタート
-
-  for (const ch of chars) {
-    if (cy < by - bh) break  // ブロック下端を超えたら終了
-    if (!ch.trim()) {
-      cy -= charHeight
-      continue
-    }
-    if (!canEncode(font, ch)) continue
+    // テキストをフォントでエンコード可能な文字のみに絞る
+    // （文字列全体を一括チェック → 失敗時のみ文字単位フィルタ）
+    const rawText = block.text.replace(/\n/g, '')
+    const safeText = filterEncodableText(font, rawText)
+    if (!safeText.trim()) continue
 
     try {
-      page.drawText(ch, {
-        x: bx + bw * 0.3,
-        y: cy,
-        size: fontSize,
-        font,
-        color: rgb(0, 0, 0),
-        opacity: TEXT_OPACITY,
-      })
-    } catch (e) {
-      console.warn(`[exportPDF] drawText failed for char "${ch}":`, e)
-    }
-    cy -= charHeight
-  }
-}
-
-/**
- * 横書きテキストを1文字ずつ左から右へ配置
- *
- * pdf-lib の drawText maxWidth はスペース区切りで折り返すため、
- * 日本語のようにスペースなしのテキストでは正しく改行できない。
- * 文字単位で配置し、ブロック右端に達したら次の行へ移動する。
- */
-function drawHorizontalText(
-  page: ReturnType<PDFDocument['addPage']>,
-  font: Awaited<ReturnType<PDFDocument['embedFont']>>,
-  text: string,
-  bx: number,
-  by: number,
-  bw: number,
-  bh: number,
-  fontSize: number,
-): void {
-  const chars = text.replace(/\n/g, '')
-  const lineHeight = fontSize * 1.2
-  let cx = bx
-  let cy = by - fontSize  // 1行目の上端
-
-  for (const ch of chars) {
-    if (cy < by - bh) break  // ブロック下端を超えたら終了
-    if (!ch.trim()) {
-      // 空白文字は幅だけ進める
-      cx += fontSize * 0.5
-      if (cx > bx + bw) {
-        cx = bx
-        cy -= lineHeight
+      if (isVerticalBlock) {
+        // 縦書き: ブロック上端から1文字ずつ下へ配置
+        // drawText は横書きなので、縦書きは1文字ずつ配置が必要
+        const charHeight = fontSize * 1.2
+        let cy = by - fontSize
+        for (const ch of safeText) {
+          if (cy < by - bh) break
+          if (!ch.trim()) { cy -= charHeight; continue }
+          page.drawText(ch, {
+            x: bx + bw * 0.3,
+            y: cy,
+            size: fontSize,
+            font,
+            color: rgb(0, 0, 0),
+            opacity: TEXT_OPACITY,
+          })
+          cy -= charHeight
+        }
+      } else {
+        // 横書き: ブロック全体のテキストを一括描画
+        // テキストは不可視（検索・選択用）なので、
+        // はみ出しは視覚的に問題にならない。
+        // 一括描画により数千回の drawText を 1 回に削減。
+        page.drawText(safeText, {
+          x: bx,
+          y: by - fontSize,
+          size: fontSize,
+          font,
+          color: rgb(0, 0, 0),
+          opacity: TEXT_OPACITY,
+          maxWidth: bw,
+          lineHeight: fontSize * 1.2,
+        })
       }
-      continue
-    }
-    if (!canEncode(font, ch)) continue
-
-    // 文字幅を取得（フォントメトリクスから）
-    let charWidth: number
-    try {
-      charWidth = font.widthOfTextAtSize(ch, fontSize)
-    } catch {
-      charWidth = fontSize  // フォールバック: 全角幅
-    }
-
-    // 右端を超えたら改行
-    if (cx + charWidth > bx + bw && cx > bx) {
-      cx = bx
-      cy -= lineHeight
-      if (cy < by - bh) break
-    }
-
-    try {
-      page.drawText(ch, {
-        x: cx,
-        y: cy,
-        size: fontSize,
-        font,
-        color: rgb(0, 0, 0),
-        opacity: TEXT_OPACITY,
-      })
     } catch (e) {
-      console.warn(`[exportPDF] drawText failed for char "${ch}":`, e)
+      console.warn(`[exportPDF] drawText failed for block:`, e)
     }
-    cx += charWidth
   }
 }
 
@@ -328,10 +267,9 @@ function drawHorizontalText(
  *
  * 注意: Uint8Array.buffer は元の ArrayBuffer 全体を返すため、
  * Uint8Array がビューの場合にサイズ不一致で PDF が破損する。
- * Uint8Array を直接 Blob コンストラクタに渡す。
+ * .slice(0) で独立した ArrayBuffer を作成する。
  */
 function triggerDownload(pdfBytes: Uint8Array, fileName: string): void {
-  // .slice() で独立した ArrayBuffer を作成し、SharedArrayBuffer 型不一致を回避
   const blob = new Blob([pdfBytes.slice(0).buffer], { type: 'application/pdf' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
