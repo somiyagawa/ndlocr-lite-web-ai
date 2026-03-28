@@ -204,7 +204,7 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 
 ### v4.4.3 — 2026-03-28
 
-**PDF フォント /Widths エラー修正・テキスト検索選択復旧** — Google Fonts CSS2 API が CJK フォントを 100 以上の unicode-range スライスに分割して返す問題を解消。旧実装では最初のスライス（日本語グリフ未収録）のみ取得していたため、Acrobat で「NotoSansJPThin-Regular フォントの /Widths が正しくありません」エラーが発生し、テキスト検索・選択が不可能だった。Noto Sans JP SubsetOTF（完全な日本語グリフセット、約 4.3 MB）を jsDelivr CDN から直接取得する方式に変更。fontkit の CJK サブセット処理による /Widths テーブル破損を回避するため `subset: false` に設定。CJK 横書きテキストの文字単位配置に変更（`maxWidth` のスペース改行問題を修正）。テキスト透過度を `opacity: 0` → `0.01` に変更（一部ビューアの検索除外問題を回避）。Blob 生成時の `Uint8Array.buffer` 使用によるPDF破損リスクを解消。CDN フォールバック対応（SubsetOTF → フル CJK OTF）、IndexedDB キャッシュキーを更新して旧キャッシュを自動無効化。
+**PDFテキストレイヤー全面刷新・パフォーマンス大幅改善** — Acrobat「NotoSansJPThin-Regular /Widths が正しくありません」エラーを解消。Google Fonts CSS2 API の unicode-range スライス問題（最初のスライスのみ取得で日本語グリフ欠落）を修正し、Noto Sans JP SubsetOTF（約 4.3 MB）を jsDelivr CDN から直接取得する方式に変更。fontkit CJK サブセット処理の /Widths テーブル破損を回避（`subset: false`）。テキストレイヤーを行単位 drawText 方式に全面設計変更: 1文字ずつ描画→半角スペース誤認、ブロック一括描画→ページ外はみ出しの両方を解決。ブロック面積と文字数からフォントサイズを逆算し、テキストがブロック領域内に自動収まるよう調整。縦書きは右→左の列単位描画。未使用の jspdf（29MB）を除去し、エクスポートモジュール（pdf-lib, fontkit, docx）を動的 import に変更して初期ロードから約 31MB を削減。バグ報告を Netlify Forms → Web3Forms API に移行（Vercel デプロイ対応）。
 
 ### v4.4.2 — 2026-03-27
 
