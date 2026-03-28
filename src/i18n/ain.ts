@@ -169,7 +169,6 @@ export const ain: Translations = {
     step1Label: '1. API की गेट',
     step1Detail: 'विजिट ऑफिशियल वेबसाइट क्लॉड GPT जेमिनी।API की जेनरेट।फ्री टियर अफर।',
     step2Label: '2. सेटिंग ओपन',
-    step2Label: '2. सेटिंग ओपन',
     step2Detail: 'क्लिक गियर आइकन हेडर।बटन ओपन सेटिंग।',
     step3Label: '3. प्रोवाइडर सिलेक्ट',
     step3Detail: 'AI प्रोवाइडर टैब सर्विस चूज।',

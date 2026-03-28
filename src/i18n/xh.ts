@@ -73,7 +73,6 @@ export const xh: Translations = {
     license: 'License',
     frogCredit: 'Choju-giga frog illustration tribute to Toru Aoike',
     privacyBrowser: 'Runs entirely in your browser — images never leave your device.',
-    bugReport: 'Bug Report',
     bugReport: '🐛 Bug Report / Feature Request',
     privacyText: 'This system uses {onnxLink} and runs entirely in your browser. Selected images and OCR results are never sent to any external server.',
     attribution: 'This tool is based on {ndlocr} and {ndlkoten} developed by the National Diet Library of Japan (NDL Lab). {hashimoto} (National Museum of Japanese History) created the web browser version, {ogata} (Bibliostyle) added AI proofreading, and {miyagawa} (University of Tsukuba) added various superfluous features including camera capture, document scanner, image preprocessing, dark mode, multilingual UI, vertical text display, search & replace, TEI XML / hOCR / text-embedded PDF / DOCX export, batch download, processing history, diff view, region-select OCR, double-page splitting, IIIF image loading, and the Choju-giga background.',
