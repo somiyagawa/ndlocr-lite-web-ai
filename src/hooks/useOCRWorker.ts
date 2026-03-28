@@ -175,6 +175,8 @@ export function useOCRWorker() {
               fullText: msg.txt,
               processingTimeMs: msg.processingTime,
               createdAt: Date.now(),
+              originalWidth: image.imageData.width,
+              originalHeight: image.imageData.height,
             })
           } else if (msg.type === 'LAYOUT_DONE') {
             workerRef.current?.removeEventListener('message', handler)
@@ -252,6 +254,8 @@ export function useOCRWorker() {
         fullText: '',
         processingTimeMs: Date.now() - startTime,
         createdAt: Date.now(),
+        originalWidth: image.imageData.width,
+        originalHeight: image.imageData.height,
       }
       setJobState((prev) => ({ ...prev, status: 'done', stageProgress: 1 }))
       resolve(result)
@@ -320,6 +324,8 @@ export function useOCRWorker() {
           processingTimeMs: Date.now() - startTime,
           createdAt: Date.now(),
           pageBlocks,
+          originalWidth: image.imageData.width,
+          originalHeight: image.imageData.height,
         }
 
         setJobState((prev) => ({ ...prev, status: 'done', stageProgress: 1 }))

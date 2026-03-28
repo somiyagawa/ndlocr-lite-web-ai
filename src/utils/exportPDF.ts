@@ -108,7 +108,12 @@ export async function downloadPDF(result: OCRResult, fullImageDataUrl?: string):
 
   if (!font) console.warn('[exportPDF] CJK font not available — text layer skipped')
 
-  await addPageToPdf(pdfDoc, result, imageDataUrl, font)
+  // ブロック座標の基準となる元画像サイズを決定
+  // originalWidth/originalHeight があればそれを使用（サムネイルと元画像のサイズが異なる場合に正確）
+  const blockCoordWidth = result.originalWidth
+  const blockCoordHeight = result.originalHeight
+
+  await addPageToPdf(pdfDoc, result, imageDataUrl, font, blockCoordWidth, blockCoordHeight)
 
   const pdfBytes = await pdfDoc.save()
   const baseName = result.fileName.replace(/\.[^/.]+$/, '')
@@ -135,7 +140,7 @@ export async function downloadBatchPDF(
     const result = results[i]
     const imageDataUrl = fullImageDataUrls?.[i] || result.imageDataUrl
     if (!imageDataUrl) continue
-    await addPageToPdf(pdfDoc, result, imageDataUrl, font)
+    await addPageToPdf(pdfDoc, result, imageDataUrl, font, result.originalWidth, result.originalHeight)
   }
 
   if (pdfDoc.getPageCount() === 0) return
@@ -184,22 +189,34 @@ async function addPageToPdf(
   result: OCRResult,
   imageDataUrl: string,
   font: Awaited<ReturnType<PDFDocument['embedFont']>> | undefined,
+  blockCoordWidth?: number,
+  blockCoordHeight?: number,
 ): Promise<void> {
   const { width: imgW, height: imgH } = await getImageDimensions(imageDataUrl)
 
+  // ブロック座標の基準サイズ:
+  //   originalWidth/originalHeight が渡された場合 → 元画像サイズ（ブロック座標の基準）
+  //   渡されない場合 → imageDataUrl の実サイズ（サムネイルの場合あり）をフォールバック
+  const coordW = blockCoordWidth && blockCoordWidth > 0 ? blockCoordWidth : imgW
+  const coordH = blockCoordHeight && blockCoordHeight > 0 ? blockCoordHeight : imgH
+
+  // PDF ページサイズは元画像サイズ基準で計算（高解像度PDFを生成）
   const DPI = 150
-  const pdfW = (imgW / DPI) * 72
-  const pdfH = (imgH / DPI) * 72
+  const pdfW = (coordW / DPI) * 72
+  const pdfH = (coordH / DPI) * 72
 
   const page = pdfDoc.addPage([pdfW, pdfH])
   const image = await embedImage(pdfDoc, imageDataUrl)
+  // 画像はページ全体に引き伸ばして配置（サムネイルでも元サイズのページに拡大表示）
   page.drawImage(image, { x: 0, y: 0, width: pdfW, height: pdfH })
 
   if (!font) return
 
   const sortedBlocks = [...result.textBlocks].sort((a, b) => a.readingOrder - b.readingOrder)
-  const scaleX = pdfW / imgW
-  const scaleY = pdfH / imgH
+  // ブロック座標 → PDF座標への変換係数
+  // ブロック座標は coordW × coordH の空間、PDF座標は pdfW × pdfH の空間
+  const scaleX = pdfW / coordW
+  const scaleY = pdfH / coordH
 
   for (const block of sortedBlocks) {
     if (!block.text.trim()) continue

@@ -555,6 +555,8 @@ export default function App() {
           fullText: file.fullText,
           processingTimeMs: file.processingTimeMs,
           createdAt: run.createdAt,
+          originalWidth: file.originalWidth,
+          originalHeight: file.originalHeight,
         }
       })
     )

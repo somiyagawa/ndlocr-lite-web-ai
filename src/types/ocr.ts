@@ -40,6 +40,10 @@ export interface OCRResult {
   processingTimeMs: number
   createdAt: number // Unix timestamp (ms)
   pageBlocks?: PageBlock[] // DEIMが検出した段・カラム境界
+  /** 元画像の幅（px）— textBlocks の座標はこのサイズ基準 */
+  originalWidth?: number
+  /** 元画像の高さ（px）— textBlocks の座標はこのサイズ基準 */
+  originalHeight?: number
 }
 
 export interface ProcessedImage {
