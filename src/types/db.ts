@@ -10,7 +10,7 @@ export interface DBModelEntry {
 // 1回の実行に含まれる1ファイル分の結果
 export interface DBRunFile {
   fileName: string
-  imageDataUrl: string // 縮小サムネイル (base64)
+  imageDataUrl: string // 原寸画像 (base64 JPEG)。旧データは200px幅サムネイルの場合あり
   textBlocks: TextBlock[]
   fullText: string
   processingTimeMs: number

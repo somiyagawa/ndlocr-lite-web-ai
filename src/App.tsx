@@ -357,7 +357,7 @@ export default function App() {
 
       const runId = crypto.randomUUID()
       const runCreatedAt = Date.now()
-      const successItems: Array<{ result: OCRResult; thumbnailDataUrl: string; originalWidth: number; originalHeight: number }> = []
+      const successItems: Array<{ result: OCRResult; originalWidth: number; originalHeight: number }> = []
       const sessionResultsAccum: OCRResult[] = []
 
       for (let i = 0; i < processedImages.length; i++) {
@@ -367,7 +367,6 @@ export default function App() {
           const result = await processImage(image, i, processedImages.length)
           successItems.push({
             result,
-            thumbnailDataUrl: image.thumbnailDataUrl,
             originalWidth: image.imageData.width,
             originalHeight: image.imageData.height,
           })
@@ -382,9 +381,9 @@ export default function App() {
       if (successItems.length > 0) {
         const runEntry: DBRunEntry = {
           id: runId,
-          files: successItems.map(({ result, thumbnailDataUrl, originalWidth, originalHeight }) => ({
+          files: successItems.map(({ result, originalWidth, originalHeight }) => ({
             fileName: result.fileName,
-            imageDataUrl: thumbnailDataUrl,
+            imageDataUrl: result.imageDataUrl,
             textBlocks: result.textBlocks,
             fullText: result.fullText,
             processingTimeMs: result.processingTimeMs,
@@ -508,21 +507,24 @@ export default function App() {
   }, [])
 
   const handleHistorySelect = useCallback(async (run: DBRunEntry) => {
-    // サムネイル画像の実サイズを取得し、ブロック座標をスケーリング
+    // 履歴に保存された画像は原寸（imageDataToDataUrl 由来）なので、
+    // ブロック座標のリスケールは不要。旧フォーマット（200px サムネイル）の場合のみスケーリング。
     const restoredResults: OCRResult[] = await Promise.all(
       run.files.map(async (file, i) => {
         let textBlocks = file.textBlocks
         let blocksWereRescaled = false
-        // 元画像サイズが記録されている場合、サムネイルとの比率でブロック座標を変換
+
+        // 旧フォーマット互換: originalWidth が記録されている場合、画像との比率を確認
         if (file.originalWidth && file.originalHeight && file.originalWidth > 0) {
-          const thumbSize = await new Promise<{ w: number; h: number }>((resolve) => {
+          const imgSize = await new Promise<{ w: number; h: number }>((resolve) => {
             const img = new Image()
             img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight })
             img.onerror = () => resolve({ w: file.originalWidth!, h: file.originalHeight! })
             img.src = file.imageDataUrl
           })
-          const scaleX = thumbSize.w / file.originalWidth
-          const scaleY = thumbSize.h / file.originalHeight
+          const scaleX = imgSize.w / file.originalWidth
+          const scaleY = imgSize.h / file.originalHeight
+          // 画像が元画像より著しく小さい場合（旧200pxサムネイル）のみリスケール
           if (Math.abs(scaleX - 1) > 0.01 || Math.abs(scaleY - 1) > 0.01) {
             blocksWereRescaled = true
             textBlocks = file.textBlocks.map(b => ({
@@ -534,6 +536,7 @@ export default function App() {
             }))
           }
         }
+
         return {
           id: `${run.id}-${i}`,
           fileName: file.fileName,
@@ -542,9 +545,6 @@ export default function App() {
           fullText: file.fullText,
           processingTimeMs: file.processingTimeMs,
           createdAt: run.createdAt,
-          // ブロック座標がサムネイルにリスケール済み → originalWidth/Height は設定しない
-          // （exportPDF が getImageDimensions でサムネイルサイズを取得し、座標と一致させる）
-          // リスケールなし → 元画像サイズを保持（座標がそのまま元画像基準）
           originalWidth: blocksWereRescaled ? undefined : file.originalWidth,
           originalHeight: blocksWereRescaled ? undefined : file.originalHeight,
         }
