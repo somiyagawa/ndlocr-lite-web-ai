@@ -4,6 +4,33 @@ export const el: Translations = {
   app: {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: 'Εργαλείο ιαπωνικής OCR στον περιηγητή',
+    confirmDiscard: 'Τα τρέχοντα αποτελέσματα OCR θα διαγραφούν. Συνέχεια;',
+    landingDesc: 'Από σύγχρονα τυπωμένα κείμενα έως κλασικά κουζουσίτζι — αυτόματη μεταγραφή ιαπωνικών στο πρόγραμμα περιήγησης με τη μηχανή OCR της Εθνικής Κοινοβουλευτικής Βιβλιοθήκης',
+    backgroundCredit: 'Φόντο: Μπλε Λίμνη, Μπιέι — MaedaAkihiko, CC BY-SA 4.0',
+    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+  },
+  nav: {
+    previous: 'Προηγούμενο',
+    next: 'Επόμενο',
+    dragToReorder: 'Σύρετε για αναδιάταξη',
+  },
+  ocr: {
+    startOcr: 'Έναρξη OCR',
+    ocrSelectedRegion: 'OCR επιλεγμένης περιοχής',
+    clearSelection: 'Εκκαθάριση επιλογής',
+    regionSelectHint: 'Σύρετε για να επιλέξετε μια περιοχή, μετά κάντε κλικ στο «Έναρξη OCR»',
+    regionSelectHintResult: 'Σύρετε για να επιλέξετε μια περιοχή, μετά κάντε κλικ στο «OCR επιλεγμένης περιοχής» για επανα-αναγνώριση',
+    stop: 'Διακοπή',
+    editReadingOrderTitle: 'Επεξεργασία σειράς ανάγνωσης',
+    editReadingOrderLabel: 'Σειρά',
+    processNewFiles: 'Επεξεργασία νέων αρχείων',
+    bugReportTitle: 'Αναφορά',
+    bugReportLabel: 'Αναφορά',
+    imageAdjustedHint: 'Image adjusted — re-OCR the full page or select a region to re-recognize',
+    reOcrInProgress: 'Re-OCR in progress…',
+    reOcrPage: 'Re-OCR Page',
+    uploadNewFiles: 'Ανέβασμα νέων αρχείων',
   },
   upload: {
     dropzone: 'Σύρετε αρχεία εδώ ή κάντε κλικ για επιλογή',
@@ -11,6 +38,7 @@ export const el: Translations = {
     acceptedFormats: 'Υποστηριζόμενες μορφές: JPG, PNG, PDF',
     startButton: 'Έναρξη OCR',
     clearButton: 'Εκκαθάριση',
+    pasteClipboard: 'Επικόλληση από πρόχειρο',
   },
   progress: {
     initializing: 'Αρχικοποίηση...',
@@ -267,6 +295,7 @@ export const el: Translations = {
     fitToHeight: 'Στο ύψος',
     resetZoom: 'Επαναφορά',
     rotate: 'Περιστροφή',
+    adjust: 'Ρύθμιση',
   },
   iiif: {
     title: 'Φορτωτής IIIF',
@@ -280,4 +309,16 @@ export const el: Translations = {
     noImages: 'Χωρίς εικόνες',
     error: 'Σφάλμα φόρτωσης',
   },
+  samples: {
+    tryWith: 'Try with sample images:',
+    modernPrint: 'Modern Print',
+    kuzushiji: 'Kuzushiji',
+    kumonoitoLabel: 'Kumo no Ito (Modern)',
+    kumonoitoDesc: 'Akutagawa Ryunosuke "The Spider\\\'s Thread" — Modern printed Japanese text',
+    taketoriLabel: 'Taketori Monogatari (Kuzushiji)',
+    taketoriDesc: 'The Tale of the Bamboo Cutter — Kuzushiji manuscript from NDL Digital Collections',
+    tamamizuLabel: 'Tamamizu Monogatari (IIIF / Kuzushiji)',
+    tamamizuDesc: 'The Tale of Tamamizu — Illustrated otogi-zoshi manuscript, Kyoto University Library (IIIF)',
+  },
+
 }

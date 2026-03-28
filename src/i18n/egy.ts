@@ -30,6 +30,11 @@ export const egy: Translations = {
     title: 'NDL(Kotenseki)OCR-lite Web',
     // mdw-nṯr n OCR m sšr = "hieroglyphs of OCR in the browser"
     subtitle: '𓌃𓂧𓅱\u{13430}𓊹𓂋 𓈖 OCR 𓅓 𓊃\u{13430}𓈙𓂋',
+    confirmDiscard: 'Current OCR results will be discarded. Continue?',
+    landingDesc: 'From modern print to classical kuzushiji — browser-based Japanese OCR powered by the National Diet Library',
+    backgroundCredit: 'Background: Blue Pond, Biei — MaedaAkihiko, CC BY-SA 4.0',
+    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
   },
   upload: {
     // iny ꜥ.t r st tn = "bring files to this place"
@@ -295,6 +300,7 @@ export const egy: Translations = {
     fitToHeight: 'Fit to Height',
     resetZoom: 'Reset Zoom',
     rotate: 'Rotate',
+    adjust: 'Adjust',
   },
   iiif: {
     title: 'IIIF Image Loader',
@@ -308,4 +314,16 @@ export const egy: Translations = {
     noImages: 'No images found in manifest',
     error: 'Failed to load IIIF manifest',
   },
+  samples: {
+    tryWith: 'Try with sample images:',
+    modernPrint: 'Modern Print',
+    kuzushiji: 'Kuzushiji',
+    kumonoitoLabel: 'Kumo no Ito (Modern)',
+    kumonoitoDesc: 'Akutagawa Ryunosuke "The Spider\\\'s Thread" — Modern printed Japanese text',
+    taketoriLabel: 'Taketori Monogatari (Kuzushiji)',
+    taketoriDesc: 'The Tale of the Bamboo Cutter — Kuzushiji manuscript from NDL Digital Collections',
+    tamamizuLabel: 'Tamamizu Monogatari (IIIF / Kuzushiji)',
+    tamamizuDesc: 'The Tale of Tamamizu — Illustrated otogi-zoshi manuscript, Kyoto University Library (IIIF)',
+  },
+
 }

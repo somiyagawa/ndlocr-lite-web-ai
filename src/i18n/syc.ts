@@ -4,6 +4,33 @@ export const syc: Translations = {
   app: {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: 'ܡܐܢܐ ܕ OCR ܝܦܘܢܝܐ ܒܡܨܦܝܢܐ',
+    confirmDiscard: 'ܦܠ̈ܛܐ ܕ OCR ܗܠܝܢ ܢܬܫܕܘܢ. ܬܫܪ؟',
+    landingDesc: 'From modern print to classical kuzushiji — browser-based Japanese OCR powered by the National Diet Library',
+    backgroundCredit: 'Background: Blue Pond, Biei — MaedaAkihiko, CC BY-SA 4.0',
+    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+  },
+  nav: {
+    previous: 'ܕܩܕܡ',
+    next: 'ܕܒܬܪ',
+    dragToReorder: 'ܥܛܘܦ ܠܬܘܟܡܐ ܕܪܗܝܛܐ',
+  },
+  ocr: {
+    startOcr: 'ܫܪܝ OCR',
+    ocrSelectedRegion: 'OCR ܕܐܬܪ ܓܒܝܐ',
+    clearSelection: 'ܫܪܝ ܓܒܝܬܐ',
+    regionSelectHint: 'Drag to select a region, then click "Start OCR" to recognize',
+    regionSelectHintResult: 'Drag to select a region, then click "OCR Selected Region" to re-recognize',
+    stop: 'ܟܠܝ',
+    editReadingOrderTitle: 'ܫܠܦ ܣܕܪ ܩܪܝܢܐ',
+    editReadingOrderLabel: 'ܣܕܪ',
+    processNewFiles: 'ܦܠܘܚ ܩ̈ܛܝܡܐ ܚܕ̈ܬܐ',
+    bugReportTitle: 'ܡܘܕܥܢܘܬ',
+    bugReportLabel: 'ܡܘܕܥܢܘܬ',
+    imageAdjustedHint: 'Image adjusted — re-OCR the full page or select a region to re-recognize',
+    reOcrInProgress: 'Re-OCR in progress…',
+    reOcrPage: 'Re-OCR Page',
+    uploadNewFiles: 'ܡܫܠܓ ܩܛܝܡܐ ܚܕ̈ܬܐ',
   },
   upload: {
     dropzone: 'ܓܪܘܪ ܩ̈ܛܝܡܐ ܠܗܪܟܐ ܐܘ ܕܘܨ ܠܓܒܝܬܐ',
@@ -11,6 +38,7 @@ export const syc: Translations = {
     acceptedFormats: 'ܛܘ̈ܦܣܐ ܡܩܒ̈ܠܐ: JPG, PNG, PDF',
     startButton: 'ܫܪܝ OCR',
     clearButton: 'ܡܚܝ',
+    pasteClipboard: 'ܐܠܨܘܩ ܡܢ ܠܘ̈ܚܐ ܕܢܣ̈ܚܐ',
   },
   progress: {
     initializing: 'ܡܫܪܐ...',
@@ -267,6 +295,7 @@ export const syc: Translations = {
     fitToHeight: 'Fit to Height',
     resetZoom: 'Reset Zoom',
     rotate: 'Rotate',
+    adjust: 'ܬܘܪܨ',
   },
   iiif: {
     title: 'IIIF Image Loader',
@@ -280,4 +309,16 @@ export const syc: Translations = {
     noImages: 'No images found in manifest',
     error: 'Failed to load IIIF manifest',
   },
+  samples: {
+    tryWith: 'Try with sample images:',
+    modernPrint: 'Modern Print',
+    kuzushiji: 'Kuzushiji',
+    kumonoitoLabel: 'Kumo no Ito (Modern)',
+    kumonoitoDesc: 'Akutagawa Ryunosuke "The Spider\\\'s Thread" — Modern printed Japanese text',
+    taketoriLabel: 'Taketori Monogatari (Kuzushiji)',
+    taketoriDesc: 'The Tale of the Bamboo Cutter — Kuzushiji manuscript from NDL Digital Collections',
+    tamamizuLabel: 'Tamamizu Monogatari (IIIF / Kuzushiji)',
+    tamamizuDesc: 'The Tale of Tamamizu — Illustrated otogi-zoshi manuscript, Kyoto University Library (IIIF)',
+  },
+
 }

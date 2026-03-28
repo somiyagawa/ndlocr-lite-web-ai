@@ -4,6 +4,33 @@ export const hi: Translations = {
   app: {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: 'ब्राउज़र में जापानी OCR उपकरण',
+    confirmDiscard: 'वर्तमान OCR परिणाम हटा दिए जाएँगे। जारी रखें?',
+    landingDesc: 'आधुनिक मुद्रित पाठ से शास्त्रीय कुज़ुशिजी तक — राष्ट्रीय डाइट पुस्तकालय OCR इंजन द्वारा ब्राउज़र-आधारित जापानी स्वचालित प्रतिलेखन',
+    backgroundCredit: 'पृष्ठभूमि: ब्लू पॉन्ड, बिएई — MaedaAkihiko, CC BY-SA 4.0',
+    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+  },
+  nav: {
+    previous: 'पिछला',
+    next: 'अगला',
+    dragToReorder: 'पुनः व्यवस्थित करने के लिए खींचें',
+  },
+  ocr: {
+    startOcr: 'OCR शुरू करें',
+    ocrSelectedRegion: 'चयनित क्षेत्र का OCR',
+    clearSelection: 'चयन साफ़ करें',
+    regionSelectHint: 'क्षेत्र चुनने के लिए खींचें, फिर "OCR शुरू करें" पर क्लिक करें',
+    regionSelectHintResult: 'क्षेत्र चुनने के लिए खींचें, फिर "चयनित क्षेत्र का OCR" पर क्लिक करें',
+    stop: 'रोकें',
+    editReadingOrderTitle: 'पढ़ने का क्रम संपादित करें',
+    editReadingOrderLabel: 'क्रम',
+    processNewFiles: 'नई फ़ाइलें प्रोसेस करें',
+    bugReportTitle: 'रिपोर्ट',
+    bugReportLabel: 'रिपोर्ट',
+    imageAdjustedHint: 'Image adjusted — re-OCR the full page or select a region to re-recognize',
+    reOcrInProgress: 'Re-OCR in progress…',
+    reOcrPage: 'Re-OCR Page',
+    uploadNewFiles: 'नई फ़ाइलें अपलोड करें',
   },
   upload: {
     dropzone: 'फ़ाइलें यहाँ खींचकर छोड़ें, या चुनने के लिए क्लिक करें',
@@ -11,6 +38,7 @@ export const hi: Translations = {
     acceptedFormats: 'समर्थित प्रारूप: JPG, PNG, PDF',
     startButton: 'OCR शुरू करें',
     clearButton: 'साफ़ करें',
+    pasteClipboard: 'क्लिपबोर्ड से पेस्ट करें',
   },
   progress: {
     initializing: 'प्रारंभ हो रहा है...',
@@ -167,6 +195,7 @@ export const hi: Translations = {
     fitToHeight: 'Fit to Height',
     resetZoom: 'Reset Zoom',
     rotate: 'Rotate',
+    adjust: 'समायोजन',
   },
   settingsModal: {
     title: 'सेटिंग्स',
@@ -280,4 +309,16 @@ export const hi: Translations = {
     noImages: 'No images found in manifest',
     error: 'Failed to load IIIF manifest',
   },
+  samples: {
+    tryWith: 'Try with sample images:',
+    modernPrint: 'Modern Print',
+    kuzushiji: 'Kuzushiji',
+    kumonoitoLabel: 'Kumo no Ito (Modern)',
+    kumonoitoDesc: 'Akutagawa Ryunosuke "The Spider\\\'s Thread" — Modern printed Japanese text',
+    taketoriLabel: 'Taketori Monogatari (Kuzushiji)',
+    taketoriDesc: 'The Tale of the Bamboo Cutter — Kuzushiji manuscript from NDL Digital Collections',
+    tamamizuLabel: 'Tamamizu Monogatari (IIIF / Kuzushiji)',
+    tamamizuDesc: 'The Tale of Tamamizu — Illustrated otogi-zoshi manuscript, Kyoto University Library (IIIF)',
+  },
+
 }

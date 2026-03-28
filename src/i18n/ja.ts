@@ -3,6 +3,16 @@ export const ja: Record<string, Record<string, string>> = {
   app: {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: 'ブラウザで動く日本語OCRツール',
+    confirmDiscard: '現在のOCR結果は破棄されます。よろしいですか？',
+    landingDesc: '現代の活字から古典籍のくずし字まで — 国立国会図書館OCRエンジンによるブラウザ完結型日本語自動書き起こし',
+    backgroundCredit: '背景写真: 美瑛・青い池 — MaedaAkihiko, CC BY-SA 4.0',
+    splashDesc: '国立国会図書館の縦書きに強い自動書き起こし日本語OCRソフト機能拡張版',
+    processingDesc: '国立国会図書館の縦書きに強い自動書き起こし日本語OCRソフト機能拡張版',
+  },
+  nav: {
+    previous: '前のファイル',
+    next: '次のファイル',
+    dragToReorder: 'ドラッグして並び替え可能',
   },
   upload: {
     dropzone: 'ここにファイルをドラッグ＆ドロップ、またはクリックして選択',
@@ -10,6 +20,7 @@ export const ja: Record<string, Record<string, string>> = {
     acceptedFormats: '対応形式: JPG, PNG, PDF',
     startButton: 'OCR開始',
     clearButton: 'クリア',
+    pasteClipboard: 'クリップボードから貼り付け',
   },
   progress: {
     initializing: '初期化中...',
@@ -21,6 +32,9 @@ export const ja: Record<string, Record<string, string>> = {
     generatingOutput: '出力生成中...',
     processing: '処理中: {current}/{total} ファイル',
     done: '完了',
+    renderingFile: '{fileName} をレンダリング中... ({current} / {total} ページ)',
+    loadingFile: '{fileName} を読み込み中...',
+    firstRunNote: '初回起動時はモデルのダウンロードに時間がかかります（数分程度）。次回以降はキャッシュから高速起動します。',
   },
   results: {
     copy: 'コピー',
@@ -158,6 +172,23 @@ export const ja: Record<string, Record<string, string>> = {
     documentScan: 'ドキュメントスキャン',
     cameraNotAvailable: 'カメラが使用できません',
   },
+  ocr: {
+    startOcr: 'OCRを開始',
+    ocrSelectedRegion: '選択領域のOCRを開始',
+    clearSelection: '選択解除',
+    regionSelectHint: 'マウスで領域をドラッグして選択し、「OCRを開始」で認識できます',
+    regionSelectHintResult: 'マウスで領域をドラッグして選択し、「選択領域のOCRを開始」で再認識できます',
+    stop: '中止',
+    editReadingOrderTitle: '読み順を手動で編集',
+    editReadingOrderLabel: '読み順編集',
+    processNewFiles: '新しいファイルを処理',
+    bugReportTitle: 'バグ報告・要望',
+    bugReportLabel: 'バグ報告・要望',
+    imageAdjustedHint: '画像補正済み — ページ全体を再OCRするか、領域を選択して再認識してください',
+    reOcrInProgress: '再OCR中…',
+    reOcrPage: 'ページを再OCR',
+    uploadNewFiles: '新しいファイルをアップロード',
+  },
   viewer: {
     zoomIn: 'ズームイン',
     zoomOut: 'ズームアウト',
@@ -165,6 +196,7 @@ export const ja: Record<string, Record<string, string>> = {
     fitToHeight: '高さに合わせる',
     resetZoom: 'ズームリセット',
     rotate: '回転',
+    adjust: '画像補正',
   },
   settingsModal: {
     title: '設定',
@@ -277,6 +309,17 @@ export const ja: Record<string, Record<string, string>> = {
     loadSelected: '選択した画像を読み込み',
     noImages: 'マニフェストに画像がありません',
     error: 'IIIFマニフェストの読み込みに失敗しました',
+  },
+  samples: {
+    tryWith: 'サンプル画像で試す:',
+    modernPrint: '現代活字',
+    kuzushiji: 'くずし字',
+    kumonoitoLabel: '蜘蛛の糸（現代）',
+    kumonoitoDesc: '芥川龍之介『蜘蛛の糸』— 活字印刷の現代日本語テキスト',
+    taketoriLabel: '竹取物語（くずし字）',
+    taketoriDesc: '竹取物語 — 国立国会図書館デジタルコレクション所蔵のくずし字写本',
+    tamamizuLabel: '玉水物語（IIIF・くずし字）',
+    tamamizuDesc: '玉水物語 — 京都大学附属図書館蔵・彩色挿図付きお伽草子写本（IIIF Presentation API）',
   },
 } as const
 

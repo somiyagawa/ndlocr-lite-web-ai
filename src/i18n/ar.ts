@@ -4,6 +4,33 @@ export const ar: Translations = {
   app: {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: 'أداة التعرف الضوئي على النصوص اليابانية في المتصفح',
+    confirmDiscard: 'سيتم تجاهل نتائج OCR الحالية. هل تريد المتابعة؟',
+    landingDesc: 'من الطباعة الحديثة إلى الكوزوشيجي الكلاسيكي — نسخ ياباني تلقائي في المتصفح بمحرك OCR لمكتبة البرلمان الوطني',
+    backgroundCredit: 'الخلفية: البركة الزرقاء، بيئي — MaedaAkihiko, CC BY-SA 4.0',
+    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+  },
+  nav: {
+    previous: 'السابق',
+    next: 'التالي',
+    dragToReorder: 'اسحب لإعادة الترتيب',
+  },
+  ocr: {
+    startOcr: 'بدء OCR',
+    ocrSelectedRegion: 'OCR للمنطقة المحددة',
+    clearSelection: 'إلغاء التحديد',
+    regionSelectHint: 'اسحب لتحديد منطقة، ثم انقر على "بدء OCR" للتعرف',
+    regionSelectHintResult: 'اسحب لتحديد منطقة، ثم انقر على "OCR للمنطقة المحددة" لإعادة التعرف',
+    stop: 'إيقاف',
+    editReadingOrderTitle: 'تحرير ترتيب القراءة',
+    editReadingOrderLabel: 'الترتيب',
+    processNewFiles: 'معالجة ملفات جديدة',
+    bugReportTitle: 'إبلاغ',
+    bugReportLabel: 'إبلاغ',
+    imageAdjustedHint: 'Image adjusted — re-OCR the full page or select a region to re-recognize',
+    reOcrInProgress: 'Re-OCR in progress…',
+    reOcrPage: 'Re-OCR Page',
+    uploadNewFiles: 'رفع ملفات جديدة',
   },
   upload: {
     dropzone: 'اسحب الملفات وأفلتها هنا، أو انقر للتحديد',
@@ -11,6 +38,7 @@ export const ar: Translations = {
     acceptedFormats: 'الصيغ المدعومة: JPG, PNG, PDF',
     startButton: 'بدء OCR',
     clearButton: 'مسح',
+    pasteClipboard: 'لصق من الحافظة',
   },
   progress: {
     initializing: 'جارٍ التهيئة...',
@@ -167,6 +195,7 @@ export const ar: Translations = {
     fitToHeight: 'Fit to Height',
     resetZoom: 'Reset Zoom',
     rotate: 'Rotate',
+    adjust: 'ضبط',
   },
   settingsModal: {
     title: 'الإعدادات',
@@ -280,4 +309,16 @@ export const ar: Translations = {
     noImages: 'No images found in manifest',
     error: 'Failed to load IIIF manifest',
   },
+  samples: {
+    tryWith: 'Try with sample images:',
+    modernPrint: 'Modern Print',
+    kuzushiji: 'Kuzushiji',
+    kumonoitoLabel: 'Kumo no Ito (Modern)',
+    kumonoitoDesc: 'Akutagawa Ryunosuke "The Spider\\\'s Thread" — Modern printed Japanese text',
+    taketoriLabel: 'Taketori Monogatari (Kuzushiji)',
+    taketoriDesc: 'The Tale of the Bamboo Cutter — Kuzushiji manuscript from NDL Digital Collections',
+    tamamizuLabel: 'Tamamizu Monogatari (IIIF / Kuzushiji)',
+    tamamizuDesc: 'The Tale of Tamamizu — Illustrated otogi-zoshi manuscript, Kyoto University Library (IIIF)',
+  },
+
 }

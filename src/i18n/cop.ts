@@ -4,6 +4,33 @@ export const cop: Translations = {
   app: {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: 'ⲡⲓⲉⲣⲅⲁⲗⲓⲟⲛ ⲛⲧⲉ OCR ⲛⲓⲁⲡⲟⲛⲓⲕⲟⲛ ϧⲉⲛ ⲡⲓ browser',
+    confirmDiscard: 'Current OCR results will be discarded. Continue?',
+    landingDesc: 'From modern print to classical kuzushiji — browser-based Japanese OCR powered by the National Diet Library',
+    backgroundCredit: 'Background: Blue Pond, Biei — MaedaAkihiko, CC BY-SA 4.0',
+    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+  },
+  nav: {
+    previous: 'Previous',
+    next: 'Next',
+    dragToReorder: 'ⲟⲣ ⲉⲡⲓⲥⲧⲁⲙⲱⲣⲓ',
+  },
+  ocr: {
+    startOcr: 'Start OCR',
+    ocrSelectedRegion: 'OCR Selected Region',
+    clearSelection: 'Clear Selection',
+    regionSelectHint: 'Drag to select a region, then click "Start OCR" to recognize',
+    regionSelectHintResult: 'Drag to select a region, then click "OCR Selected Region" to re-recognize',
+    stop: 'Stop',
+    editReadingOrderTitle: 'Edit reading order',
+    editReadingOrderLabel: 'Edit Reading Order',
+    processNewFiles: 'Process New Files',
+    bugReportTitle: 'Bug Report',
+    bugReportLabel: 'ⲙⲉⲧⲙⲉⲑⲣⲉ',
+    imageAdjustedHint: 'Image adjusted — re-OCR the full page or select a region to re-recognize',
+    reOcrInProgress: 'Re-OCR in progress…',
+    reOcrPage: 'Re-OCR Page',
+    uploadNewFiles: 'Upload new files',
   },
   upload: {
     dropzone: 'ⲥⲱⲕ ⲛⲓⲫⲁⲓⲗ ⲙⲡⲁⲓⲙⲁ ⲓⲉ ϫⲉⲙϫⲟⲙ ⲉⲥⲱⲧⲡ',
@@ -11,6 +38,7 @@ export const cop: Translations = {
     acceptedFormats: 'ⲛⲓⲧⲩⲡⲟⲥ: JPG, PNG, PDF',
     startButton: 'ⲁⲣⲭⲉⲥⲑⲉ ⲛ OCR',
     clearButton: 'ⲧⲟⲩⲃⲟ',
+    pasteClipboard: 'Paste from Clipboard',
   },
   progress: {
     initializing: 'ⲥⲉⲥⲟⲃⲧⲉ...',
@@ -267,6 +295,7 @@ export const cop: Translations = {
     fitToHeight: 'Fit to Height',
     resetZoom: 'Reset Zoom',
     rotate: 'Rotate',
+    adjust: 'Adjust',
   },
   iiif: {
     title: 'IIIF Image Loader',
@@ -280,4 +309,16 @@ export const cop: Translations = {
     noImages: 'No images found in manifest',
     error: 'Failed to load IIIF manifest',
   },
+  samples: {
+    tryWith: 'Try with sample images:',
+    modernPrint: 'Modern Print',
+    kuzushiji: 'Kuzushiji',
+    kumonoitoLabel: 'Kumo no Ito (Modern)',
+    kumonoitoDesc: 'Akutagawa Ryunosuke "The Spider\\\'s Thread" — Modern printed Japanese text',
+    taketoriLabel: 'Taketori Monogatari (Kuzushiji)',
+    taketoriDesc: 'The Tale of the Bamboo Cutter — Kuzushiji manuscript from NDL Digital Collections',
+    tamamizuLabel: 'Tamamizu Monogatari (IIIF / Kuzushiji)',
+    tamamizuDesc: 'The Tale of Tamamizu — Illustrated otogi-zoshi manuscript, Kyoto University Library (IIIF)',
+  },
+
 }

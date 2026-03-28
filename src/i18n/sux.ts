@@ -3,13 +3,44 @@ import type { Translations } from './ja'
 // Sumerian — Unicode Cuneiform (U+12000–U+1236E)
 // 𒀀 = A, 𒁀 = BA, 𒂗 = EN, 𒄀 = GI, 𒆠 = KI, 𒈾 = NA, 𒌓 = UD, 𒌝 = UM
 export const sux: Translations = {
-  app: { title: 'NDL(Kotenseki)OCR-lite Web', subtitle: '𒅀𒉺𒀀𒈾 OCR 𒈾𒅎𒆪𒍪 𒁾𒊬𒂊' },
+  app: {
+    title: 'NDL(Kotenseki)OCR-lite Web',
+    subtitle: '𒅀𒉺𒀀𒈾 OCR 𒈾𒅎𒆪𒍪 𒁾𒊬𒂊',
+    confirmDiscard: 'Current OCR results will be discarded. Continue?',
+    landingDesc: 'From modern print to classical kuzushiji — browser-based Japanese OCR powered by the National Diet Library',
+    backgroundCredit: 'Background: Blue Pond, Biei — MaedaAkihiko, CC BY-SA 4.0',
+    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+  },
+  nav: {
+    previous: 'Previous',
+    next: 'Next',
+    dragToReorder: 'Drag to reorder',
+  },
+  ocr: {
+    startOcr: 'Start OCR',
+    ocrSelectedRegion: 'OCR Selected Region',
+    clearSelection: 'Clear Selection',
+    regionSelectHint: 'Drag to select a region, then click "Start OCR" to recognize',
+    regionSelectHintResult: 'Drag to select a region, then click "OCR Selected Region" to re-recognize',
+    stop: 'Stop',
+    editReadingOrderTitle: 'Edit reading order',
+    editReadingOrderLabel: 'Edit Reading Order',
+    processNewFiles: 'Process New Files',
+    bugReportTitle: 'Bug Report',
+    bugReportLabel: 'Bug Report',
+    imageAdjustedHint: 'Image adjusted — re-OCR the full page or select a region to re-recognize',
+    reOcrInProgress: 'Re-OCR in progress…',
+    reOcrPage: 'Re-OCR Page',
+    uploadNewFiles: 'Upload new files',
+  },
   upload: {
     dropzone: '𒁾𒁉 𒆠𒁉𒊺 𒄥𒊏, 𒌑𒈾𒀀𒁺𒄄 𒉌𒋼𒈾',
     directoryButton: '𒂊𒁾𒁀 𒁀𒀊𒁺𒄄',
     acceptedFormats: '𒀠𒀀𒈾 𒋗𒁺𒀀: JPG, PNG, PDF',
     startButton: 'OCR 𒃶𒂗𒋗𒌝',
     clearButton: '𒁀𒀊𒁀𒁺𒊒',
+    pasteClipboard: 'Paste from Clipboard',
   },
   progress: {
     initializing: '𒈬𒌦𒁲𒈨...', loadingLayoutModel: '𒀠𒀀𒈾𒁉 𒈬𒌦𒁲𒂊... {percent}%',
@@ -242,6 +273,7 @@ export const sux: Translations = {
     fitToHeight: 'Fit to Height',
     resetZoom: 'Reset Zoom',
     rotate: 'Rotate',
+    adjust: 'Adjust',
   },
   iiif: {
     title: 'IIIF Image Loader',
@@ -255,4 +287,16 @@ export const sux: Translations = {
     noImages: 'No images found in manifest',
     error: 'Failed to load IIIF manifest',
   },
+  samples: {
+    tryWith: 'Try with sample images:',
+    modernPrint: 'Modern Print',
+    kuzushiji: 'Kuzushiji',
+    kumonoitoLabel: 'Kumo no Ito (Modern)',
+    kumonoitoDesc: 'Akutagawa Ryunosuke "The Spider\\\'s Thread" — Modern printed Japanese text',
+    taketoriLabel: 'Taketori Monogatari (Kuzushiji)',
+    taketoriDesc: 'The Tale of the Bamboo Cutter — Kuzushiji manuscript from NDL Digital Collections',
+    tamamizuLabel: 'Tamamizu Monogatari (IIIF / Kuzushiji)',
+    tamamizuDesc: 'The Tale of Tamamizu — Illustrated otogi-zoshi manuscript, Kyoto University Library (IIIF)',
+  },
+
 }

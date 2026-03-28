@@ -4,6 +4,33 @@ export const ru: Translations = {
   app: {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: 'Инструмент японского OCR, работающий в браузере',
+    confirmDiscard: 'Текущие результаты OCR будут удалены. Продолжить?',
+    landingDesc: 'От современной печати до классического кудзусидзи — автоматическая транскрипция японского языка в браузере на базе OCR-движка Национальной парламентской библиотеки',
+    backgroundCredit: 'Фон: Голубой пруд, Биэй — MaedaAkihiko, CC BY-SA 4.0',
+    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+  },
+  nav: {
+    previous: 'Назад',
+    next: 'Далее',
+    dragToReorder: 'Перетащите для переупорядочения',
+  },
+  ocr: {
+    startOcr: 'Начать OCR',
+    ocrSelectedRegion: 'OCR выделенной области',
+    clearSelection: 'Снять выделение',
+    regionSelectHint: 'Перетащите мышь для выбора области, затем нажмите «Начать OCR»',
+    regionSelectHintResult: 'Перетащите мышь для выбора области, затем нажмите «OCR выделенной области» для переопознания',
+    stop: 'Стоп',
+    editReadingOrderTitle: 'Редактировать порядок чтения',
+    editReadingOrderLabel: 'Порядок',
+    processNewFiles: 'Обработать новые файлы',
+    bugReportTitle: 'Отчёт',
+    bugReportLabel: 'Отчёт',
+    imageAdjustedHint: 'Image adjusted — re-OCR the full page or select a region to re-recognize',
+    reOcrInProgress: 'Re-OCR in progress…',
+    reOcrPage: 'Re-OCR Page',
+    uploadNewFiles: 'Загрузить новые файлы',
   },
   upload: {
     dropzone: 'Перетащите файлы сюда или нажмите для выбора',
@@ -11,6 +38,7 @@ export const ru: Translations = {
     acceptedFormats: 'Поддерживаемые форматы: JPG, PNG, PDF',
     startButton: 'Начать OCR',
     clearButton: 'Очистить',
+    pasteClipboard: 'Вставить из буфера обмена',
   },
   progress: {
     initializing: 'Инициализация...',
@@ -267,6 +295,7 @@ export const ru: Translations = {
     fitToHeight: 'По высоте',
     resetZoom: 'Сбросить масштаб',
     rotate: 'Повернуть',
+    adjust: 'Коррекция',
   },
   iiif: {
     title: 'Загрузчик IIIF',
@@ -280,4 +309,16 @@ export const ru: Translations = {
     noImages: 'Изображений нет',
     error: 'Ошибка загрузки манифеста',
   },
+  samples: {
+    tryWith: 'Try with sample images:',
+    modernPrint: 'Modern Print',
+    kuzushiji: 'Kuzushiji',
+    kumonoitoLabel: 'Kumo no Ito (Modern)',
+    kumonoitoDesc: 'Akutagawa Ryunosuke "The Spider\\\'s Thread" — Modern printed Japanese text',
+    taketoriLabel: 'Taketori Monogatari (Kuzushiji)',
+    taketoriDesc: 'The Tale of the Bamboo Cutter — Kuzushiji manuscript from NDL Digital Collections',
+    tamamizuLabel: 'Tamamizu Monogatari (IIIF / Kuzushiji)',
+    tamamizuDesc: 'The Tale of Tamamizu — Illustrated otogi-zoshi manuscript, Kyoto University Library (IIIF)',
+  },
+
 }

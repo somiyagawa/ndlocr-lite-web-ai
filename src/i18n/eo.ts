@@ -4,6 +4,33 @@ export const eo: Translations = {
   app: {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: 'Japana Ilo de OCR Funkcianta en la Foliumilo',
+    confirmDiscard: 'Nuna OCR-rezulto estos forĵetita. Ĉu daŭrigi?',
+    landingDesc: 'De moderna presaĵo ĝis klasika kuzushiji — aŭtomata japana transskribo en retumilo per OCR-motoro de la Nacia Dieta Biblioteko',
+    backgroundCredit: 'Fono: Blua Lageto, Biei — MaedaAkihiko, CC BY-SA 4.0',
+    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+  },
+  nav: {
+    previous: 'Antaŭa',
+    next: 'Sekva',
+    dragToReorder: 'Treni por reordigi',
+  },
+  ocr: {
+    startOcr: 'Komenci OCR',
+    ocrSelectedRegion: 'OCR de elektita regiono',
+    clearSelection: 'Malselekti',
+    regionSelectHint: 'Trenu por elekti regionon, poste alklaku "Komenci OCR" por rekoni',
+    regionSelectHintResult: 'Trenu por elekti regionon, poste alklaku "OCR de elektita regiono" por rerekoni',
+    stop: 'Halti',
+    editReadingOrderTitle: 'Redakti legordon',
+    editReadingOrderLabel: 'Legordo',
+    processNewFiles: 'Prilabori novajn dosierojn',
+    bugReportTitle: 'Raporti',
+    bugReportLabel: 'Raporti',
+    imageAdjustedHint: 'Image adjusted — re-OCR the full page or select a region to re-recognize',
+    reOcrInProgress: 'Re-OCR in progress…',
+    reOcrPage: 'Re-OCR Page',
+    uploadNewFiles: 'Alŝuti novajn dosierojn',
   },
   upload: {
     dropzone: 'Tragu kaj demetu dosierojn ĉi tie, aŭ klaku por elekti',
@@ -11,6 +38,7 @@ export const eo: Translations = {
     acceptedFormats: 'Subtenataj formatoj: JPG, PNG, PDF',
     startButton: 'Komenci OCR',
     clearButton: 'Malplenigu',
+    pasteClipboard: 'Alglui el tondujo',
   },
   progress: {
     initializing: 'Iniciatado...',
@@ -264,6 +292,7 @@ export const eo: Translations = {
     fitToHeight: 'Fit to Height',
     resetZoom: 'Reset Zoom',
     rotate: 'Rotate',
+    adjust: 'Korekti bildon',
   },
   iiif: {
     title: 'IIIF Image Loader',
@@ -277,4 +306,16 @@ export const eo: Translations = {
     noImages: 'No images found in manifest',
     error: 'Failed to load IIIF manifest',
   },
+  samples: {
+    tryWith: 'Try with sample images:',
+    modernPrint: 'Modern Print',
+    kuzushiji: 'Kuzushiji',
+    kumonoitoLabel: 'Kumo no Ito (Modern)',
+    kumonoitoDesc: 'Akutagawa Ryunosuke "The Spider\\\'s Thread" — Modern printed Japanese text',
+    taketoriLabel: 'Taketori Monogatari (Kuzushiji)',
+    taketoriDesc: 'The Tale of the Bamboo Cutter — Kuzushiji manuscript from NDL Digital Collections',
+    tamamizuLabel: 'Tamamizu Monogatari (IIIF / Kuzushiji)',
+    tamamizuDesc: 'The Tale of Tamamizu — Illustrated otogi-zoshi manuscript, Kyoto University Library (IIIF)',
+  },
+
 }

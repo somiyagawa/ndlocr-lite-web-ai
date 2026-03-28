@@ -922,15 +922,30 @@ export default function App() {
                             {selectedRegion && (
                               <div className="region-action-bar">
                                 <button className="btn btn-primary btn-sm" onClick={() => setIsReadyToProcess(true)}>
-                                  {t(lang, 'ocr.ocrSelectedRegion')}
+                                  {L(lang, { ja: '選択領域のOCRを開始', en: 'OCR Selected Region', 'zh-CN': '对选定区域执行OCR', 'zh-TW': '對選取區域執行OCR', ko: '선택 영역 OCR 실행', la: 'OCR regionis selectae', eo: 'OCR de elektita regiono', es: 'OCR de región seleccionada', de: 'OCR des ausgewählten Bereichs', ar: 'OCR للمنطقة المحددة', hi: 'चयنित क्षेत्र का OCR', ru: 'OCR выделенной области', el: 'OCR επιλεγμένης περιοχής', syc: 'OCR ܕܐܬܪ ܓܒܝܐ' })}
                                 </button>
                                 <button className="btn btn-secondary btn-sm" onClick={handleClearRegion}>
-                                  {t(lang, 'ocr.clearSelection')}
+                                  {L(lang, { ja: '選択解除', en: 'Clear Selection', 'zh-CN': '取消选择', 'zh-TW': '取消選取', ko: '선택 해제', la: 'Selectionem delere', eo: 'Malselekti', es: 'Borrar selección', de: 'Auswahl aufheben', ar: 'إلغاء التحديد', hi: 'चयन साफ़ करें', ru: 'Снять выделение', el: 'Εκκαθάριση επιλογής', syc: 'ܫܪܝ ܓܒܝܬܐ' })}
                                 </button>
                               </div>
                             )}
                             <p className="region-select-hint">
-                              {t(lang, 'ocr.regionSelectHintResult')}
+                              {L(lang, {
+                                ja: 'マウスで領域をドラッグして選択し、「選択領域のOCRを開始」で再認識できます',
+                                en: 'Drag to select a region, then click "OCR Selected Region" to re-recognize',
+                                'zh-CN': '拖动鼠标选择区域，然后点击"对选定区域执行OCR"重新识别',
+                                'zh-TW': '拖曳滑鼠選取區域，然後點擊「對選取區域執行OCR」重新辨識',
+                                ko: '마우스로 영역을 드래그하여 선택하고 "선택 영역 OCR 실행"으로 재인식합니다',
+                                la: 'Trahe murem ad regionem seligendam, deinde "OCR regionis selectae" preme',
+                                eo: 'Trenu por elekti regionon, poste alklaku "OCR de elektita regiono" por rerekoni',
+                                es: 'Arrastra para seleccionar una región, luego haz clic en "OCR de región seleccionada"',
+                                de: 'Ziehen Sie, um einen Bereich auszuwählen, dann klicken Sie auf "OCR des ausgewählten Bereichs"',
+                                ar: 'اسحب لتحديد منطقة، ثم انقر على "OCR للمنطقة المحددة" لإعادة التعرف',
+                                hi: 'क्षेत्र चुनने के लिए खींचें, फिर "चयनित क्षेत्र का OCR" पर क्लिक करें',
+                                ru: 'Перетащите мышь для выбора области, затем нажмите «OCR выделенной области» для переопознания',
+                                el: 'Σύρετε για να επιλέξετε μια περιοχή, μετά κάντε κλικ στο «OCR επιλεγμένης περιοχής» για επανα-αναγνώριση',
+                                syc: 'ܓܪܘܪ ܠܓܒܝ ܐܬܪ، ܘܕܘܨ «OCR ܕܐܬܪ ܓܒܝܐ» ܠܡܓܒܝܬܐ ܓܒܝܬܐ'
+                              })}
                             </p>
                           </div>
                           {showPreprocessPanel && (
@@ -993,7 +1008,14 @@ export default function App() {
               }
               input.click()
             }}
-            title={t(lang, 'ocr.uploadNewFiles')}
+            title={L(lang, {
+              ja: '新しいファイルをアップロード', en: 'Upload new files',
+              'zh-CN': '上传新文件', 'zh-TW': '上傳新檔案',
+              ko: '새 파일 업로드', la: 'Fasciculos novos imponere',
+              eo: 'Alŝuti novajn dosierojn', es: 'Subir nuevos archivos',
+              de: 'Neue Dateien hochladen', ar: 'رفع ملفات جديدة', hi: 'नई फ़ाइलें अपलोड करें',
+              ru: 'Загрузить новые файлы', el: 'Ανέβασμα νέων αρχείων', syc: 'ܡܫܠܓ ܩܛܝܡܐ ܚܕ̈ܬܐ'
+            })}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="12" y1="5" x2="12" y2="19" />

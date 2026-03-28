@@ -4,6 +4,33 @@ export const ko: Translations = {
   app: {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: '브라우저 기반 일본어 OCR 도구',
+    confirmDiscard: '현재 OCR 결과가 삭제됩니다. 계속하시겠습니까?',
+    landingDesc: '현대 인쇄체에서 고전 흘림체까지 — 일본 국립국회도서관 OCR 엔진 기반 브라우저 완결형 일본어 자동 전사',
+    backgroundCredit: '배경 사진: 비에이·아오이이케 — MaedaAkihiko, CC BY-SA 4.0',
+    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+  },
+  nav: {
+    previous: '이전',
+    next: '다음',
+    dragToReorder: '끌어서 재정렬',
+  },
+  ocr: {
+    startOcr: 'OCR 시작',
+    ocrSelectedRegion: '선택 영역 OCR 실행',
+    clearSelection: '선택 해제',
+    regionSelectHint: '마우스로 영역을 드래그하여 선택하고 "OCR 시작"으로 인식합니다',
+    regionSelectHintResult: '마우스로 영역을 드래그하여 선택하고 "선택 영역 OCR 실행"으로 재인식합니다',
+    stop: '중지',
+    editReadingOrderTitle: '읽기 순서 편집',
+    editReadingOrderLabel: '읽기 순서',
+    processNewFiles: '새 파일 처리',
+    bugReportTitle: '버그 보고',
+    bugReportLabel: '버그 보고',
+    imageAdjustedHint: '이미지 보정됨 — 전체 페이지를 재OCR하거나 영역을 선택하여 재인식하세요',
+    reOcrInProgress: '재OCR 중…',
+    reOcrPage: '페이지 재OCR',
+    uploadNewFiles: '새 파일 업로드',
   },
   upload: {
     dropzone: '파일을 여기에 드래그 앤 드롭하거나 클릭하여 선택',
@@ -11,6 +38,7 @@ export const ko: Translations = {
     acceptedFormats: '지원 형식: JPG, PNG, PDF',
     startButton: 'OCR 시작',
     clearButton: '초기화',
+    pasteClipboard: '클립보드에서 붙여넣기',
   },
   progress: {
     initializing: '초기화 중...',
@@ -228,10 +256,23 @@ export const ko: Translations = {
   },
   viewer: {
     zoomIn: '확대', zoomOut: '축소', fitToWidth: '너비에 맞추기', fitToHeight: '높이에 맞추기', resetZoom: '확대/축소 초기화', rotate: '회전',
+    adjust: '이미지 보정',
   },
   iiif: {
     title: 'IIIF 이미지 로더', manifestUrl: 'IIIF 매니페스트 URL', load: '불러오기', loading: '매니페스트 불러오는 중...',
     selectImages: '불러올 이미지 선택', selectAll: '모두 선택', deselectAll: '모두 해제',
     loadSelected: '선택한 이미지 불러오기', noImages: '매니페스트에 이미지가 없습니다', error: 'IIIF 매니페스트 불러오기 실패',
   },
+  samples: {
+    tryWith: '샘플 이미지로 사용해보기:',
+    modernPrint: '현대 활자',
+    kuzushiji: '흘림체',
+    kumonoitoLabel: '거미줄 (현대)',
+    kumonoitoDesc: '아쿠타가와 류노스케 "거미줄" — 현대 인쇄 일본어 텍스트',
+    taketoriLabel: '다케토리 모노가타리 (흘림체)',
+    taketoriDesc: '다케토리 모노가타리 — NDL 디지털 컬렉션 흘림체 필사본',
+    tamamizuLabel: '다마미즈 모노가타리 (IIIF / 흘림체)',
+    tamamizuDesc: '다마미즈 모노가타리 — 교토대학 도서관 소장 채색 삽화 오토기조시 (IIIF)',
+  },
+
 }

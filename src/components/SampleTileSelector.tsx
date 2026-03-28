@@ -5,12 +5,11 @@
  * IIIF サンプルはクリック時にマニフェストURLをIIIFLoaderに渡す。
  */
 import { useCallback } from 'react'
+import { t } from '../i18n'
 import type { OCRMode } from '../types/ocr'
 
 interface SampleTileBase {
   id: string
-  label: Record<string, string>
-  description: Record<string, string>
   category: 'modern' | 'koten'
 }
 
@@ -34,20 +33,6 @@ const SAMPLES: SampleTile[] = [
   {
     type: 'local',
     id: 'kumonoito',
-    label: {
-      ja: '蜘蛛の糸（現代）',
-      en: 'Kumo no Ito (Modern)',
-      'zh-CN': '蛛丝（现代）',
-      'zh-TW': '蛛絲（現代）',
-      ko: '거미줄 (현대)',
-    },
-    description: {
-      ja: '芥川龍之介『蜘蛛の糸』— 活字印刷の現代日本語テキスト',
-      en: 'Akutagawa Ryūnosuke "The Spider\'s Thread" — Modern printed Japanese text',
-      'zh-CN': '芥川龙之介《蛛丝》— 现代印刷日语文本',
-      'zh-TW': '芥川龍之介《蛛絲》— 現代印刷日語文本',
-      ko: '아쿠타가와 류노스케 "거미줄" — 현대 인쇄 일본어 텍스트',
-    },
     imagePath: '/kumonoito.png',
     fileName: 'kumonoito.png',
     mimeType: 'image/png',
@@ -56,20 +41,6 @@ const SAMPLES: SampleTile[] = [
   {
     type: 'local',
     id: 'taketori',
-    label: {
-      ja: '竹取物語（くずし字）',
-      en: 'Taketori Monogatari (Kuzushiji)',
-      'zh-CN': '竹取物语（草书）',
-      'zh-TW': '竹取物語（草書）',
-      ko: '다케토리 모노가타리 (흘림체)',
-    },
-    description: {
-      ja: '竹取物語 — 国立国会図書館デジタルコレクション所蔵のくずし字写本',
-      en: 'The Tale of the Bamboo Cutter — Kuzushiji manuscript from NDL Digital Collections',
-      'zh-CN': '竹取物语 — 日本国立国会图书馆数字馆藏草书手稿',
-      'zh-TW': '竹取物語 — 日本國立國會圖書館數位典藏草書手稿',
-      ko: '다케토리 모노가타리 — NDL 디지털 컬렉션 흘림체 필사본',
-    },
     imagePath: '/samples/kuzushiji-sample-taketori.jpg',
     fileName: 'kuzushiji-sample-taketori.jpg',
     mimeType: 'image/jpeg',
@@ -78,20 +49,6 @@ const SAMPLES: SampleTile[] = [
   {
     type: 'iiif',
     id: 'tamamizu',
-    label: {
-      ja: '玉水物語（IIIF・くずし字）',
-      en: 'Tamamizu Monogatari (IIIF / Kuzushiji)',
-      'zh-CN': '玉水物语（IIIF・草书）',
-      'zh-TW': '玉水物語（IIIF・草書）',
-      ko: '다마미즈 모노가타리 (IIIF / 흘림체)',
-    },
-    description: {
-      ja: '玉水物語 — 京都大学附属図書館蔵・彩色挿図付きお伽草子写本（IIIF Presentation API）',
-      en: 'The Tale of Tamamizu — Illustrated otogi-zōshi manuscript, Kyoto University Library (IIIF)',
-      'zh-CN': '玉水物语 — 京都大学图书馆藏・彩色插图御伽草子写本（IIIF）',
-      'zh-TW': '玉水物語 — 京都大學圖書館藏・彩色插圖御伽草子寫本（IIIF）',
-      ko: '다마미즈 모노가타리 — 교토대학 도서관 소장 채색 삽화 오토기조시 (IIIF)',
-    },
     manifestUrl: 'https://rmda.kulib.kyoto-u.ac.jp/iiif/metadata_manifest/RB00013653/manifest.json',
     thumbnailUrl: 'https://rmda.kulib.kyoto-u.ac.jp/iiif/RB00013653/canvas/3/thumbnail',
     category: 'koten',
@@ -104,10 +61,6 @@ interface SampleTileSelectorProps {
   disabled: boolean
   onSampleSelected: (files: File[]) => Promise<void>
   onIIIFSampleSelected?: (manifestUrl: string) => void
-}
-
-function L(lang: string, map: Record<string, string>): string {
-  return map[lang] ?? map['en'] ?? map['ja'] ?? ''
 }
 
 export function SampleTileSelector({ ocrMode, lang, disabled, onSampleSelected, onIIIFSampleSelected }: SampleTileSelectorProps) {
@@ -136,13 +89,7 @@ export function SampleTileSelector({ ocrMode, lang, disabled, onSampleSelected, 
   return (
     <div className="sample-tile-container">
       <div className="sample-tile-label">
-        {L(lang, {
-          ja: 'サンプル画像で試す:',
-          en: 'Try with sample images:',
-          'zh-CN': '使用示例图片试用:',
-          'zh-TW': '使用範例圖片試用:',
-          ko: '샘플 이미지로 사용해보기:',
-        })}
+        {t(lang as any, 'samples.tryWith')}
       </div>
       <div className="sample-tile-grid">
         {visibleSamples.map(sample => (
@@ -151,7 +98,7 @@ export function SampleTileSelector({ ocrMode, lang, disabled, onSampleSelected, 
             className={`sample-tile sample-tile-${sample.category}`}
             onClick={() => handleTileClick(sample)}
             disabled={disabled}
-            title={L(lang, sample.description)}
+            title={t(lang as any, `samples.${sample.id}Desc`)}
           >
             <div className="sample-tile-image-wrap">
               {sample.type === 'iiif' ? (
@@ -164,7 +111,7 @@ export function SampleTileSelector({ ocrMode, lang, disabled, onSampleSelected, 
               ) : (
                 <img
                   src={sample.imagePath}
-                  alt={L(lang, sample.label)}
+                  alt={t(lang as any, `samples.${sample.id}Label`)}
                   className="sample-tile-image"
                   width={270}
                   height={180}
@@ -175,12 +122,12 @@ export function SampleTileSelector({ ocrMode, lang, disabled, onSampleSelected, 
                 {sample.type === 'iiif'
                   ? 'IIIF'
                   : sample.category === 'modern'
-                    ? L(lang, { ja: '現代活字', en: 'Modern Print', 'zh-CN': '现代印刷', 'zh-TW': '現代活字', ko: '현대 활자' })
-                    : L(lang, { ja: 'くずし字', en: 'Kuzushiji', 'zh-CN': '草书', 'zh-TW': '草書', ko: '흘림체' })
+                    ? t(lang as any, 'samples.modernPrint')
+                    : t(lang as any, 'samples.kuzushiji')
                 }
               </span>
             </div>
-            <span className="sample-tile-title">{L(lang, sample.label)}</span>
+            <span className="sample-tile-title">{t(lang as any, `samples.${sample.id}Label`)}</span>
           </button>
         ))}
       </div>

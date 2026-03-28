@@ -4,6 +4,33 @@ export const zhCN: Translations = {
   app: {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: '浏览器端日语OCR工具',
+    confirmDiscard: '当前OCR结果将被丢弃。是否继续？',
+    landingDesc: '从现代印刷体到古典草书 — 基于日本国立国会图书馆OCR引擎的浏览器端日语自动转录',
+    backgroundCredit: '背景照片：美瑛·青池 — MaedaAkihiko, CC BY-SA 4.0',
+    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+  },
+  nav: {
+    previous: '上一个',
+    next: '下一个',
+    dragToReorder: '拖动重新排列',
+  },
+  ocr: {
+    startOcr: '开始OCR',
+    ocrSelectedRegion: '对选定区域执行OCR',
+    clearSelection: '取消选择',
+    regionSelectHint: '拖动鼠标选择区域，然后点击"开始OCR"进行识别',
+    regionSelectHintResult: '拖动鼠标选择区域，然后点击"对选定区域执行OCR"重新识别',
+    stop: '停止',
+    editReadingOrderTitle: '编辑阅读顺序',
+    editReadingOrderLabel: '编辑读序',
+    processNewFiles: '处理新文件',
+    bugReportTitle: '反馈',
+    bugReportLabel: '反馈',
+    imageAdjustedHint: '图像已校正 — 重新OCR整页或选择区域重新识别',
+    reOcrInProgress: '重新OCR中…',
+    reOcrPage: '重新OCR此页',
+    uploadNewFiles: '上传新文件',
   },
   upload: {
     dropzone: '拖放文件到此处，或点击选择',
@@ -11,6 +38,7 @@ export const zhCN: Translations = {
     acceptedFormats: '支持格式: JPG, PNG, PDF',
     startButton: '开始OCR',
     clearButton: '清除',
+    pasteClipboard: '从剪贴板粘贴',
   },
   progress: {
     initializing: '初始化中...',
@@ -228,10 +256,23 @@ export const zhCN: Translations = {
   },
   viewer: {
     zoomIn: '放大', zoomOut: '缩小', fitToWidth: '适合宽度', fitToHeight: '适合高度', resetZoom: '重置缩放', rotate: '旋转',
+    adjust: '图像校正',
   },
   iiif: {
     title: 'IIIF图像加载器', manifestUrl: 'IIIF清单URL', load: '加载', loading: '正在加载清单...',
     selectImages: '选择要加载的图像', selectAll: '全选', deselectAll: '取消全选',
     loadSelected: '加载所选图像', noImages: '清单中没有图像', error: '加载IIIF清单失败',
   },
+  samples: {
+    tryWith: '使用示例图片试用:',
+    modernPrint: '现代印刷',
+    kuzushiji: '草书',
+    kumonoitoLabel: '蛛丝（现代）',
+    kumonoitoDesc: '芥川龙之介《蛛丝》— 现代印刷日语文本',
+    taketoriLabel: '竹取物语（草书）',
+    taketoriDesc: '竹取物语 — 日本国立国会图书馆数字馆藏草书手稿',
+    tamamizuLabel: '玉水物语（IIIF・草书）',
+    tamamizuDesc: '玉水物语 — 京都大学图书馆藏・彩色插图御伽草子写本（IIIF）',
+  },
+
 }

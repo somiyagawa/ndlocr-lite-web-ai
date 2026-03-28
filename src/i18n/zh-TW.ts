@@ -4,6 +4,33 @@ export const zhTW: Translations = {
   app: {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: '瀏覽器端日語OCR工具',
+    confirmDiscard: '目前的OCR結果將被捨棄。是否繼續？',
+    landingDesc: '從現代印刷體到古典草書 — 基於日本國立國會圖書館OCR引擎的瀏覽器端日語自動轉錄',
+    backgroundCredit: '背景照片：美瑛·青池 — MaedaAkihiko, CC BY-SA 4.0',
+    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+  },
+  nav: {
+    previous: '上一個',
+    next: '下一個',
+    dragToReorder: '拖動重新排列',
+  },
+  ocr: {
+    startOcr: '開始OCR',
+    ocrSelectedRegion: '對選取區域執行OCR',
+    clearSelection: '取消選取',
+    regionSelectHint: '拖曳滑鼠選取區域，然後點擊「開始OCR」進行辨識',
+    regionSelectHintResult: '拖曳滑鼠選取區域，然後點擊「對選取區域執行OCR」重新辨識',
+    stop: '停止',
+    editReadingOrderTitle: '編輯閱讀順序',
+    editReadingOrderLabel: '編輯讀序',
+    processNewFiles: '處理新檔案',
+    bugReportTitle: '回饋',
+    bugReportLabel: '回饋',
+    imageAdjustedHint: '影像已校正 — 重新OCR整頁或選取區域重新辨識',
+    reOcrInProgress: '重新OCR中…',
+    reOcrPage: '重新OCR此頁',
+    uploadNewFiles: '上傳新檔案',
   },
   upload: {
     dropzone: '拖放檔案到此處，或點擊選擇',
@@ -11,6 +38,7 @@ export const zhTW: Translations = {
     acceptedFormats: '支援格式: JPG, PNG, PDF',
     startButton: '開始OCR',
     clearButton: '清除',
+    pasteClipboard: '從剪貼簿貼上',
   },
   progress: {
     initializing: '初始化中...',
@@ -228,10 +256,23 @@ export const zhTW: Translations = {
   },
   viewer: {
     zoomIn: '放大', zoomOut: '縮小', fitToWidth: '符合寬度', fitToHeight: '符合高度', resetZoom: '重設縮放', rotate: '旋轉',
+    adjust: '影像校正',
   },
   iiif: {
     title: 'IIIF影像載入器', manifestUrl: 'IIIF清單URL', load: '載入', loading: '正在載入清單...',
     selectImages: '選擇要載入的影像', selectAll: '全選', deselectAll: '取消全選',
     loadSelected: '載入所選影像', noImages: '清單中沒有影像', error: '載入IIIF清單失敗',
   },
+  samples: {
+    tryWith: '使用範例圖片試用:',
+    modernPrint: '現代活字',
+    kuzushiji: '草書',
+    kumonoitoLabel: '蛛絲（現代）',
+    kumonoitoDesc: '芥川龍之介《蛛絲》— 現代印刷日語文本',
+    taketoriLabel: '竹取物語（草書）',
+    taketoriDesc: '竹取物語 — 日本國立國會圖書館數位典藏草書手稿',
+    tamamizuLabel: '玉水物語（IIIF・草書）',
+    tamamizuDesc: '玉水物語 — 京都大學圖書館藏・彩色插圖御伽草子寫本（IIIF）',
+  },
+
 }

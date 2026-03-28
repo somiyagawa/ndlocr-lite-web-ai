@@ -4,6 +4,33 @@ export const de: Translations = {
   app: {
     title: 'NDL(Kotenseki)OCR-lite Web',
     subtitle: 'Japanisches OCR-Werkzeug im Browser',
+    confirmDiscard: 'Aktuelle OCR-Ergebnisse werden verworfen. Fortfahren?',
+    landingDesc: 'Vom modernen Druck bis zum klassischen Kuzushiji — browserbasierte japanische OCR mit der Engine der Nationalen Parlamentsbibliothek',
+    backgroundCredit: 'Hintergrund: Blauer Teich, Biei — MaedaAkihiko, CC BY-SA 4.0',
+    splashDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+    processingDesc: 'Extended Japanese OCR with enhanced features, built on the National Diet Library engine',
+  },
+  nav: {
+    previous: 'Zurück',
+    next: 'Weiter',
+    dragToReorder: 'Ziehen zum Neuordnen',
+  },
+  ocr: {
+    startOcr: 'OCR starten',
+    ocrSelectedRegion: 'OCR des ausgewählten Bereichs',
+    clearSelection: 'Auswahl aufheben',
+    regionSelectHint: 'Ziehen Sie, um einen Bereich auszuwählen, dann klicken Sie auf "OCR starten"',
+    regionSelectHintResult: 'Ziehen Sie, um einen Bereich auszuwählen, dann klicken Sie auf "OCR des ausgewählten Bereichs"',
+    stop: 'Stopp',
+    editReadingOrderTitle: 'Lesereihenfolge bearbeiten',
+    editReadingOrderLabel: 'Reihenfolge',
+    processNewFiles: 'Neue Dateien verarbeiten',
+    bugReportTitle: 'Melden',
+    bugReportLabel: 'Melden',
+    imageAdjustedHint: 'Image adjusted — re-OCR the full page or select a region to re-recognize',
+    reOcrInProgress: 'Re-OCR in progress…',
+    reOcrPage: 'Re-OCR Page',
+    uploadNewFiles: 'Neue Dateien hochladen',
   },
   upload: {
     dropzone: 'Dateien hierher ziehen oder klicken zum Auswählen',
@@ -11,6 +38,7 @@ export const de: Translations = {
     acceptedFormats: 'Unterstützte Formate: JPG, PNG, PDF',
     startButton: 'OCR starten',
     clearButton: 'Löschen',
+    pasteClipboard: 'Aus Zwischenablage einfügen',
   },
   progress: {
     initializing: 'Initialisierung...',
@@ -267,6 +295,7 @@ export const de: Translations = {
     fitToHeight: 'An Höhe anpassen',
     resetZoom: 'Zoom zurücksetzen',
     rotate: 'Drehen',
+    adjust: 'Anpassen',
   },
   iiif: {
     title: 'IIIF-Lader',
@@ -280,4 +309,16 @@ export const de: Translations = {
     noImages: 'Keine Bilder',
     error: 'Manifest-Ladefehler',
   },
+  samples: {
+    tryWith: 'Try with sample images:',
+    modernPrint: 'Modern Print',
+    kuzushiji: 'Kuzushiji',
+    kumonoitoLabel: 'Kumo no Ito (Modern)',
+    kumonoitoDesc: 'Akutagawa Ryunosuke "The Spider\\\'s Thread" — Modern printed Japanese text',
+    taketoriLabel: 'Taketori Monogatari (Kuzushiji)',
+    taketoriDesc: 'The Tale of the Bamboo Cutter — Kuzushiji manuscript from NDL Digital Collections',
+    tamamizuLabel: 'Tamamizu Monogatari (IIIF / Kuzushiji)',
+    tamamizuDesc: 'The Tale of Tamamizu — Illustrated otogi-zoshi manuscript, Kyoto University Library (IIIF)',
+  },
+
 }
