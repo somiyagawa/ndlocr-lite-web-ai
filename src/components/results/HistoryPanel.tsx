@@ -25,7 +25,7 @@ export function HistoryPanel({ runs, onSelect, onClear, onClose, lang }: History
   }
 
   const formatDate = (ts: number) => {
-    const localeMap: Record<Language, string> = {
+    const localeMap: Partial<Record<Language, string>> = {
       ja: 'ja-JP',
       en: 'en-US',
       'zh-CN': 'zh-CN',

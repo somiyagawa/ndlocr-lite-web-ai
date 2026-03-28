@@ -84,7 +84,7 @@ type TranslationStrings = {
   processing: string
 }
 
-const t: Record<Language, TranslationStrings> = {
+const t: Partial<Record<Language, TranslationStrings>> = {
   ja: {
     imagePreprocessing: '画像補正',
     brightness: '明度',
@@ -583,7 +583,7 @@ export function ImagePreprocessPanel({
   const [options, setOptions] = useState<PreprocessOptions>(DEFAULT_PREPROCESS_OPTIONS)
   const [isProcessing, setIsProcessing] = useState(false)
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null)
-  const strings = t[lang]
+  const strings = t[lang] ?? t.en!
 
   // ── Perspective crop: use lifted state if available, otherwise local fallback ──
   const showPerspective = perspectiveActive ?? false

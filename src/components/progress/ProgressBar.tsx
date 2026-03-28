@@ -8,7 +8,7 @@ interface ProgressBarProps {
   lang: Language
 }
 
-const MODEL_LABELS: Record<Language, { layout: string; rec30: string; rec50: string; rec100: string; downloading: string }> = {
+const MODEL_LABELS: Partial<Record<Language, { layout: string; rec30: string; rec50: string; rec100: string; downloading: string }>> = {
   ja: {
     layout: 'レイアウト検出モデル',
     rec30: '文字認識モデル（≤30文字）',
@@ -131,7 +131,7 @@ export const ProgressBar = memo(function ProgressBar({ jobState, lang }: Progres
   const isError = status === 'error'
   const isDone = status === 'done'
   const isDownloading = stage === 'loading_models' && modelProgress != null
-  const labels = MODEL_LABELS[lang]
+  const labels = MODEL_LABELS[lang] ?? MODEL_LABELS.en!
 
   if (isDownloading) {
     return (

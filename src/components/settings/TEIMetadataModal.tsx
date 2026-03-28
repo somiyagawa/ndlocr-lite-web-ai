@@ -39,7 +39,7 @@ export function TEIMetadataModal({
     onClose()
   }
 
-  const fields: Array<{ key: keyof TEIMetadata; label: Record<Language, string> }> = [
+  const fields: Array<{ key: keyof TEIMetadata; label: Partial<Record<Language, string>> }> = [
     {
       key: 'title',
       label: {
