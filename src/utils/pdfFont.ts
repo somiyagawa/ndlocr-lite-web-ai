@@ -1,31 +1,31 @@
 /**
  * PDF エクスポート用 CJK フォントローダー
  *
- * Google Fonts API から Noto Sans JP の woff2 を取得し、
- * IndexedDB にキャッシュして pdf-lib + fontkit で使用する。
- * pdf-lib は woff2 / TTF / OTF いずれも対応している。
+ * Noto Sans JP SubsetOTF（日本語サブセット、約 4.3 MB）を
+ * CDN から直接取得し、IndexedDB にキャッシュする。
+ *
+ * 旧実装では Google Fonts CSS2 API を使用していたが、
+ * CSS2 API は CJK フォントを 100 以上の unicode-range スライスに
+ * 分割して返すため、最初のスライスのみしか取得できず、
+ * 大半の日本語グリフが欠落していた。
+ * 完全な OTF ファイルを直接取得することでこの問題を解決する。
  */
 
 const FONT_CACHE_DB = 'pdf-font-cache'
 const FONT_CACHE_STORE = 'fonts'
-const FONT_KEY = 'NotoSansJP-Regular-v2'
+// キャッシュキーを変更して旧キャッシュ（壊れた woff2 スライス）を無効化
+const FONT_KEY = 'NotoSansJP-Regular-SubsetOTF-v3'
 
 /**
- * Google Fonts CSS API からフォントバイナリの URL を取得する。
- * ブラウザの実 User-Agent がそのまま送信されるため、
- * 現代ブラウザでは woff2 URL が返される。pdf-lib + fontkit は woff2 対応。
+ * CDN URL リスト（フォールバック順）
+ *
+ * 1. jsDelivr — notofonts/noto-cjk リポジトリ SubsetOTF/JP（〜4.3 MB）
+ * 2. jsDelivr — notofonts/noto-cjk フル OTF（〜16 MB、フォールバック）
  */
-async function fetchFontUrlFromCSS(): Promise<string> {
-  const cssUrl = 'https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400'
-  const res = await fetch(cssUrl)
-  if (!res.ok) throw new Error(`Google Fonts CSS fetch failed: ${res.status}`)
-
-  const css = await res.text()
-  // CSS 内の url(...) を抽出（複数あれば最初の1つ）
-  const urlMatch = css.match(/url\(([^)]+)\)/)
-  if (!urlMatch) throw new Error('Font URL not found in CSS response')
-  return urlMatch[1].replace(/['"]/g, '')
-}
+const FONT_URLS = [
+  'https://cdn.jsdelivr.net/gh/notofonts/noto-cjk@main/Sans/SubsetOTF/JP/NotoSansJP-Regular.otf',
+  'https://cdn.jsdelivr.net/gh/notofonts/noto-cjk@main/Sans/OTF/Japanese/NotoSansCJKjp-Regular.otf',
+]
 
 // ---- IndexedDB キャッシュ ----
 
@@ -82,7 +82,7 @@ let fontBytesCache: ArrayBuffer | null = null
  * 優先順位:
  *   1. メモリキャッシュ
  *   2. IndexedDB キャッシュ
- *   3. Google Fonts API → woff2 フェッチ → IndexedDB に保存
+ *   3. CDN からフェッチ → IndexedDB に保存
  *
  * @returns フォントの ArrayBuffer。失敗時は null。
  */
@@ -93,29 +93,43 @@ export async function loadCJKFontBytes(): Promise<ArrayBuffer | null> {
   try {
     // IndexedDB キャッシュ
     const cached = await getCachedFont()
-    if (cached && cached.byteLength > 10_000) {
+    if (cached && cached.byteLength > 100_000) {
+      console.log(`[pdfFont] CJK font loaded from cache: ${(cached.byteLength / 1024).toFixed(0)} KB`)
       fontBytesCache = cached
       return cached
     }
 
-    // Google Fonts CSS → woff2 URL → バイナリ取得
-    const fontUrl = await fetchFontUrlFromCSS()
-    console.log('[pdfFont] Fetching CJK font from:', fontUrl)
+    // CDN から直接 OTF をフェッチ（フォールバック付き）
+    for (const url of FONT_URLS) {
+      try {
+        console.log('[pdfFont] Fetching CJK font from:', url)
+        const res = await fetch(url, { mode: 'cors' })
+        if (!res.ok) {
+          console.warn(`[pdfFont] Font fetch failed (${res.status}): ${url}`)
+          continue
+        }
 
-    const res = await fetch(fontUrl, { mode: 'cors' })
-    if (!res.ok) throw new Error(`Font fetch failed: ${res.status}`)
+        const data = await res.arrayBuffer()
+        // OTF ファイルは最低でも数百 KB はある
+        if (data.byteLength < 100_000) {
+          console.warn(`[pdfFont] Font data too small (${data.byteLength} bytes): ${url}`)
+          continue
+        }
 
-    const data = await res.arrayBuffer()
-    if (data.byteLength < 10_000) {
-      throw new Error(`Font data too small: ${data.byteLength} bytes`)
+        console.log(`[pdfFont] CJK font loaded: ${(data.byteLength / 1024 / 1024).toFixed(1)} MB from ${url}`)
+
+        // キャッシュに保存
+        await cacheFont(data)
+        fontBytesCache = data
+        return data
+      } catch (e) {
+        console.warn(`[pdfFont] Failed to fetch from ${url}:`, e)
+        continue
+      }
     }
 
-    console.log(`[pdfFont] CJK font loaded: ${(data.byteLength / 1024).toFixed(0)} KB`)
-
-    // キャッシュに保存
-    await cacheFont(data)
-    fontBytesCache = data
-    return data
+    console.warn('[pdfFont] All CJK font sources failed')
+    return null
   } catch (e) {
     console.warn('[pdfFont] CJK font loading failed:', e)
     return null

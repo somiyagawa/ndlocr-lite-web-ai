@@ -72,7 +72,7 @@ export async function downloadPDF(result: OCRResult, fullImageDataUrl?: string):
   // CJK フォント読み込み・埋め込み
   const fontBytes = await loadCJKFontBytes()
   const font = fontBytes
-    ? await pdfDoc.embedFont(fontBytes, { subset: true })
+    ? await pdfDoc.embedFont(fontBytes, { subset: false })
     : undefined
 
   if (!font) {
@@ -100,7 +100,7 @@ export async function downloadBatchPDF(results: OCRResult[]): Promise<void> {
   // CJK フォント読み込み（1回だけ）
   const fontBytes = await loadCJKFontBytes()
   const font = fontBytes
-    ? await pdfDoc.embedFont(fontBytes, { subset: true })
+    ? await pdfDoc.embedFont(fontBytes, { subset: false })
     : undefined
 
   if (!font) {

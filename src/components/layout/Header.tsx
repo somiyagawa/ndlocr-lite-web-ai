@@ -8,6 +8,28 @@ import type { OCRMode } from '../../types/ocr'
 /** 更新履歴データ */
 const CHANGELOG: { version: string; date: string; changes: Record<string, string[]> }[] = [
   {
+    version: '4.4.3',
+    date: '2026-03-28',
+    changes: {
+      ja: [
+        'PDFフォント修正: Google Fonts CSS2 APIのunicode-rangeスライス問題を解消 — 最初のスライス（日本語グリフ未収録）のみ取得していた不具合を修正',
+        'PDFフォント: Noto Sans JP SubsetOTF（完全な日本語グリフセット、約4.3MB）をjsDelivr CDNから直接取得に変更',
+        'PDF /Widths修正: fontkitのCJKフォントサブセット処理による /Widths テーブル破損を回避（subset: false に変更）',
+        'Acrobat互換性: 「NotoSansJPThin-Regular フォントの /Widths が正しくありません」エラーを解消',
+        'PDFテキスト検索・選択: 日本語テキストレイヤーが正常に埋め込まれ、Acrobat上で検索・選択が可能に',
+        'フォントキャッシュ: CDNフォールバック対応（SubsetOTF → フルCJK OTF）、IndexedDBキャッシュキーを更新して旧キャッシュを自動無効化',
+      ],
+      en: [
+        'PDF font fix: resolved Google Fonts CSS2 API unicode-range slicing issue — was only fetching the first slice which lacked Japanese glyphs',
+        'PDF font: switched to Noto Sans JP SubsetOTF (complete Japanese glyph set, ~4.3 MB) fetched directly from jsDelivr CDN',
+        'PDF /Widths fix: avoid fontkit CJK font subsetting corruption by disabling subset embedding',
+        'Acrobat compatibility: resolved "NotoSansJPThin-Regular /Widths incorrect" error',
+        'PDF text search/select: Japanese text layer now correctly embedded, enabling search and selection in Acrobat',
+        'Font cache: CDN fallback support (SubsetOTF → full CJK OTF), updated IndexedDB cache key to auto-invalidate old corrupt cache',
+      ],
+    },
+  },
+  {
     version: '4.4.2',
     date: '2026-03-27',
     changes: {
@@ -573,7 +595,7 @@ export const Header = memo(function Header({
           title={changelogTitle}
           role="button"
           tabIndex={0}
-        >v4.4.2</span>
+        >v4.4.3</span>
       </button>
 
       {/* Hamburger button - visible on mobile only */}

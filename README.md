@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/version-4.4.2-teal?style=for-the-badge" alt="v4.4.2" />
+  <img src="https://img.shields.io/badge/version-4.4.3-teal?style=for-the-badge" alt="v4.4.3" />
   <img src="https://img.shields.io/badge/license-CC_BY_4.0-blue?style=for-the-badge" alt="CC BY 4.0" />
   <img src="https://img.shields.io/badge/browser-100%25_client--side-green?style=for-the-badge" alt="Client-side" />
   <img src="https://img.shields.io/badge/lang-16_languages-orange?style=for-the-badge" alt="Multilingual" />
@@ -201,6 +201,10 @@ npm run mcp-server   # MCPモックサーバー（localhost:3456）
 ---
 
 ## 更新記録
+
+### v4.4.3 — 2026-03-28
+
+**PDF フォント /Widths エラー修正・テキスト検索選択復旧** — Google Fonts CSS2 API が CJK フォントを 100 以上の unicode-range スライスに分割して返す問題を解消。旧実装では最初のスライス（日本語グリフ未収録）のみ取得していたため、Acrobat で「NotoSansJPThin-Regular フォントの /Widths が正しくありません」エラーが発生し、テキスト検索・選択が不可能だった。Noto Sans JP SubsetOTF（完全な日本語グリフセット、約 4.3 MB）を jsDelivr CDN から直接取得する方式に変更。fontkit の CJK サブセット処理による /Widths テーブル破損を回避するため `subset: false` に設定。CDN フォールバック対応（SubsetOTF → フル CJK OTF）、IndexedDB キャッシュキーを更新して旧キャッシュを自動無効化。
 
 ### v4.4.2 — 2026-03-27
 
