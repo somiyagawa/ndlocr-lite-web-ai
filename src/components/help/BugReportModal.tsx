@@ -161,14 +161,19 @@ function getBrowserInfo(): string {
 const APP_VERSION = '4.4.3'
 
 /**
- * Web3Forms アクセスキー
+ * Web3Forms アクセスキー（オプション）
  *
  * Vercel 環境では Netlify Forms が使えないため、
  * クライアントサイドで動作する Web3Forms API を使用する。
  * https://web3forms.com で無料キーを取得し、
  * Vercel の環境変数 VITE_WEB3FORMS_KEY に設定する。
+ *
+ * キーが未設定の場合は GitHub Issues へのリダイレクトにフォールバックする。
  */
 const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY as string | undefined
+
+/** GitHub Issues URL（Web3Forms 未設定時のフォールバック） */
+const GITHUB_ISSUES_URL = 'https://github.com/somiyagawa/ndlocr-lite-web-ai-deluxe/issues/new'
 
 export const BugReportModal = memo(function BugReportModal({ lang, onClose }: BugReportModalProps) {
   const strings = getStrings(lang)
@@ -184,15 +189,42 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
     : category === 'feature' ? strings.categoryFeature
     : strings.categoryOther
 
+  /**
+   * GitHub Issues にリダイレクトする（Web3Forms 未設定時のフォールバック）。
+   * COOP ヘッダー環境でも window.location.href は動作する。
+   */
+  const submitViaGitHub = useCallback(() => {
+    const title = encodeURIComponent(
+      `[${categoryLabel}] ${description.slice(0, 80)}`,
+    )
+    const bodyParts = [
+      `## ${categoryLabel}`,
+      '',
+      `**App Version:** v${APP_VERSION}`,
+      `**Browser:** ${getBrowserInfo()}`,
+      name ? `**Reporter:** ${name}${email ? ` (${email})` : ''}` : '',
+      '',
+      '## Description',
+      description,
+    ]
+    if (category === 'bug' && steps.trim()) {
+      bodyParts.push('', '## Steps to Reproduce', steps)
+    }
+    const body = encodeURIComponent(bodyParts.filter(Boolean).join('\n'))
+    const url = `${GITHUB_ISSUES_URL}?title=${title}&body=${body}`
+
+    // window.location.href で遷移（COOP 環境でも安全）
+    window.location.href = url
+  }, [name, email, category, categoryLabel, description, steps])
+
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setStatus('sending')
 
-    // Web3Forms API — Vercel 等あらゆるホスティングで動作するクライアントサイド送信
-    // https://web3forms.com で無料キーを取得し VITE_WEB3FORMS_KEY に設定する
+    // Web3Forms キーが未設定 → GitHub Issues にフォールバック
     if (!WEB3FORMS_KEY) {
-      console.error('[BugReport] VITE_WEB3FORMS_KEY is not set. Cannot submit.')
-      setStatus('error')
+      console.log('[BugReport] Web3Forms key not set — redirecting to GitHub Issues')
+      submitViaGitHub()
       return
     }
 
@@ -208,7 +240,6 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
       app_version: APP_VERSION,
       page_url: window.location.href,
       timestamp: new Date().toISOString(),
-      // ハニーポット（スパム対策）
       botcheck: '',
     }
 
@@ -229,7 +260,7 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
       console.error('Form submission error:', err)
       setStatus('error')
     }
-  }, [name, email, category, categoryLabel, description, steps])
+  }, [name, email, category, categoryLabel, description, steps, submitViaGitHub])
 
   return (
     <div className="modal-overlay" onClick={onClose}>
