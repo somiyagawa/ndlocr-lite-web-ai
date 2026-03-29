@@ -28,6 +28,7 @@ interface TranslationStrings {
   sentMessage: string
   errorMessage: string
   retry: string
+  openGitHub: string
 }
 
 const translations: Record<string, TranslationStrings> = {
@@ -53,6 +54,7 @@ const translations: Record<string, TranslationStrings> = {
     sentMessage: 'ご報告ありがとうございます。内容を確認いたします。',
     errorMessage: '送信に失敗しました。ネットワーク接続を確認して再度お試し下さい。',
     retry: '再送信',
+    openGitHub: 'こちらをクリックして報告を送信',
   },
   en: {
     title: 'Bug Report / Feature Request',
@@ -76,6 +78,7 @@ const translations: Record<string, TranslationStrings> = {
     sentMessage: 'Thank you for your report. We will review it shortly.',
     errorMessage: 'Submission failed. Please check your network connection and try again.',
     retry: 'Retry',
+    openGitHub: 'Click here to submit your report',
   },
   'zh-CN': {
     title: '错误报告 / 功能建议',
@@ -99,6 +102,7 @@ const translations: Record<string, TranslationStrings> = {
     sentMessage: '感谢您的反馈。我们会尽快查看。',
     errorMessage: '发送失败。请检查网络连接后重试。',
     retry: '重试',
+    openGitHub: '点击这里提交报告',
   },
   'zh-TW': {
     title: '錯誤報告 / 功能建議',
@@ -122,6 +126,7 @@ const translations: Record<string, TranslationStrings> = {
     sentMessage: '感謝您的回報。我們會盡快查看。',
     errorMessage: '發送失敗。請檢查網路連線後重試。',
     retry: '重試',
+    openGitHub: '點擊這裡提交報告',
   },
   ko: {
     title: '버그 보고 / 기능 요청',
@@ -145,6 +150,7 @@ const translations: Record<string, TranslationStrings> = {
     sentMessage: '보고해 주셔서 감사합니다. 곧 확인하겠습니다.',
     errorMessage: '전송 실패. 네트워크 연결을 확인하고 다시 시도해 주세요.',
     retry: '다시 시도',
+    openGitHub: '여기를 클릭하여 보고서 제출',
   },
 }
 
@@ -184,17 +190,16 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
   const [description, setDescription] = useState('')
   const [steps, setSteps] = useState('')
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [githubUrl, setGithubUrl] = useState<string | null>(null)
 
   const categoryLabel = category === 'bug' ? strings.categoryBug
     : category === 'feature' ? strings.categoryFeature
     : strings.categoryOther
 
   /**
-   * GitHub Issues を新しいタブで開く（Web3Forms 未設定時のフォールバック）。
-   * COOP: same-origin 環境では window.location.href だとアプリ全体が遷移してしまうため、
-   * <a target="_blank"> のクリックをシミュレートして新タブで開く。
+   * GitHub Issues URL を生成する
    */
-  const submitViaGitHub = useCallback(() => {
+  const buildGitHubUrl = useCallback(() => {
     const title = encodeURIComponent(
       `[${categoryLabel}] ${description.slice(0, 80)}`,
     )
@@ -212,73 +217,54 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
       bodyParts.push('', '## Steps to Reproduce', steps)
     }
     const body = encodeURIComponent(bodyParts.filter(Boolean).join('\n'))
-    const url = `${GITHUB_ISSUES_URL}?title=${title}&body=${body}`
-
-    // <a> 要素を生成して新タブで開く（COOP 環境で安全に動作）
-    const a = document.createElement('a')
-    a.href = url
-    a.target = '_blank'
-    a.rel = 'noopener noreferrer'
-    document.body.appendChild(a)
-    a.click()
-    document.body.removeChild(a)
+    return `${GITHUB_ISSUES_URL}?title=${title}&body=${body}`
   }, [name, email, category, categoryLabel, description, steps])
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault()
     setStatus('sending')
 
-    // Web3Forms キーが未設定 → GitHub Issues を新タブで開く
-    if (!WEB3FORMS_KEY) {
-      console.log('[BugReport] Web3Forms key not set — opening GitHub Issues in new tab')
-      submitViaGitHub()
-      setStatus('sent')
-      return
-    }
-
-    const payload = {
-      access_key: WEB3FORMS_KEY,
-      subject: `[NDL OCR v${APP_VERSION}] ${categoryLabel}: ${description.slice(0, 60)}`,
-      from_name: name || 'Anonymous',
-      email: email || 'noreply@example.com',
-      category: `${category} (${categoryLabel})`,
-      description,
-      steps: steps || '(N/A)',
-      browser: getBrowserInfo(),
-      app_version: APP_VERSION,
-      page_url: window.location.href,
-      timestamp: new Date().toISOString(),
-      botcheck: '',
-    }
-
-    try {
-      const controller = new AbortController()
-      const timeout = setTimeout(() => controller.abort(), 15000) // 15秒タイムアウト
-      const response = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
-      })
-      clearTimeout(timeout)
-      const result = await response.json()
-      if (response.ok && result.success) {
-        setStatus('sent')
-      } else {
-        console.error('Form submission failed:', result)
-        // Web3Forms 失敗 → GitHub Issues にフォールバック
-        console.log('[BugReport] Web3Forms failed — falling back to GitHub Issues')
-        submitViaGitHub()
-        setStatus('sent')
+    // Web3Forms キーが設定されている場合はAPIで送信を試みる
+    if (WEB3FORMS_KEY) {
+      const payload = {
+        access_key: WEB3FORMS_KEY,
+        subject: `[NDL OCR v${APP_VERSION}] ${categoryLabel}: ${description.slice(0, 60)}`,
+        from_name: name || 'Anonymous',
+        email: email || 'noreply@example.com',
+        category: `${category} (${categoryLabel})`,
+        description,
+        steps: steps || '(N/A)',
+        browser: getBrowserInfo(),
+        app_version: APP_VERSION,
+        page_url: window.location.href,
+        timestamp: new Date().toISOString(),
+        botcheck: '',
       }
-    } catch (err) {
-      console.error('Form submission error:', err)
-      // ネットワークエラー・タイムアウト → GitHub Issues にフォールバック
-      console.log('[BugReport] Fetch error — falling back to GitHub Issues')
-      submitViaGitHub()
-      setStatus('sent')
+      try {
+        const controller = new AbortController()
+        const timeout = setTimeout(() => controller.abort(), 15000)
+        const response = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(payload),
+          signal: controller.signal,
+        })
+        clearTimeout(timeout)
+        const result = await response.json()
+        if (response.ok && result.success) {
+          setStatus('sent')
+          return
+        }
+      } catch {
+        // Web3Forms 失敗 → GitHub Issues リンク表示にフォールバック
+      }
     }
-  }, [name, email, category, categoryLabel, description, steps, submitViaGitHub])
+
+    // GitHub Issues のリンクを生成して表示（ユーザーが自分でクリックする）
+    const url = buildGitHubUrl()
+    setGithubUrl(url)
+    setStatus('sent')
+  }, [name, email, category, categoryLabel, description, steps, buildGitHubUrl])
 
   return (
     <div className="modal-overlay" onClick={onClose}>
