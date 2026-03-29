@@ -1,4 +1,4 @@
-import { useState, useCallback, memo } from 'react'
+import { useState, useMemo, memo } from 'react'
 import type { Language } from '../../i18n'
 
 interface BugReportModalProps {
@@ -21,14 +21,13 @@ interface TranslationStrings {
   stepsLabel: string
   stepsPlaceholder: string
   browserLabel: string
-  send: string
   cancel: string
-  sending: string
-  sent: string
+  confirm: string
   sentMessage: string
-  errorMessage: string
-  retry: string
-  openGitHub: string
+  viaGitHub: string
+  viaEmail: string
+  viaTwitter: string
+  chooseMethod: string
 }
 
 const translations: Record<string, TranslationStrings> = {
@@ -47,14 +46,13 @@ const translations: Record<string, TranslationStrings> = {
     stepsLabel: '再現手順',
     stepsPlaceholder: '(バグの場合) どのような手順で問題が発生しましたか？',
     browserLabel: 'ブラウザ',
-    send: '送信',
     cancel: 'キャンセル',
-    sending: '送信中…',
-    sent: '送信完了！',
-    sentMessage: 'ご報告ありがとうございます。内容を確認いたします。',
-    errorMessage: '送信に失敗しました。ネットワーク接続を確認して再度お試し下さい。',
-    retry: '再送信',
-    openGitHub: 'こちらをクリックして報告を送信',
+    confirm: '次へ',
+    sentMessage: '以下のいずれかの方法で報告を送信して下さい。',
+    viaGitHub: 'GitHub Issue で報告',
+    viaEmail: 'メールで報告',
+    viaTwitter: 'Twitter / X で報告',
+    chooseMethod: '送信方法を選択',
   },
   en: {
     title: 'Bug Report / Feature Request',
@@ -71,14 +69,13 @@ const translations: Record<string, TranslationStrings> = {
     stepsLabel: 'Steps to Reproduce',
     stepsPlaceholder: '(For bugs) What steps led to the issue?',
     browserLabel: 'Browser',
-    send: 'Send',
     cancel: 'Cancel',
-    sending: 'Sending…',
-    sent: 'Sent!',
-    sentMessage: 'Thank you for your report. We will review it shortly.',
-    errorMessage: 'Submission failed. Please check your network connection and try again.',
-    retry: 'Retry',
-    openGitHub: 'Click here to submit your report',
+    confirm: 'Next',
+    sentMessage: 'Please choose a method to submit your report.',
+    viaGitHub: 'Report via GitHub Issue',
+    viaEmail: 'Report via Email',
+    viaTwitter: 'Report via Twitter / X',
+    chooseMethod: 'Choose submission method',
   },
   'zh-CN': {
     title: '错误报告 / 功能建议',
@@ -95,14 +92,13 @@ const translations: Record<string, TranslationStrings> = {
     stepsLabel: '复现步骤',
     stepsPlaceholder: '（如为错误）导致问题的步骤是什么？',
     browserLabel: '浏览器',
-    send: '发送',
     cancel: '取消',
-    sending: '发送中…',
-    sent: '已发送！',
-    sentMessage: '感谢您的反馈。我们会尽快查看。',
-    errorMessage: '发送失败。请检查网络连接后重试。',
-    retry: '重试',
-    openGitHub: '点击这里提交报告',
+    confirm: '下一步',
+    sentMessage: '请选择以下方式提交报告。',
+    viaGitHub: '通过 GitHub Issue 报告',
+    viaEmail: '通过电子邮件报告',
+    viaTwitter: '通过 Twitter / X 报告',
+    chooseMethod: '选择提交方式',
   },
   'zh-TW': {
     title: '錯誤報告 / 功能建議',
@@ -119,14 +115,13 @@ const translations: Record<string, TranslationStrings> = {
     stepsLabel: '重現步驟',
     stepsPlaceholder: '（如為錯誤）導致問題的步驟是什麼？',
     browserLabel: '瀏覽器',
-    send: '發送',
     cancel: '取消',
-    sending: '發送中…',
-    sent: '已發送！',
-    sentMessage: '感謝您的回報。我們會盡快查看。',
-    errorMessage: '發送失敗。請檢查網路連線後重試。',
-    retry: '重試',
-    openGitHub: '點擊這裡提交報告',
+    confirm: '下一步',
+    sentMessage: '請選擇以下方式提交報告。',
+    viaGitHub: '透過 GitHub Issue 報告',
+    viaEmail: '透過電子郵件報告',
+    viaTwitter: '透過 Twitter / X 報告',
+    chooseMethod: '選擇提交方式',
   },
   ko: {
     title: '버그 보고 / 기능 요청',
@@ -143,14 +138,13 @@ const translations: Record<string, TranslationStrings> = {
     stepsLabel: '재현 단계',
     stepsPlaceholder: '(버그의 경우) 문제가 발생한 단계는?',
     browserLabel: '브라우저',
-    send: '보내기',
     cancel: '취소',
-    sending: '보내는 중…',
-    sent: '전송 완료!',
-    sentMessage: '보고해 주셔서 감사합니다. 곧 확인하겠습니다.',
-    errorMessage: '전송 실패. 네트워크 연결을 확인하고 다시 시도해 주세요.',
-    retry: '다시 시도',
-    openGitHub: '여기를 클릭하여 보고서 제출',
+    confirm: '다음',
+    sentMessage: '아래 방법 중 하나로 보고서를 제출해 주세요.',
+    viaGitHub: 'GitHub Issue로 보고',
+    viaEmail: '이메일로 보고',
+    viaTwitter: 'Twitter / X로 보고',
+    chooseMethod: '제출 방법 선택',
   },
 }
 
@@ -165,21 +159,9 @@ function getBrowserInfo(): string {
 }
 
 const APP_VERSION = '4.4.4'
-
-/**
- * Web3Forms アクセスキー（オプション）
- *
- * Vercel 環境では Netlify Forms が使えないため、
- * クライアントサイドで動作する Web3Forms API を使用する。
- * https://web3forms.com で無料キーを取得し、
- * Vercel の環境変数 VITE_WEB3FORMS_KEY に設定する。
- *
- * キーが未設定の場合は GitHub Issues へのリダイレクトにフォールバックする。
- */
-const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY as string | undefined
-
-/** GitHub Issues URL（Web3Forms 未設定時のフォールバック） */
+const REPORT_EMAIL = 'miyagawa.so.kb@u.tsukuba.ac.jp'
 const GITHUB_ISSUES_URL = 'https://github.com/somiyagawa/ndlocr-lite-web-ai-deluxe/issues/new'
+const TWITTER_HANDLE = 'So_Miyagawa'
 
 export const BugReportModal = memo(function BugReportModal({ lang, onClose }: BugReportModalProps) {
   const strings = getStrings(lang)
@@ -189,82 +171,65 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
   const [category, setCategory] = useState<'bug' | 'feature' | 'other'>('bug')
   const [description, setDescription] = useState('')
   const [steps, setSteps] = useState('')
-  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
-  const [githubUrl, setGithubUrl] = useState<string | null>(null)
+  const [showLinks, setShowLinks] = useState(false)
 
   const categoryLabel = category === 'bug' ? strings.categoryBug
     : category === 'feature' ? strings.categoryFeature
     : strings.categoryOther
 
-  /**
-   * GitHub Issues URL を生成する
-   */
-  const buildGitHubUrl = useCallback(() => {
-    const title = encodeURIComponent(
-      `[${categoryLabel}] ${description.slice(0, 80)}`,
-    )
-    const bodyParts = [
-      `## ${categoryLabel}`,
+  /** 報告本文を組み立てる */
+  const reportBody = useMemo(() => {
+    const parts = [
+      `[${categoryLabel}]`,
       '',
-      `**App Version:** v${APP_VERSION}`,
-      `**Browser:** ${getBrowserInfo()}`,
-      name ? `**Reporter:** ${name}${email ? ` (${email})` : ''}` : '',
+      `App Version: v${APP_VERSION}`,
+      `Browser: ${getBrowserInfo()}`,
+      name ? `Reporter: ${name}${email ? ` (${email})` : ''}` : '',
       '',
-      '## Description',
+      'Description:',
       description,
     ]
     if (category === 'bug' && steps.trim()) {
-      bodyParts.push('', '## Steps to Reproduce', steps)
+      parts.push('', 'Steps to Reproduce:', steps)
     }
-    const body = encodeURIComponent(bodyParts.filter(Boolean).join('\n'))
-    return `${GITHUB_ISSUES_URL}?title=${title}&body=${body}`
+    return parts.filter(Boolean).join('\n')
   }, [name, email, category, categoryLabel, description, steps])
 
-  const handleSubmit = useCallback(async (e: React.FormEvent) => {
+  /** GitHub Issues URL */
+  const githubUrl = useMemo(() => {
+    const title = encodeURIComponent(`[${categoryLabel}] ${description.slice(0, 80)}`)
+    const mdBody = reportBody
+      .replace('Description:', '## Description')
+      .replace('Steps to Reproduce:', '## Steps to Reproduce')
+      .replace(/^App Version:/m, '**App Version:**')
+      .replace(/^Browser:/m, '**Browser:**')
+      .replace(/^Reporter:/m, '**Reporter:**')
+    const body = encodeURIComponent(mdBody)
+    return `${GITHUB_ISSUES_URL}?title=${title}&body=${body}`
+  }, [categoryLabel, description, reportBody])
+
+  /** mailto: URL */
+  const mailtoUrl = useMemo(() => {
+    const subject = encodeURIComponent(`[NDL OCR v${APP_VERSION}] ${categoryLabel}: ${description.slice(0, 60)}`)
+    const body = encodeURIComponent(reportBody)
+    return `mailto:${REPORT_EMAIL}?subject=${subject}&body=${body}`
+  }, [categoryLabel, description, reportBody])
+
+  /** Twitter / X メンション URL（280文字に収める） */
+  const twitterUrl = useMemo(() => {
+    const prefix = `@${TWITTER_HANDLE} [NDL OCR v${APP_VERSION}] ${categoryLabel}: `
+    const maxDesc = 280 - prefix.length - 3 // 末尾の "..." 分
+    const truncated = description.length > maxDesc
+      ? description.slice(0, maxDesc) + '...'
+      : description
+    const text = encodeURIComponent(prefix + truncated)
+    return `https://x.com/intent/tweet?text=${text}`
+  }, [categoryLabel, description])
+
+  const handleConfirm = (e: React.FormEvent) => {
     e.preventDefault()
-    setStatus('sending')
-
-    // Web3Forms キーが設定されている場合はAPIで送信を試みる
-    if (WEB3FORMS_KEY) {
-      const payload = {
-        access_key: WEB3FORMS_KEY,
-        subject: `[NDL OCR v${APP_VERSION}] ${categoryLabel}: ${description.slice(0, 60)}`,
-        from_name: name || 'Anonymous',
-        email: email || 'noreply@example.com',
-        category: `${category} (${categoryLabel})`,
-        description,
-        steps: steps || '(N/A)',
-        browser: getBrowserInfo(),
-        app_version: APP_VERSION,
-        page_url: window.location.href,
-        timestamp: new Date().toISOString(),
-        botcheck: '',
-      }
-      try {
-        const controller = new AbortController()
-        const timeout = setTimeout(() => controller.abort(), 15000)
-        const response = await fetch('https://api.web3forms.com/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-          body: JSON.stringify(payload),
-          signal: controller.signal,
-        })
-        clearTimeout(timeout)
-        const result = await response.json()
-        if (response.ok && result.success) {
-          setStatus('sent')
-          return
-        }
-      } catch {
-        // Web3Forms 失敗 → GitHub Issues リンク表示にフォールバック
-      }
-    }
-
-    // GitHub Issues のリンクを生成して表示（ユーザーが自分でクリックする）
-    const url = buildGitHubUrl()
-    setGithubUrl(url)
-    setStatus('sent')
-  }, [name, email, category, categoryLabel, description, steps, buildGitHubUrl])
+    setShowLinks(true)
+  }
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -274,29 +239,40 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
           <button className="modal-close" onClick={onClose} type="button">&times;</button>
         </div>
 
-        {status === 'sent' ? (
+        {showLinks ? (
           <div className="bug-report-sent">
-            <div className="bug-report-sent-icon">✓</div>
+            <h3>{strings.chooseMethod}</h3>
             <p>{strings.sentMessage}</p>
-            <button className="preprocess-btn preprocess-btn-primary" onClick={onClose} type="button">
-              OK
+            <div className="bug-report-link-buttons">
+              <a
+                href={githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="preprocess-btn preprocess-btn-primary bug-report-link-btn"
+              >
+                {strings.viaGitHub}
+              </a>
+              <a
+                href={mailtoUrl}
+                className="preprocess-btn preprocess-btn-primary bug-report-link-btn"
+              >
+                {strings.viaEmail}
+              </a>
+              <a
+                href={twitterUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="preprocess-btn preprocess-btn-primary bug-report-link-btn"
+              >
+                {strings.viaTwitter}
+              </a>
+            </div>
+            <button className="preprocess-btn preprocess-btn-secondary" onClick={onClose} type="button" style={{ marginTop: '12px' }}>
+              {strings.cancel}
             </button>
           </div>
-        ) : status === 'error' ? (
-          <div className="bug-report-sent">
-            <div className="bug-report-sent-icon" style={{ color: 'var(--color-danger, #dc3545)' }}>✕</div>
-            <p>{strings.errorMessage}</p>
-            <div className="bug-report-actions">
-              <button className="preprocess-btn preprocess-btn-secondary" onClick={onClose} type="button">
-                {strings.cancel}
-              </button>
-              <button className="preprocess-btn preprocess-btn-primary" onClick={() => setStatus('idle')} type="button">
-                {strings.retry}
-              </button>
-            </div>
-          </div>
         ) : (
-          <form className="bug-report-form" onSubmit={handleSubmit}>
+          <form className="bug-report-form" onSubmit={handleConfirm}>
             <div className="bug-report-row">
               <label>{strings.categoryLabel}</label>
               <div className="bug-report-category-group">
@@ -378,9 +354,9 @@ export const BugReportModal = memo(function BugReportModal({ lang, onClose }: Bu
               <button
                 type="submit"
                 className="preprocess-btn preprocess-btn-primary"
-                disabled={!description.trim() || status === 'sending'}
+                disabled={!description.trim()}
               >
-                {status === 'sending' ? strings.sending : strings.send}
+                {strings.confirm}
               </button>
             </div>
           </form>
