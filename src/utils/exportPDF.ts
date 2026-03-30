@@ -78,11 +78,17 @@ function filterEncodableText(
     // 文字単位フィルタ
   }
   let result = ''
+  const skipped: string[] = []
   for (const ch of text) {
     try {
       font.encodeText(ch)
       result += ch
-    } catch { /* skip */ }
+    } catch {
+      skipped.push(ch)
+    }
+  }
+  if (skipped.length > 0) {
+    console.warn(`[exportPDF] ${skipped.length} chars not encodable: ${skipped.slice(0, 10).join('')}${skipped.length > 10 ? '...' : ''}`)
   }
   return result
 }
@@ -296,7 +302,7 @@ async function addPageToPdf(
 }
 
 function triggerDownload(pdfBytes: Uint8Array, fileName: string): void {
-  const blob = new Blob([pdfBytes.slice(0).buffer], { type: 'application/pdf' })
+  const blob = new Blob([pdfBytes.buffer as ArrayBuffer], { type: 'application/pdf' })
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url

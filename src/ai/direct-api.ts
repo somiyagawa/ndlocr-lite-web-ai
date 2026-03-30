@@ -16,7 +16,8 @@ export function createDirectApiConnector(
 
   return {
     async proofread(ocrText: string, imageBase64: string): Promise<ProofreadResult> {
-      const correctedText = await callProvider(config, prompt, ocrText, imageBase64)
+      const rawText = await callProvider(config, prompt, ocrText, imageBase64)
+      const correctedText = stripAIArtifacts(rawText)
       return { correctedText, changes: [] }
     },
 
@@ -29,6 +30,36 @@ export function createDirectApiConnector(
       }
     },
   }
+}
+
+/**
+ * AI応答からマークダウンコードブロック等のアーティファクトを除去する。
+ * Gemini 等はプロンプトで「修正後のテキストのみ出力」と指示しても
+ * ```text ... ``` で囲ったり説明文を付加したりすることがある。
+ */
+function stripAIArtifacts(text: string): string {
+  let s = text.trim()
+
+  // マークダウンコードブロックを除去: ```lang\n...\n```
+  const codeBlockRe = /^```[\w]*\n([\s\S]*?)\n```$/
+  const m = s.match(codeBlockRe)
+  if (m) {
+    s = m[1].trim()
+  }
+
+  // 先頭に「修正後:」「以下が修正テキストです」等の説明行がある場合を除去
+  // （日本語・英語の典型パターン）
+  const prefixPatterns = [
+    /^(?:修正後(?:のテキスト)?[:：]\s*\n)/,
+    /^(?:以下が修正(?:後の)?テキストです[:：]?\s*\n)/,
+    /^(?:Here is the corrected text[:：]?\s*\n)/i,
+    /^(?:Corrected text[:：]?\s*\n)/i,
+  ]
+  for (const pat of prefixPatterns) {
+    s = s.replace(pat, '')
+  }
+
+  return s.trim()
 }
 
 /** タイムアウト付き fetch */

@@ -1653,7 +1653,9 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   max-width: 560px;
   width: 90%;
   max-height: 80vh;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   box-shadow: var(--shadow-lg), 0 0 40px rgba(0, 0, 0, 0.15);
   display: flex;
   flex-direction: column;
@@ -1687,7 +1689,7 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
 .panel-footer {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 0.75rem;
   padding: 0.75rem 1.5rem;
   border-top: 1px solid var(--color-border);
@@ -2120,24 +2122,9 @@ button:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 
   width: 260px;
 }
 
-/* ===== HISTORY ===== */
+/* ===== HISTORY (legacy, unused — primary styles are in .history-panel above) ===== */
 .history-section {
   padding: 1.5rem;
-}
-
-.history-item {
-  padding: 1rem;
-  background: var(--color-border-light);
-  border-radius: var(--radius);
-  margin-bottom: 0.75rem;
-  border-left: 3px solid var(--color-primary);
-  transition: all var(--transition);
-}
-
-.history-item:hover {
-  background: var(--color-primary-light);
-  transform: translateX(4px);
-  box-shadow: var(--shadow-sm);
 }
 
 .history-item-title {
